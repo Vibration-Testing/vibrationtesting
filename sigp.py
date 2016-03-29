@@ -50,11 +50,12 @@ import pylab as pl
 # ------
 #
 # In order to be consistent with the Control Systems Library, increasing time
-# or increasing frequency steps positively with increased column number. Rows
+# or increasing frequency steps positively with increased column number (second dimension). Rows (first dimension)
 # correspond to appropriate degress of freedom, output numbers, etc. The
 # third dimension indexes each data instance (experiment).
 #
-# In order to be consistent with scipy and matlab, increaseing time or frequency
+# Awesome: I don't know which standard the package is following now!
+# In order to be consistent with scipy and matlab, increasing time or frequency indices
 # increases in the 0th dimension (0,1,2). The first dimension is the index.
 # The second dimension is the realization number (for multiple runs/simulations/datasets).
 #
@@ -83,7 +84,7 @@ def hanning(x):
     :Example:
 
     >>> import numpy as np
-    >>> import vttools as vt
+    >>> import vibrationtesting as vt
     >>> import matplotlib.pyplot as plt
     >>> sample_freq = 1e3
     >>> tfinal = 5
@@ -124,13 +125,13 @@ def hanning(x):
     """
     
     if isinstance(x,(list, tuple, np.ndarray)):
-        # Create hanning windowing matrix of dimension N by n by nr
+        # Create hanning windowing matrix of dimension n by N by nr
         # where N is number of data points and n is the number of number of inputs or outputs.
         # and nr is the number of records.
-        n=x.shape[0]
-        f=hanning(n)
+        N=x.shape[1]
+        f=hanning(N)
         if len(x.shape)==3:
-            _, f, _=np.meshgrid(np.arange(x.shape[1]),f,np.arange(x.shape[2]))
+            _, f, _=np.meshgrid(np.arange(x.shape[0]),f,np.arange(x.shape[2]))
         elif len(x.shape)==2:
             #f,_=np.meshgrid(f[0,:],np.arange(x.shape[0]))
             _, f = np.meshgrid(np.arange(x.shape[1]),f)
@@ -138,11 +139,12 @@ def hanning(x):
             f=f
         
     else:
-        
+        #print(x)
         # Create hanning window of length x
-        n = x
-        f = np.sin(np.pi * np.arange(n)/(n-1))**2 * np.sqrt(8/3)
-        f = f/np.linalg.norm(f) * np.sqrt(n)
+        N = x
+        print(N)
+        f = np.sin(np.pi * np.arange(N)/(N-1))**2 * np.sqrt(8/3)
+        f = f/np.linalg.norm(f) * np.sqrt(N)
     return f
 
 
@@ -289,7 +291,7 @@ def asd(x,t,window="hanning",ave=bool(True)):
     >>> from scipy import signal
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
-    >>> import vttools as vt
+    >>> import vibrationtesting as vt
     >>> from numpy import linalg
 
     Generate a 5 second test signal, a 10 V sine wave at 50 Hz, corrupted by
@@ -351,7 +353,7 @@ def crsd(x,y,t,window="hanning",ave=bool(True)):
     >>> from scipy import signal
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
-    >>> import vttools as vt
+    >>> import vibrationtesting as vt
     >>> from numpy import linalg
 
     Generate a 5 second test signal, a 10 V sine wave at 50 Hz, corrupted by
@@ -438,6 +440,8 @@ def crsd(x,y,t,window="hanning",ave=bool(True)):
     else:
         win=1
         if window=="hanning":#BLACKWIN, BOXWIN, EXPWIN, HAMMWIN, FLATWIN and TRIWIN
+            #print('shape of x')
+            #print(x.shape)
             win=hanning(x)
         elif window=="blackwin":
             win=blackwin(x)
@@ -473,7 +477,7 @@ def crsd(x,y,t,window="hanning",ave=bool(True)):
    
     return f, Pxy
 
-def frfest(x,f,dt,window="hanning",ave=bool(True),Hv=bool(False)):#,n,options)
+def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):#,n,options)
     """returns freq, H1, H2, coh, Hv
     
     Estimates the :math:`H(j\\omega)` Frequency Response Functions (FRFs) between :math:`x` and :math:`f`.
@@ -511,7 +515,7 @@ def frfest(x,f,dt,window="hanning",ave=bool(True),Hv=bool(False)):#,n,options)
         
     >>> import control as ctrl
     >>> import matplotlib.pyplot as plt
-    >>> import vttools as vt
+    >>> import vibrationtesting as vt
     >>> import numpy as np
     >>> sample_freq = 1e3
     >>> noise_power = 0.001 * sample_freq / 2
@@ -600,8 +604,11 @@ def frfest(x,f,dt,window="hanning",ave=bool(True),Hv=bool(False)):#,n,options)
 
             
     # Note: Two different ways to ignore returned values shown
-    Pff=asd(f,dt)[1]
-    freq,Pxf=crsd(x,f,dt)
+    Pff = asd(f,dt)[1]
+    print('works until here?')
+    print(x.shape)
+    print(f.shape)
+    freq, Pxf = crsd(x, f, dt)
     _,Pxx=asd(x,dt)
 
     Txf1=np.conj(Pxf/Pff)  # Note Pfx=conj(Pxf) is applied in the H1 FRF estimation
@@ -1084,7 +1091,7 @@ def  frfplt(freq,H,freq_min=0,freq_max=0,FLAG=1):
     
 if __name__ == "__main__":
     import doctest
-    #import vttools as vt
+    #import vibrationtesting as vt
     #doctest.testmod(optionflags=doctest.ELLIPSIS)
     doctest.run_docstring_examples(frfest,globals(),optionflags=doctest.ELLIPSIS)
     #doctest.run_docstring_examples(asd,globals(),optionflags=doctest.ELLIPSIS)
