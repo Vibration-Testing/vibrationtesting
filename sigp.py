@@ -13,6 +13,8 @@ import warnings
 import numpy as np
 from numpy import ma
 import scipy as sp
+import scipy.signal as sig
+import scipy.fftpack as fftpack
 from numpy import linalg as la 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -61,23 +63,20 @@ import pylab as pl
 #
 
 
-
-
-
-
-def hanning(x):
+def window(x, windowname = 'hanning', normalize = False):
     """returns w
-    Create a hanning window of length :math:`x`, or a hanning window sized to match :math:`x`
+    Create a  window of length :math:`x`, or a hanning window sized to match :math:`x`
     such that x*w is the windowed result.
     
     Parameters
  
-    x: 1) Integer. Number of points in desired hanning windows.
-       2) Array to which window needs to be applied. 
+    x:                 1) Integer. Number of points in desired hanning windows.
+                       2) Array to which window needs to be applied. 
+    windowname:        One of: hanning, hamming, blackman, flatwin, boxwin
+    normalize (False): Adjust power level (for use in ASD) to 1
 
     Returns
  
-
     w: 1) hanning window array of size x
        2) windowing array. Windowed array is then x*w
 
@@ -125,26 +124,181 @@ def hanning(x):
     """
     
     if isinstance(x,(list, tuple, np.ndarray)):
-        # Create hanning windowing matrix of dimension n by N by nr
+        # Create Hanning windowing array of dimension n by N by nr
         # where N is number of data points and n is the number of number of inputs or outputs.
         # and nr is the number of records.
-        N=x.shape[1]
-        f=hanning(N)
-        if len(x.shape)==3:
-            _, f, _=np.meshgrid(np.arange(x.shape[0]),f,np.arange(x.shape[2]))
+        
+        swap = 0
+        if len(x.shape) == 1:
+            # We have either a scalar or 1D array
+            if x.shape[0] == 1:
+                print(" x is a scalar... and shouldn\'t have entered this part of the loop.")
+            else:
+                N = len(x)
+            
+            f = self.window(N , windowname = windowname)
+            
+        elif len(x.shape)==3:
+            
+            if x.shape[0]>x.shape[1]:
+                x = sp.swapaxes(x,0,1)
+                swap = 1
+                print('Swapping axes temporarily to be compliant with expectations. I\'ll fix them in your result')
+
+            f=window(N , windowname = windowname)
+            f,_, _=np.meshgrid(f, np.arange(x.shape[0]),np.arange(x.shape[2]))
+            if swap == 1:
+                f = sp.swapaxes(f,0,1)
+            
         elif len(x.shape)==2:
             #f,_=np.meshgrid(f[0,:],np.arange(x.shape[0]))
-            _, f = np.meshgrid(np.arange(x.shape[1]),f)
-        else:
-            f=f
-        
+            #print('b')
+
+            if x.shape[0]>x.shape[1]:
+                x = sp.swapaxes(x,0,1)
+                swap = 1
+                print('Swapping axes temporarily to be compliant with expectations. I\'ll fix them in your result')
+
+            f = window(x.shape[1] , windowname = windowname)
+            f, _ = np.meshgrid(f, np.arange(x.shape[0]))
+            if swap == 1:
+                f = sp.swapaxes(f,0,1)
+            
     else:
         #print(x)
         # Create hanning window of length x
         N = x
-        print(N)
+        #print(N)
+        if windowname is 'hanning':
+            f = np.sin(np.pi * np.arange(N)/(N-1))**2 * np.sqrt(8/3)
+        elif windowname is 'hamming':
+            f=(0.54-0.46*np.cos(2*np.pi*(np.arange(N))/(N-1)))*np.sqrt(5000/1987)
+        elif windowname is 'blackman':
+            print('blackman')
+            f=(0.42-0.5*np.cos(2*np.pi*(np.arange(N)+.5)/(N))+.08*np.cos(4*np.pi*(np.arange(N)+.5)/(N)))*np.sqrt(5000/1523)
+        elif windowname is 'flatwin':
+            f=1.0-1.933*np.cos(2*np.pi*(np.arange(N))/(N-1))+1.286*np.cos(4*np.pi*(np.arange(N))/(N-1))-0.338*np.cos(6*np.pi*(np.arange(N))/(N-1))+0.032*np.cos(8*np.pi*(np.arange(N))/(N-1))
+        elif windowname is 'boxwin':
+            f=np.ones((1,N))
+        else:
+            f = np.ones((1,N))
+            print("I don't recognize that window name. Sorry")
+            
+        if normalize is True:
+            f = f/np.linalg.norm(f) * np.sqrt(N)
+    return f
+
+
+def hanning(x, normalize = False):
+    """returns w
+    Create a hanning window of length :math:`x`, or a hanning window sized to match :math:`x`
+    such that x*w is the windowed result.
+    
+    Parameters
+ 
+    x:                 1) Integer. Number of points in desired hanning windows.
+                       2) Array to which window needs to be applied. 
+    normalize (False): Adjust power level (for use in ASD) to 1
+
+    Returns
+ 
+    w: 1) hanning window array of size x
+       2) windowing array. Windowed array is then x*w
+
+    :Example:
+
+    >>> import numpy as np
+    >>> import vibrationtesting as vt
+    >>> import matplotlib.pyplot as plt
+    >>> sample_freq = 1e3
+    >>> tfinal = 5
+    >>> fs = 100
+    >>> A = 10
+    >>> freq = 5
+    >>> noise_power = 0.001 * sample_freq / 2
+    >>> time = np.reshape(np.arange(0, tfinal, 1/sample_freq),(1,-1))
+    >>> xsin = A*np.sin(2*np.pi*freq*time)
+    >>> xcos = A*np.cos(2*np.pi*freq*time)
+    # assembling individual records. vstack assembles channels
+    >>> x=np.dstack((xsin,xcos)) # assembling individual records. vstack
+    >>> xw=vt.hanning(x)*x
+    >>> plt.subplot(2, 1, 1)
+    <matplotlib.axes._subplots.AxesSubplot object at ...>
+    >>> plt.plot(time.T,x.T)
+    [<matplotlib.lines.Line2D object at ...>]
+    >>> plt.ylim([-20, 20])
+    (-20, 20)
+    >>> plt.title('Unwindowed data, 2 records.')
+    <matplotlib.text.Text object at ...>
+    >>> plt.ylabel('$x(t)$')
+    <matplotlib.text.Text object at ...>
+    >>> plt.subplot(2, 1, 2)
+    <matplotlib.axes._subplots.AxesSubplot object at ...>
+    >>> plt.title('Original (raw) data.')
+    <matplotlib.text.Text object at ...>
+    >>> plt.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,'--',time[0,:],-vt.hanning(x)[0,:]*A,'--')
+    [<matplotlib.lines.Line2D object at ...>]
+    >>> plt.ylabel('Hanning windowed $x(t)$')
+    <matplotlib.text.Text object at ...>
+    >>> plt.xlabel('time')
+    <matplotlib.text.Text object at ...>
+    >>> plt.title('Effect of window. Note the scaling to conserve ASD amplitude')
+    <matplotlib.text.Text object at ...>
+    >>> plt.show()
+    
+    """
+    
+    if isinstance(x,(list, tuple, np.ndarray)):
+        # Create Hanning windowing array of dimension n by N by nr
+        # where N is number of data points and n is the number of number of inputs or outputs.
+        # and nr is the number of records.
+        print(len(x.shape))
+        swap = 0
+        if len(x.shape) == 1:
+            # We have either a scalar or 1D array
+            if x.shape[0] == 1:
+                print(" x is a scalar... and shouldn\'t have entered this part of the loop.")
+            else:
+                N = len(x)
+            f = hanning(N)
+            
+        elif len(x.shape)==3:
+            #print('a')
+            #print(f.shape)
+            
+            if x.shape[0]>x.shape[1]:
+                x = sp.swapaxes(x,0,1)
+                swap = 1
+                print('Swapping axes temporarily to be compliant with expectations. I\'ll fix them in your result')
+
+            f=hanning(x.shape[1])
+            f,_, _=np.meshgrid(f, np.arange(x.shape[0]),np.arange(x.shape[2]))
+            if swap == 1:
+                f = sp.swapaxes(f,0,1)
+            
+        elif len(x.shape)==2:
+            #f,_=np.meshgrid(f[0,:],np.arange(x.shape[0]))
+            #print('b')
+            print('length = 2')
+            print(x.shape)
+            if x.shape[0]>x.shape[1]:
+                x = sp.swapaxes(x,0,1)
+                swap = 1
+                print('Swapping axes temporarily to be compliant with expectations. I\'ll fix them in your result')
+
+            f=hanning(x.shape[1])
+            f, _ = np.meshgrid(f, np.arange(x.shape[0]))
+            if swap == 1:
+                f = sp.swapaxes(f,0,1)
+            
+    else:
+        #print(x)
+        # Create hanning window of length x
+        N = x
+        #print(N)
         f = np.sin(np.pi * np.arange(N)/(N-1))**2 * np.sqrt(8/3)
-        f = f/np.linalg.norm(f) * np.sqrt(N)
+        if normalize is True:
+            f = f/np.linalg.norm(f) * np.sqrt(N)
     return f
 
 
@@ -156,7 +310,7 @@ def blackwin(x):
     Returns x as the Blackman windowing array x_window
     The windowed signal is then x*x_window
     """
-    disp('blackwin is untested')
+    print('blackwin is untested')
     if isinstance(x,(list, tuple, np.ndarray)):
         n=x.shape[1]
         f=blackwin(n)
@@ -407,37 +561,42 @@ def crsd(x,y,t,window="hanning",ave=bool(True)):
         dt=t[2]-t[1]
     elif t.shape[1]>1:
         dt=t[2]-t[1]
-        disp('t must be a scalar or size (n,1)')
+        print('t must be a scalar or size (n,1)')
     elif t.shape[1]==1 and t.shape[0]==1:
         dt=t[0]
-    
+    if dt <= 0:
+        print('You sent in bad data. Delta t is negative. Please check your inputs.')
 
-    #if len(x.shape)==1:
-    #    x=np.reshape(x,(1,-1))
-    n=x.shape[0];
+    if len(x.shape)==1:
+        x = np.expand_dims(x, axis = 0)
+        x = sp.expand_dims(x, axis = 2)
+        y = sp.expand_dims(y, axis = 0)
+        y = sp.expand_dims(y, axis = 2)
+    n=x.shape[1];
 
     # No clue what this does, and I wrote it. Comment your code, you fool!
     # What this "should" do is assure that the data is longer in 0 axis than the others. 
-    if len(x.shape)==2:
-        # The issue fixed here is that the user put time along the 1 axis (instead of zero)
-        if (x.shape).index(max(x.shape))==1:
-            x=x.reshape(max(x.shape),-1,1)
-            print('I think you put time along the 1 axis instead of the 0 axis. Attempting to fix this.')
-        else:
-            # Here we are appending a 3rd dimension to simplify averaging command later. We could bypass at that point, and should. 
-            x=x.reshape(max(x.shape),-1,1)
+    # if len(x.shape)==2:
+    #     # The issue fixed here is that the user put time along the 1 axis (instead of zero)
+    #     if (x.shape).index(max(x.shape))==0:
+    #         #x=x.reshape(max(x.shape),-1,1)
+    #         print('I think you put time along the 0 axis instead of the 1 axis. Not even attempting to fix this.')
+    #     else:
+    #         # Here we are appending a 3rd dimension to simplify averaging command later. We could bypass at that point, and should. 
+    #         x=x.reshape(max(x.shape),-1,1)
 
-    if len(y.shape)==2:
-        if (y.shape).indey(may(y.shape))==1:
-            y=y.reshape(may(y.shape),-1,1)
-            print('I think you put time along the 1 axis instead of the 0 axis. Attempting to fix this.')            
-        else:
-            y=y.reshape(may(y.shape),-1,1)
-    # Should use scipy.signal windows. I need to figure this out. Problem is: They don't scale the ASDs by the windowing "weakening". 
+    # if len(y.shape)==2:
+    #     if (y.shape).indey(may(y.shape))==0:
+    #         #y=y.reshape(may(y.shape),-1,1)
+    #         print('I think you put time along the 0 axis instead of the 1 axis. Not attempting to fix this.')            
+    #     else:
+    #         y=y.reshape(may(y.shape),-1,1)
+    # # Should use scipy.signal windows. I need to figure this out. Problem is: They don't scale the ASDs by the windowing "weakening". 
     
     if window=="none":
         a=1
     else:
+        print('This doesn\'t work yet')
         win=1
         if window=="hanning":#BLACKWIN, BOXWIN, EXPWIN, HAMMWIN, FLATWIN and TRIWIN
             #print('shape of x')
@@ -461,9 +620,9 @@ def crsd(x,y,t,window="hanning",ave=bool(True)):
         del win
 
     print('current editing location')
-    ffty=np.fft.rfft(y,n,0)*dt
+    ffty=np.fft.rfft(y,axis = 1)*dt
 
-    fftx=np.fft.rfft(x,n,0)*dt
+    fftx=np.fft.rfft(x,n,axis = 1)*dt
 
     Pxy=np.conj(fftx)*ffty/(n*dt)*2
 
@@ -473,7 +632,8 @@ def crsd(x,y,t,window="hanning",ave=bool(True)):
         #Pxy=np.reshape(Pxy,(-1,n,1))#<----------------------------------------------
     
     nfreq=1/dt/2;
-    f=np.linspace(0, nfreq, Pxy.shape[0])
+    f=np.linspace(0, nfreq, Pxy.shape[1])
+    
    
     return f, Pxy
 
@@ -1086,8 +1246,120 @@ def  frfplt(freq,H,freq_min=0,freq_max=0,FLAG=1):
      ##  set(gca,'YTick',gridmin_max(1):90:gridmin_max(2))
      ##  zoom on
     
+def xcorr(t, x, y, zeropad = True):
 
+    tau = t
+    sx = len(x)
+    sy = len(y)
+    if zeropad == True:
+        Xn = sp.fft(x, n = len(x)*2)
+        Yn = sp.conj(sp.fft(y, n = len(x)*2))
+    else:
+        Xn = sp.fft(x)
+        Yn = sp.conj(sp.fft(y))
 
+    xcor = sp.real(fftpack.fftshift(sp.ifft(Xn*Yn)))
+    dt = t[1]-t[0]
+    
+    tau = sp.linspace(-len(xcor)/2*dt-dt/2,len(xcor)/2*dt-dt/2,len(xcor))
+    return tau, xcor
+
+    
+'''
+    function [tout,crcorout]=crcor(x,y,dt,type,ave)
+%CRCOR Cross correlation.
+% [Tau,COR]=CRCOR(X,Y,DT,TYPE,AVE) returns the Cross Correlation 
+% between signals X and Y.
+% [Tau,COR]=CRCOR(X,X,DT,TYPE,AVE) returns the Auto Correlation 
+% of the signal X.
+% DT is the time between samples.
+% If DT is the time vector, DT is extracted as T(2)-T(1).
+% TYPE is the type of correlation. TYPE = 1 causes CRCOR
+% to return the linear correlation function. TYPE = 2
+% causes CRCOR to return the circular correlation function.
+% The default value is 1.
+% If X and Y are matrices, averaging will be performed on the
+% Correlations unless AVE is set to 'noave'. TYPE and AVE are 
+% optional. Either can be left out.
+%
+% COH(X,Y,DT,N,AVE) plots the Correlation if there are no ouput 
+% arguments. Click in the region of interest to zoom in. 
+% Each click will double the size of the plot. Double click 
+% to return to full scale.
+%
+% See also TFEST, ASD, COH, CRSD, and TFPLOT.
+
+%	Copyright (c) 1994 by Joseph C. Slater
+sy=size(y);
+sy=size(y);
+if nargin==3
+  type=1;
+  ave='yes';
+ elseif nargin==4
+  if strcmp(type,'noave')
+   ave=n;
+   type=1;
+  else
+   ave='yes';
+  end
+end
+
+if isempty(type)
+  type=1;
+end
+
+sx=size(x);
+nc=sx(2);
+
+if type==1
+  n=sx(1)*2;
+ else
+  n=sx(1);
+end
+
+if length(dt)~=1
+ dt=dt(2)-dt(1);
+end
+
+tmax=dt*(length(x)-1);
+t=(-tmax:(2*tmax/(n-1)):tmax)'-(tmax/(n-1));
+
+X=fft(x,n);
+Y=fft(y,n);
+pxy=real(ifft(conj(X).*Y));
+
+crcr=fftshift(real(pxy));
+crcr=crcr(1:length(crcr),:);
+
+if nc~=1 & ~strcmp(ave,'noave')
+ crcr=mean(crcr')';
+end
+
+if nargout==0
+ plot(t,crcr)
+ %logo
+ if type==1
+   text1='Linear ';
+  else
+   text1='Circular ';
+ end
+ if x==y
+   text2='Auto ';
+  else
+   text2='Cross ';
+ end
+ text3=[text1 text2 'Correlation'];
+ title(text3)
+ xlabel('Time')
+ ylabel(text3)
+ grid
+ zoom on
+ return
+end
+
+crcorout=crcr;
+tout=t;
+'''
     
 if __name__ == "__main__":
     import doctest
