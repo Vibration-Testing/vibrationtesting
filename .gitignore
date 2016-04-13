@@ -29,7 +29,7 @@ _build*
 latex*
 html*
 *~
-#*.html
+*.html
 
 # Mac
 aquamacs
