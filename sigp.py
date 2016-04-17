@@ -491,7 +491,7 @@ def asd(x,t,windowname ="hanning",ave=bool(True)):
     peak, we can recover the noise power on the signal.
 
     """
-    f, Pxx=crsd(x,x,t,windowname = windowname,ave)
+    f, Pxx = crsd(x,x,t,windowname = windowname,ave = ave)
     Pxx=Pxx.real
     return f, Pxx
 
