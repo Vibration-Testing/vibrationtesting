@@ -436,7 +436,7 @@ def boxwin(x):
 def hannwin(x):
     f=hanning(x)
     return f
-def asd(x,t,window="hanning",ave=bool(True)):
+def asd(x,t,windowname ="hanning",ave=bool(True)):
     """
     Calculate the autospectrum (power spectrum) density of a signal x
 
@@ -490,11 +490,8 @@ def asd(x,t,window="hanning",ave=bool(True)):
     If we average the last half of the spectral density, to exclude the
     peak, we can recover the noise power on the signal.
 
-
-    Now compute and plot the power spectrum.
-
     """
-    f, Pxx=crsd(x,x,t,window,ave)
+    f, Pxx=crsd(x,x,t,windowname = windowname,ave)
     Pxx=Pxx.real
     return f, Pxx
 
