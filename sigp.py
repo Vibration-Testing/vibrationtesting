@@ -498,7 +498,7 @@ def asd(x,t,window="hanning",ave=bool(True)):
     Pxx=Pxx.real
     return f, Pxx
 
-def crsd(x,y,t,window="hanning",ave=bool(True)):
+def crsd(x, y, t, windowname = "hanning", ave = bool(True)):
     """
     Calculate the cross spectrum (power spectrum) density between two signals.
 
@@ -568,7 +568,7 @@ def crsd(x,y,t,window="hanning",ave=bool(True)):
         print('You sent in bad data. Delta t is negative. Please check your inputs.')
 
     if len(x.shape)==1:
-        x = np.expand_dims(x, axis = 0)
+        x = sp.expand_dims(x, axis = 0)
         x = sp.expand_dims(x, axis = 2)
         y = sp.expand_dims(y, axis = 0)
         y = sp.expand_dims(y, axis = 2)
@@ -601,25 +601,25 @@ def crsd(x,y,t,window="hanning",ave=bool(True)):
         if window=="hanning":#BLACKWIN, BOXWIN, EXPWIN, HAMMWIN, FLATWIN and TRIWIN
             #print('shape of x')
             #print(x.shape)
-            win=hanning(x)
+            win=window(x, windowname = 'hanning')
         elif window=="blackwin":
-            win=blackwin(x)
+            win=window(x, windowname = 'blackwin')
         elif window=="boxwin":
-            win=boxwin(x)
+            win=window(x, windowname = 'boxwin')
         elif window=="expwin":
-            win=expwin(x)
+            win=window(x, windowname = 'expwin')
         elif window=="hammwin":
-            win=hamming(x)
+            win=window(x, windowname = 'hamming')
         elif window=="triwin":
-            win=triwin(x)
+            win=window(x, windowname = 'triwin')
         elif window=="flatwin":
-            win=flatwin(x)
+            win=window(x, windowname = 'flatwin')
         
         y=y*win
         x=x*win
         del win
 
-    print('current editing location')
+    
     ffty=np.fft.rfft(y,axis = 1)*dt
 
     fftx=np.fft.rfft(x,n,axis = 1)*dt
@@ -629,7 +629,7 @@ def crsd(x,y,t,window="hanning",ave=bool(True)):
     
     if len(Pxy.shape)==3 and Pxy.shape[2]>1 and ave:
         Pxy=np.mean(Pxy,2)
-        #Pxy=np.reshape(Pxy,(-1,n,1))#<----------------------------------------------
+        
     
     nfreq=1/dt/2;
     f=np.linspace(0, nfreq, Pxy.shape[1])
