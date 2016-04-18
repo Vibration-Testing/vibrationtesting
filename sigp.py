@@ -593,7 +593,7 @@ def crsd(x, y, t, windowname = "hanning", ave = bool(True)):
     if window=="none":
         a=1
     else:
-        print('This doesn\'t work yet')
+        #print('This doesn\'t work yet')
         win=1
         if window=="hanning":#BLACKWIN, BOXWIN, EXPWIN, HAMMWIN, FLATWIN and TRIWIN
             #print('shape of x')
@@ -629,7 +629,7 @@ def crsd(x, y, t, windowname = "hanning", ave = bool(True)):
         
     
     nfreq=1/dt/2;
-    f=np.linspace(0, nfreq, Pxy.shape[1])
+    f=np.linspace(0, nfreq, Pxy.shape[1])#/2./sp.pi
     
    
     return f, Pxy
