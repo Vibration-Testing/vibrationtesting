@@ -1392,6 +1392,55 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
             H[i] = (C@la.solve(w*1j*sp.eye(sa)-A,B)+D)[out_index,in_index]
         return omega, H
 
+
+def so2ss(M, C, K, Bt, Cd, Cv, Ca):
+    """returns A, B, C, D
+    Given second order linear matrix equation of the form 
+    :math:`M\\ddot{x} + C \\dot{x} + K x= Bt u`
+    and
+    :math:`y = Cd x + + Cv \\dot{x} + Ca\\ddot{x}`
+    returns the state space form equations
+    :math:`\\dot{z} = A z + B u`
+    :math:`y = C z + D u`
+    """
+
+    
+    A = sp.vstack((sp.hstack((sp.eye(2)*0,sp.eye(2))),sp.hstack((-la.solve(M,K),-la.solve(M,C)))))
+    B = sp.vstack((sp.zeros((Bt.shape[0],1)),Bt))
+    C_ss = sp.hstack((-C_a@la.solve(M,K),-C_a@la.solve(M,C)))
+    D = C_a@la.solve(M,Bt)
+
+    return A, B, C_ss, D
+
+
+def damp(A):
+
+
+    # Original Author: Kai P. Mueller <mueller@ifr.ing.tu-bs.de> for Octave
+    # Created: September 29, 1997.
+
+    print("............... Eigenvalue ...........     Damping     Frequency")
+    print("--------[re]---------[im]--------[abs]----------------------[Hz]")
+    e, _ = la.eig(A)
+
+    for i in range(len(e)):
+        pole = e[i];
+
+        
+        d0 = -sp.cos(math.atan2(sp.imag(pole), sp.real(pole)));
+        f0 = 0.5 / sp.pi * abs(pole);
+        if (abs(sp.imag(pole)) < abs(sp.real(pole))):
+            print('      {:.3f}                    {:.3f}       {:.3f}         {:.3f}'.
+                  format(float(sp.real(pole)), float(abs(pole)), float(d0), float(f0)));
+
+        else:
+            print('      {:.3f}        {:+.3f}      {:.3f}       {:.3f}         {:.3f}'.
+                  format(float(sp.real(pole)), float(sp.imag(pole)),
+                         float(abs(pole)), float(d0), float(f0)));
+    
+  
+    
+
 if __name__ == "__main__":
     import doctest
     #import vibrationtesting as vt
