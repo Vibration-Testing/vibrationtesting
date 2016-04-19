@@ -11,11 +11,12 @@ import math
 import warnings
 
 import numpy as np
+import control as ctrl
 from numpy import ma
 import scipy as sp
 import scipy.signal as sig
 import scipy.fftpack as fftpack
-from numpy import linalg as la 
+import scipy.linalg  as la 
 import matplotlib
 import matplotlib.pyplot as plt
 rcParams = matplotlib.rcParams
@@ -1357,7 +1358,25 @@ end
 crcorout=crcr;
 tout=t;
 '''
-    
+
+
+def d2c(Ad, Bd, C, D, dt):
+    """returns A, B, C, D
+    Converts a set of digital state space system matrices to their continuous counterpart.
+    """
+    A = la.logm(Ad)/dt
+    B = la.solve((Ad - sp.eye(A.shape[0])), A) @ Bd
+    return A, B, C, D
+
+def c2d(A, B, C, D, dt):
+    """returns Ad, Bd, C, D
+    Converts a set of digital state space system matrices to their continuous counterpart.
+    """
+
+    Ad = la.expm(A * dt)
+    Bd = la.solve(A,(Ad - sp.eye(A.shape[0]))) @ B  
+    return Ad, Bd, C, D
+
 if __name__ == "__main__":
     import doctest
     #import vibrationtesting as vt
