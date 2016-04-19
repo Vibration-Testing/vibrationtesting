@@ -1377,6 +1377,21 @@ def c2d(A, B, C, D, dt):
     Bd = la.solve(A,(Ad - sp.eye(A.shape[0]))) @ B  
     return Ad, Bd, C, D
 
+def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
+        """returns omega, H
+        obtains the computed FRF of a state space system between selected input
+        and output over frequency range of interest. 
+        """
+        #A, B, C, D = ctrl.ssdata(sys)
+        sa = A.shape[0]
+        omega = sp.linspace(omega_low, omega_high,1000)
+        H = omega* 1j
+        i = 0
+        for i in sp.arange(len(omega)):
+            w = omega[i]
+            H[i] = (C@la.solve(w*1j*sp.eye(sa)-A,B)+D)[out_index,in_index]
+        return omega, H
+
 if __name__ == "__main__":
     import doctest
     #import vibrationtesting as vt
