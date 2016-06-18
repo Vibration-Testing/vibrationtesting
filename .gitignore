@@ -19,6 +19,9 @@ lib/
 lib64/
 .ipynb_check*
 .ipynb*check*/*
+.#.*
+.ipynb_checkpoints/**
+.ipynb*
 parts/
 sdist/
 var/
