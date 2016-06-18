@@ -17,12 +17,18 @@ eggs/
 .eggs/
 lib/
 lib64/
+.ipynb_check*
+.ipynb*check*/*
 parts/
 sdist/
 var/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Misc
+pncr*
+Untitled*
 
 # Sphinx
 _build*
