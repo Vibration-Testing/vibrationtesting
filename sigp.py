@@ -1371,10 +1371,12 @@ def d2c(Ad, Bd, C, D, dt):
 def c2d(A, B, C, D, dt):
     """returns Ad, Bd, C, D
     Converts a set of digital state space system matrices to their continuous counterpart.
+    Simply calls scipy.signal.cont2discrete
     """
 
+    Ad, Bd, _, _, _ = sig.cont2discrete((A, B, C, D), dt)
     Ad = la.expm(A * dt)
-    Bd = la.solve(A,(Ad - sp.eye(A.shape[0]))) @ B  
+    Bd = la.solve(A,(Ad - sp.eye(A.shape[0]))) @ B
     return Ad, Bd, C, D
 
 def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
@@ -1407,8 +1409,8 @@ def so2ss(M, C, K, Bt, Cd, Cv, Ca):
     
     A = sp.vstack((sp.hstack((sp.eye(2)*0,sp.eye(2))),sp.hstack((-la.solve(M,K),-la.solve(M,C)))))
     B = sp.vstack((sp.zeros((Bt.shape[0],1)),Bt))
-    C_ss = sp.hstack((-C_a@la.solve(M,K),-C_a@la.solve(M,C)))
-    D = C_a@la.solve(M,Bt)
+    C_ss = sp.hstack((Cd-Ca@la.solve(M,K),Cv-Ca@la.solve(M,C)))
+    D = Ca@la.solve(M,Bt)
 
     return A, B, C_ss, D
 
