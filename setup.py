@@ -23,7 +23,7 @@ with open('vibrationtesting/__init__.py', 'rb') as fid:
             version = line.strip().split()[-1][1:-1]
             break
 
-download_url = ('https://github.com/josephcslater/vibrationtesting/\
+download_url = ('https://github.com/Vibration-Testing/vibrationtesting/\
                 blob/master/dist/vibrationtesting-' + version + '.whl')
 
 setup(name='vibrationtesting',
@@ -32,7 +32,7 @@ setup(name='vibrationtesting',
                    identification for vibrating systems'),
       author=u'Joseph C. Slater',
       author_email='joseph.c.slater@gmail.com',
-      url='https://github.com/josephcslater/vibrationtesting',
+      url='https://github.com/Vibration-Testing/vibrationtesting',
       packages=['vibrationtesting'],
       package_data={'vibrationtesting': ['../readme.rst', 'data/*.mat'],
                     '': ['readme.rst']},
