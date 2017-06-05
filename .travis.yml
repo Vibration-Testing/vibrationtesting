@@ -1,0 +1,20 @@
+language: python
+
+python:
+    - "3.5"
+    - "3.6"
+
+before_install:
+  - mkdir -p $HOME/.config/matplotlib
+
+install:
+  - pip install -r requirements.txt
+  - pip install .
+
+cache:
+  directories:
+    - $HOME/.cache/matplotlib
+
+script:
+  - pytest
+
