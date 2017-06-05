@@ -4,11 +4,11 @@
 
 
 .. .. include:: <isonum.txt>
-.. image:: https://badge.fury.io/py/vibration_toolbox.png/
-    :target: http://badge.fury.io/py/vibration_toolbox
+.. image:: https://badge.fury.io/py/vibrationtesting.png/
+    :target: http://badge.fury.io/py/vibrationtesting
 
-.. image:: https://travis-ci.org/vibrationtoolbox/vibration_toolbox.svg?branch=master
-    :target: https://travis-ci.org/vibrationtoolbox/vibration_toolbox
+.. image:: https://travis-ci.org/Vibration-Testing/vibrationtesting.svg?branch=master
+    :target: https://travis-ci.org/Vibration-Testing/vibrationtesting
 
 .. .. image:: https://img.shields.io/pypi/v/vibration_toolbox.svg
     :target: https://img.shields.io/pypi/v/vibration_toolbox
@@ -17,16 +17,16 @@
 ..  #:target: https://coveralls.io/r/vibrationtoolbox/vibration_toolbox
 
 
-Joseph C. Slater and Raphael Timbó
+Joseph C. Slater
 
-This is the software repository for the Vibration Toolbox, not the `online manual <http://vibrationtoolbox.github.io/vibration_toolbox/>`_.
+This is the software repository for the Vibration Toolbox, not the `online manual <http://Vibration-Testing.github.io/vibrationtesting/>`_.
 
-Welcome to `Engineering Vibration Toolbox <http://vibrationtoolbox.github.io/vibration_toolbox/>`_.
-Originally written for `Matlab <http://www.mathworks.com>`_\®, this `Python <http://python.org>`_ version is a completely new design build for modern education. This is an *educational* set of codes intended primarily for
-demonstration of concepts. You may find them useful for application, but that
-isn't the intent. If you have professional-level needs please `contact the authors <mailto:joseph.c.slater@gmail.com>`_.
+Welcome to `Vibration Testing <http://Vibration-Testing.github.io/vibrationtesting/>`_.
+Originally written for `Matlab <http://www.mathworks.com>`_\®, this `Python <http://python.org>`_ version is a completely new design build for modern applications. This is an *applied* set of codes intended primarily for
+researchers that accompanies the text by the author (unpublished). You may find them useful for application, but that
+isn't the intent.
 
-For more information, please see the `documentation for the Python version <http://vibrationtoolbox.github.io/vibration_toolbox/>`_ but please excuse that it is all still under development. Such documentation has never existed for the other ports of the toolbox so this is taking some time. We don't need feedback at this time, but we will take assistance in improving documentation and code. *Please* clone the repository and support use by submitting pull requests fixing typos and clarifying documentation.
+For more information, please see the `documentation for the Python version <http://Vibration-Testing.github.io/vibrationtesting/>`_ but please excuse that it is all still under development. Such documentation has never existed for the other ports of the toolbox so this is taking some time. We don't need feedback at this time, but we will take assistance in improving documentation and code. *Please* clone the repository and support use by submitting pull requests fixing typos and clarifying documentation.
 
 
 Installation
@@ -36,11 +36,11 @@ If you aren't familiar at all with Python, please see  `Installing Python <https
 
 Installation is made easy with ``pip`` (or ``pip3``), with releases as we have time while we try
 to create a full first release. Much of it works already, but we certainly need
-issue reports (on `github <http://github.com/vibrationtoolbox/vibration_toolbox>`_).
+issue reports (on `github <http://github.com/Vibration-Testing/vibrationtesting>`_).
 
-To install::
+To install (may not be available yet)::
 
-  pip install --user vibration_toolbox
+  pip install --user vibrationtesting
 
 where ``--user`` isn't necessary if you are using a locally installed version of Python such as `Anaconda <https://www.continuum.io/downloads>`_.
 
@@ -48,7 +48,7 @@ To run, I recommend you open a `Jupyter <https://jupyter.org>`_ notebook by usin
 
   import vibration_toolbox as vtb
 
-For examples, see the `JupyterNotebooks folder <https://github.com/vibrationtoolbox/vibration_toolbox/tree/master/docs/tutorial>`_. Some of these have interactive capabilities that are only apparent when you run them yourself instead of just looking at them on github. Unfortunately our organization of these still leaves a little to be desired.
+For examples, see the `JupyterNotebooks folder <https://github.com/Vibration-Testing/vibrationtesting/tree/master/JupyterNotebooks>`_. Some of these have interactive capabilities that are only apparent when you run them yourself instead of just looking at them on github. Unfortunately our organization of these still leaves a little to be desired.
 
 Installation of current code
 ____________________________
@@ -60,8 +60,8 @@ If you wish to install the current version of the software, download the newest 
 
 Then, type::
 
-  pip install --force-reinstall --upgrade --user dist/vibration_toolbox-0.5b9-py3-none-any.whl
+  pip install --force-reinstall --upgrade --user dist/vibrationtesting-0.5b9-py3-none-any.whl
 
 Where you see ``0.5.b9`` above, you will likely need to insert the correct version. We don't increment versions for each minor edit, so you may have to force upgrade.
 
-That should be it. Please note issues on the `issues tab <https://github.com/vibrationtoolbox/vibration_toolbox>`_ on github.
+That should be it. Please note issues on the `issues tab <https://github.com/Vibration-Testing/vibrationtesting/issues>`_ on github.
