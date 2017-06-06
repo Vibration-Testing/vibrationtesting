@@ -24,13 +24,13 @@ from docutils.utils import get_source_line
 
 # Find modules and their help for inclusion in documentation
 sys.path.insert(0, os.path.abspath('.'))
-sys.path.append('../vibration_toolbox')
+sys.path.append('../vibrationtesting')
 sys.path.append('../JupyterNotebooks')
 sys.path.append('..')
 
 
 # Avoid needin to update version here for release
-from vibration_toolbox import __version__, __title__, __author__, __license__,\
+from vibrationtesting import __version__, __title__, __author__, __license__,\
     __copyright__
 
 # print("license is", __version__)
@@ -81,9 +81,9 @@ numpydoc_use_plots = True
 
 
 # General information about the project.
-project = 'Vibration Toolbox'
-copyright = u'2017, Joseph C. Slater and Raphael Timbó'
-author = u'Joseph C. Slater and Raphael Timbó'
+project = 'Vibration Testing'
+copyright = u'2017, Joseph C. Slater'
+author = u'Joseph C. Slater'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -155,15 +155,15 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'VibrationToolboxdoc'
+htmlhelp_basename = 'VibrationTesting'
 
 html_theme_options = {
 #    'logo': 'js.jpg',
-    'logo_name': 'VTB',
-    'description': 'Vibration Education in a Modern Environment',
+    'logo_name': 'VTest',
+    'description': 'Vibration Testing Analysis',
     'github_button': 'True',
-    'github_user': 'vibrationtoolbox',
-    'analytics_id': 'UA-62100376-4',
+    'github_user': 'vibrationtesting',
+#    'analytics_id': 'UA-62100376-4',
 }
 
 
@@ -191,8 +191,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'VibrationToolbox.tex', 'Vibration Toolbox Documentation',
-     'Joseph C. Slater and Raphael Timbó', 'manual'),
+    (master_doc, 'VibrationTesting.tex', 'Vibration Testing Documentation',
+     'Joseph C. Slater', 'manual'),
 ]
 
 
@@ -201,7 +201,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'vibrationtoolbox', 'Vibration Toolbox Documentation',
+    (master_doc, 'vibrationtesting', 'Vibration Testing Documentation',
      [author], 1)
 ]
 
@@ -212,7 +212,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'VibrationToolbox', 'Vibration Toolbox Documentation',
-     author, 'VibrationToolbox', 'One line description of project.',
+    (master_doc, 'VibrationTesting', 'Vibration Testing Documentation',
+     author, 'VibrationTesting', 'One line description of project.',
      'Miscellaneous'),
 ]
