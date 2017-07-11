@@ -66,7 +66,7 @@ import pylab as pl
 # MIMO FRF calculation is an open question. Pretty printing of FRFs is always
 # a welcome tool.
 #
-# System ID is likely the remaining missing aspect at this time. 
+# System ID is likely the remaining missing aspect at this time.
 #
 #
 # In order to be consistent with the Control Systems Library, increasing time
@@ -87,6 +87,7 @@ def window(x, windowname='hanning', normalize=False):
     such that x*w is the windowed result.
 
     Parameters
+    ----------
 
     x:                 1) Integer. Number of points in desired hanning windows.
                        2) Array to which window needs to be applied.
@@ -94,6 +95,7 @@ def window(x, windowname='hanning', normalize=False):
     normalize (False): Adjust power level (for use in ASD) to 1
 
     Returns
+    -------
 
     w: 1) hanning window array of size x
        2) windowing array. Windowed array is then x*w
