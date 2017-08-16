@@ -21,64 +21,40 @@ import matplotlib
 import matplotlib.pyplot as plt
 rcParams = matplotlib.rcParams
 
-import matplotlib.cbook as cbook
-from matplotlib.cbook import _string_to_bool, mplDeprecation
-import matplotlib.collections as mcoll
-import matplotlib.colors as mcolors
-import matplotlib.contour as mcontour
-import matplotlib.dates as _  # <-registers a date unit converter
-from matplotlib import docstring
-import matplotlib.image as mimage
-import matplotlib.legend as mlegend
-import matplotlib.lines as mlines
-import matplotlib.markers as mmarkers
-import matplotlib.mlab as mlab
-import matplotlib.path as mpath
-import matplotlib.patches as mpatches
-import matplotlib.quiver as mquiver
-import matplotlib.stackplot as mstack
-import matplotlib.streamplot as mstream
-import matplotlib.table as mtable
-import matplotlib.text as mtext
-import matplotlib.ticker as mticker
-import matplotlib.transforms as mtransforms
-import matplotlib.tri as mtri
-import matplotlib.transforms as mtrans
-from matplotlib.container import BarContainer, ErrorbarContainer, StemContainer
-from matplotlib.axes._base import _AxesBase
-from matplotlib.axes._base import _process_plot_format
-import pylab as pl
 
-# Notes:
-# ------
-# Sept. 3, 2016
-# Development of windows in scipy.signal has been rapid and maintaining
-# determining what I should build into this toolbox, or simply leverage
-# from scipy.signal has been a moving target.
-# It's now apparent that creating or returning a window is pointless. Further,
-# Applying should be a relatively simple code obviating much of any need for the
-# code here.
-#
-# The cross spectrum analysis formerly lacking is now available, periodogram
-# is often the best option, however not with impulse excitations.
-#
-# FRF calculation is typically trivial, Hv being an expected gap long term
-# MIMO FRF calculation is an open question. Pretty printing of FRFs is always
-# a welcome tool.
-#
-# System ID is likely the remaining missing aspect at this time.
-#
-#
-# In order to be consistent with the Control Systems Library, increasing time
-# or increasing frequency steps positively with increased column number (second dimension). Rows (first dimension)
-# correspond to appropriate degress of freedom, output numbers, etc. The
-# third dimension indexes each data instance (experiment).
-#
-# Awesome: I don't know which standard the package is following now!
-# In order to be consistent with scipy and matlab, increasing time or frequency indices
-# increases in the 0th dimension (0,1,2). The first dimension is the index.
-# The second dimension is the realization number (for multiple runs/simulations/datasets).
-#
+"""Notes:
+------
+Sept. 3, 2016
+Development of windows in scipy.signal has been rapid and
+determining what I should build into this toolbox, or simply leverage
+from scipy.signal has been a moving target.
+It's now apparent that creating or returning a window is pointless. Further,
+Applying should be a relatively simple code obviating much of any need for the
+code here.
+
+The cross spectrum analysis formerly lacking is now available, periodogram
+is often the best option, however not with impulse excitations.
+
+FRF calculation is typically trivial, Hv being an expected gap long term
+MIMO FRF calculation is an open question. Pretty printing of FRFs is always
+a welcome tool.
+
+System ID is likely the remaining missing aspect at this time.
+
+In order to be consistent with the Control Systems Library, increasing time
+or increasing frequency steps positively with increased column number (second
+dimension). Rows (first dimension- 0 dimension)
+correspond to appropriate degress of freedom, output numbers, etc. The
+third dimension (2) indexes each data instance (experiment).
+
+http://python-control.readthedocs.io/en/latest/conventions.html#time-series-data
+
+Problem: This hasn't been fully implemented.
+I don't know which standard the package is following now!
+In order to be consistent with scipy and matlab, increasing time or frequency indices
+increases in the 0th dimension (0,1,2). The first dimension is the index.
+The second dimension is the realization number (for multiple runs/simulations/datasets).
+"""
 
 
 def window(x, windowname='hanning', normalize=False):
@@ -113,8 +89,7 @@ def window(x, windowname='hanning', normalize=False):
     >>> noise_power = 0.001 * sample_freq / 2
     >>> time = np.reshape(np.arange(0, tfinal, 1/sample_freq),(1,-1))
     >>> xsin = A*np.sin(2*np.pi*freq*time)
-    >>> xcos = A*np.cos(2*np.pi*freq*time)
-    # assembling individual records. vstack assembles channels
+    >>> xcos = A*np.cos(2*np.pi*freq*time) # assembling individual records. vstack assembles channels
     >>> x=np.dstack((xsin,xcos)) # assembling individual records. vstack
     >>> xw=vt.hanning(x)*x
     >>> plt.subplot(2, 1, 1)
@@ -246,7 +221,6 @@ def hanning(x, normalize=False):
     >>> time = np.reshape(np.arange(0, tfinal, 1/sample_freq),(1,-1))
     >>> xsin = A*np.sin(2*np.pi*freq*time)
     >>> xcos = A*np.cos(2*np.pi*freq*time)
-    # assembling individual records. vstack assembles channels
     >>> x=np.dstack((xsin,xcos)) # assembling individual records. vstack
     >>> xw=vt.hanning(x)*x
     >>> plt.subplot(2, 1, 1)
@@ -279,7 +253,7 @@ def hanning(x, normalize=False):
         # Create Hanning windowing array of dimension n by N by nr
         # where N is number of data points and n is the number of number of inputs or outputs.
         # and nr is the number of records.
-        print(len(x.shape))
+        #print(len(x.shape))
         swap = 0
         if len(x.shape) == 1:
             # We have either a scalar or 1D array
