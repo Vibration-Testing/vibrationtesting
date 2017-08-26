@@ -7,20 +7,33 @@ Contributing code
 -----------------
 To contribute code we recommend you follow these steps:
 
-1. Clone the repository (easier- use the `github app <https://desktop.github.com>`_):
+To contribute code we recommend you follow these steps:
 
-.. code-block:: bash
+#. Fork the repository on github
 
-    >> git clone https://github.com/Vibration-Testing/vibrationtesting.git
+#. Set up travis-ci for your branch. This is actually pretty quick and easy:
 
-2. Create a new branch and add your code. If a new function is added
-please provide docstrings following the
-`Numpy standards for docstrings <https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt>`_.
-The docstrings should contain examples to be tested.
+  #. Go to settings on github for your fork.
 
-    Specifically note:
+  #. Select ``Integration & Services``
 
-    1. Parameters should be listed similarly to:
+  #. Click ``Add service`` and select ``Travis CI``.
+
+#. Clone the repository to your favorite location on your drive where you want to work on it.
+
+#. To work in `developer mode <https://packaging.python.org/distributing/#working-in-development-mode>`_, at the top level directory inside the ``vibration testing toolbox`` type::
+
+    $ pip install -e .
+
+   This will allow you to edit the code while having it pretend to be installed. Keep in mind, if you have actually installed the ``vibration testing toolbox`` you may have a conflict. You must uninstall it and install your development version with the command above.
+
+#. If a new function is added
+   please provide docstrings following the `Numpy standards for docstrings <https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt>`_.
+   The docstrings should contain examples to be tested.
+
+   Specifically note:
+
+   1. Parameters should be listed similarly to:
 
     |    filename : str
     |    copy : bool
@@ -30,29 +43,32 @@ The docstrings should contain examples to be tested.
     |    files : list of str
     |    time : array_like
 
-    2. First line should be inline with the ``"""`` and brief enough to fit on one line.
+   2. First line should be inline with the ``"""`` and brief enough to fit on one line.
 
-    3. There must be a blank line after the first line.
+   3. There must be a blank line after the first line.
 
-    This is not exhaustive. It just highlights some consistent errors made.
+   This is not exhaustive. It just highlights some consistent errors made.
 
-3. Run the doctests regularly when you make edits.
+#. Run the doctests regularly when you make edits.
 
-To run the doctests `<pytest https://docs.pytest.org/en/latest/>`_ is needed.
-To run the tests from the shell you can access the project directory and type:
+   To run the doctests `<pytest https://docs.pytest.org/en/latest/>`_ is needed and can be installed with ``pip install -U pytest``.
 
-    $ pytest
+   To run the tests from the shell you can `cd` to the project's root directory and type::
 
-To run the tests from pycharm you can do:
-Run -> Edit Configurations -> Add -> python tests -> pytest
-Then just set the path to the project directory.
+     $ pytest
 
-4. Commit and check `travis-ci <https://travis-ci.org/Vibration-Testing/vibrationtesting>`_ tests regularly. Having a great number of changes before a commit can make tracing errors very hard. Make sure you are looking at your branch when assessing whether it's working. 
 
-5. Update from the main repository before submitting a pull request. This assures that you can check how your code works with the current repository. If it doesn't work, the pull will (should) be denied.
+    1. To run the tests from ``pycharm`` you can do: Run -> Edit Configurations -> Add -> python tests -> pytest Then just set the path to the project directory.
 
-6. If the tests are passing, make a git pull to assure that your code is up to date with the master branch and that the code has no conflicts. After that, push your branch to github and then open a pull request.
+    2. To run the tests from ``spyder`` see `spyder-unittest <https://github.com/spyder-ide/spyder-unittest`_.
 
+#. Commit and check `travis-ci <https://travis-ci.org/vibrationtoolbox/vibration_toolbox>`_ tests regularly. Having a great number of changes before a commit can make tracing errors very hard. Make sure you are looking at your branch when assessing whether it's working.
+
+#. Update from the main repository before submitting a pull request. This assures that you can check how your code works with the current repository. If it doesn't work, the pull will (should) be denied.
+
+#. If the tests are passing, make a git pull (in your GitHub app) to assure that your code is up to date with the master branch and that your code has no conflicts with the current base. Doing this regularly ensures that your accumulated edits won't be massively in conflict with the existing code base. After that, push your branch to github and then open a pull request.
+
+#. Please provide feedback and corrections to these instructions. 
 
 Instructions bellow are directed to main developers
 ===================================================
@@ -65,7 +81,7 @@ To make distribution and release
 
 The ``conf.py`` file for the documentation pulls the version from ``__init__.py``
 
-To make a distribition (for testing or posting to github)
+To make a distribution (for testing or posting to github)
 -----------------------------------------------------------
 
 .. code-block:: bash
