@@ -64,11 +64,11 @@ To contribute code we recommend you follow these steps:
 
 #. Commit and check `travis-ci <https://travis-ci.org/vibrationtoolbox/vibration_toolbox>`_ tests regularly. Having a great number of changes before a commit can make tracing errors very hard. Make sure you are looking at your branch when assessing whether it's working.
 
-#. Update from the main repository before submitting a pull request. This assures that you can check how your code works with the current repository. If it doesn't work, the pull will (should) be denied.
+#. You may need to `update from the main repository <https://www.sitepoint.com/quick-tip-sync-your-fork-with-the-original-without-the-cli/>`_ before submitting a pull request. This allows you to see the complete results before we look at them.  If it doesn't work, the pull will (should) be denied. This can be a bit daunting for some, so it's recommended but not necessary.
 
 #. If the tests are passing, make a git pull (in your GitHub app) to assure that your code is up to date with the master branch and that your code has no conflicts with the current base. Doing this regularly ensures that your accumulated edits won't be massively in conflict with the existing code base. After that, push your branch to github and then open a pull request.
 
-#. Please provide feedback and corrections to these instructions. 
+#. Please provide feedback and corrections to these instructions.
 
 Instructions bellow are directed to main developers
 ===================================================
