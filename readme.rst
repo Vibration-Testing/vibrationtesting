@@ -17,7 +17,7 @@
 ..  #:target: https://coveralls.io/r/vibrationtoolbox/vibration_toolbox
 
 
-Joseph C. Slater
+Joseph C. Slaater
 
 This is the software repository for the Vibration Toolbox, not the `online manual <http://Vibration-Testing.github.io/vibrationtesting/>`_.
 
