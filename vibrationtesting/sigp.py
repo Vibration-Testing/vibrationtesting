@@ -1088,29 +1088,29 @@ def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
     else:
         print("Sorry, that option isn't supported yet")
 
-    # elif FLAG==2:
+    '''# elif FLAG==2:
     # subplot(2,1,1)
     # semilogx(F,mag)
-    ##   xlabel('Frequency (Hz)')
-    ##   ylabel('Mag (dB)')
+    #   xlabel('Frequency (Hz)')
+    #   ylabel('Mag (dB)')
     # grid on
     # %  Fmin,Fmax,min(mag),max(mag)
     # axis([Fmin Fmax minmag maxmag])
 
     # subplot(2,1,2)
     # semilogx(F,phase)
-    ##   xlabel('Frequency (Hz)')
-    ##   ylabel('Phase (deg)')
+    # xlabel('Frequency (Hz)')
+    # ylabel('Phase (deg)')
     # grid on
     # axis([Fmin Fmax  phmin_max(1) phmin_max(2)])
     # gridmin_max=round(phmin_max/90)*90;
     # set(gca,'YTick',gridmin_max(1):90:gridmin_max(2))
 
     # elif FLAG==3:
-      # subplot(2,1,1)
-      # mag=20*log10(abs(Xfer));
-      # semilogx(F*2*pi,mag)
-      ## xlabel('Frequency (Rad/s)')
+    # subplot(2,1,1)
+    # mag=20*log10(abs(Xfer));
+    # semilogx(F*2*pi,mag)
+    # xlabel('Frequency (Rad/s)')
       ## ylabel('Mag (dB)')
       # grid on
       # axis([Wmin Wmax minmag maxmag])
@@ -1258,6 +1258,7 @@ def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
      # gridmin_max=round(phmin_max/90)*90;
      # set(gca,'YTick',gridmin_max(1):90:gridmin_max(2))
      # zoom on
+     '''
 
 
 def xcorr(t, x, y, zeropad=True):
@@ -1281,8 +1282,9 @@ def xcorr(t, x, y, zeropad=True):
 
 
 def d2c(Ad, Bd, C, D, dt):
-    """returns A, B, C, D
-    Converts a set of digital state space system matrices to their continuous counterpart.
+    """Returns continuous A, B, C, D from discrete A, B, C, D
+    Converts a set of digital state space system matrices to their
+    continuous counterpart.
     """
     A = la.logm(Ad) / dt
     B = la.solve((Ad - sp.eye(A.shape[0])), A) @ Bd
@@ -1290,8 +1292,9 @@ def d2c(Ad, Bd, C, D, dt):
 
 
 def c2d(A, B, C, D, dt):
-    """returns Ad, Bd, C, D
-    Converts a set of digital state space system matrices to their continuous counterpart.
+    """Returns discrete Ad, Bd, C, D from continuous A, B, C, D
+    Converts a set of digital state space system matrices to their
+    continuous counterpart.
     Simply calls scipy.signal.cont2discrete
     """
 
@@ -1320,12 +1323,66 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
 def so2ss(M, C, K, Bt, Cd, Cv, Ca):
     """returns A, B, C, D
     Given second order linear matrix equation of the form
-    :math:`M\\ddot{x} + C \\dot{x} + K x= Bt u`
+    :math:`M\\ddot{x} + C \\dot{x} + K x= \\tilde{B} u`
     and
-    :math:`y = Cd x + + Cv \\dot{x} + Ca\\ddot{x}`
+    :math:`y = C_d x + + C_v \\dot{x} + C_a\\ddot{x}`
     returns the state space form equations
-    :math:`\\dot{z} = A z + B u`
+    :math:`\\dot{z} = A z + B u`,
     :math:`y = C z + D u`
+
+    Parameters
+    ----------
+    M: array
+        Mass matrix
+    C: array
+        Damping matrix
+    K:  array
+        Stiffness matrix
+    Bt: array
+        Input matrix
+    Cd: array
+        Displacement sensor output matrix
+    Cv: array
+        Velocimeter output matrix
+    Ca: array
+        Accelerometer output matrix
+
+    Returns
+    -------
+    A: array
+        State matrix
+    B: array
+        Input matrix
+    C: array
+        Output matrix
+    D: array
+        Pass through matrix
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import vibrationtesting as vt
+    >>> M = np.array([[2, 1],[1, 3]])
+    >>> K = np.array([[2, -1],[-1, 3]])
+    >>> C = np.array([[0.01, 0.001],[0.001, 0.01]])
+    >>> Bt = np.array([[0],[1]])
+    >>> Cd = Cv = np.zeros((1,2))
+    >>> Ca = np.array([[1, 0]])
+    >>> A, B, Css, D = vt.so2ss(M, C, K, Bt, Cd, Cv, Ca)
+    >>> print('A: ', A)
+    A:  [[ 0.      0.      1.      0.    ]
+     [ 0.      0.      0.      1.    ]
+     [-1.4     1.2    -0.0058  0.0014]
+     [ 0.8    -1.4     0.0016 -0.0038]]
+    >>> print('B: ', B)
+    B:  [[ 0.]
+     [ 0.]
+     [ 0.]
+     [ 1.]]
+    >>> print('C: ', Css)
+    C:  [[-1.4     1.2    -0.0058  0.0014]]
+    >>> print('D: ', D)
+    D:  [[-0.2]]
     """
 
     A = sp.vstack((sp.hstack((sp.eye(2) * 0, sp.eye(2))),
@@ -1352,10 +1409,12 @@ def damp(A):
         d0 = -sp.cos(math.atan2(sp.imag(pole), sp.real(pole)))
         f0 = 0.5 / sp.pi * abs(pole)
         if (abs(sp.imag(pole)) < abs(sp.real(pole))):
-            print('      {:.3f}                    {:.3f}       {:.3f}         {:.3f}'.
-                  format(float(sp.real(pole)), float(abs(pole)), float(d0), float(f0)))
+            print('      {:.3f}                    {:.3f}       \
+                  {:.3f}         {:.3f}'.format(float(sp.real(pole)),
+                  float(abs(pole)), float(d0), float(f0)))
 
         else:
-            print('      {:.3f}        {:+.3f}      {:.3f}       {:.3f}         {:.3f}'.
-                  format(float(sp.real(pole)), float(sp.imag(pole)),
-                         float(abs(pole)), float(d0), float(f0)))
+            print('      {:.3f}        {:+.3f}      {:.3f}       \
+                  {:.3f}         {:.3f}'.format(float(sp.real(pole)),
+                  float(sp.imag(pole)), float(abs(pole)), float(d0),
+                  float(f0)))
