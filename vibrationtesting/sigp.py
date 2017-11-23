@@ -475,29 +475,26 @@ def asd(x, t, windowname="hanning", ave=bool(True)):
     >>> time = np.reshape(time, (1, -1))
     >>> x = A*np.sin(2*np.pi*sig_freq*time)
     >>> x = x + np.random.normal(scale=np.sqrt(noise_power), size=(1, time.shape[1]))
-    >>> plt.subplot(2,1,1)
-    <matplotlib...>
-    >>> plt.plot(time[0,:],x[0,:])
+    >>> fig, (ax1, ax2) = plt.subplots(2,1)
+    >>> ax1.plot(time[0,:],x[0,:])
     [<matplotlib.lines.Line2D object at ...>]
-    >>> plt.title('Time history')
+    >>> ax1.set_title('Time history')
     Text(0.5,1,'Time history')
-    >>> plt.xlabel('Time (sec)')
+    >>> ax1.set_xlabel('Time (sec)')
     Text(0.5,0,'Time (sec)')
-    >>> plt.ylabel('$x(t)$')
+    >>> ax1.set_ylabel('$x(t)$')
     Text(0,0.5,'$x(t)$')
 
     Compute and plot the autospectrum density.
 
     >>> freq_vec, Pxx = vt.asd(x, time, windowname="hanning", ave=bool(False))
-    >>> plt.subplot(2,1,2)
-    <matplotlib...>
-    >>> plt.plot(freq_vec, 20*np.log10(Pxx[0,:]))
+    >>> ax2.plot(freq_vec, 20*np.log10(Pxx[0,:]))
     [<matplotlib.lines.Line2D object at ...>]
-    >>> plt.ylim([-400, 100])
+    >>> ax2.set_ylim([-400, 100])
     (-400, 100)
-    >>> plt.xlabel('frequency [Hz]')
+    >>> ax2.set_xlabel('frequency [Hz]')
     Text(0.5,0,'frequency [Hz]')
-    >>> plt.ylabel('PSD [V**2/Hz]')
+    >>> ax2.set_ylabel('PSD [V**2/Hz]')
     Text(0,0.5,'PSD [V**2/Hz]')
 
     If we average the last half of the spectral density, to exclude the
