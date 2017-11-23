@@ -21,7 +21,7 @@ To contribute code we recommend you follow these steps:
 
 #. Clone the repository to your favorite location on your drive where you want to work on it.
 
-#. To work in `developer mode <https://packaging.python.org/distributing/#working-in-development-mode>`_, at the top level directory inside the ``vibration testing toolbox`` type::
+#. To work in `developer mode <https://packaging.python.org/distributing/#working-in-development-mode>`_, from a terminal (python enabled) at the top level directory inside the ``vibration testing toolbox`` type::
 
     $ pip install -e .
 
@@ -76,7 +76,7 @@ Instructions bellow are directed to main developers
 To make distribution and release
 --------------------------------
 
-1) Edit the version number in ``vibration_toolbox/__init__.py``
+1) Edit the version number in ``vibrationtesting/__init__.py``
 2) Use the Makefile, ``make release``
 
 The ``conf.py`` file for the documentation pulls the version from ``__init__.py``
