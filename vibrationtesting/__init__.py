@@ -8,6 +8,10 @@ Signal processing (:mod:`vibrationtesting.sigp`)
 Convolution
 ===========
 
+Don't believe any of this!   It's still not updated!
+
+
+
 .. autosummary::
    :toctree: generated/
 
@@ -66,6 +70,13 @@ __author__ = u'Joseph C. Slater'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2002-2017 Joseph C. Slater'
 
+import sys
+import matplotlib as mpl
+
+if 'pytest' in sys.argv[0]:
+    print('Setting backend to agg to run tests')
+    mpl.use('agg')
+
 from .sigp import *
 
 """
@@ -96,3 +107,12 @@ np.set_printoptions(edgeitems=3, infstr='inf', linewidth=75,
 # from numpy.testing import Tester
 # test = Tester().test
 # bench = Tester().bench
+
+# print options were change inside modules to produce better
+# outputs at examples. Here we set the print options to the
+# default values after importing the modules to avoid changing
+# np default print options when importing the toolbox.
+
+np.set_printoptions(edgeitems=3, infstr='inf', linewidth=75,
+                    nanstr='nan', precision=8, suppress=False,
+                    threshold=1000, formatter=None)
