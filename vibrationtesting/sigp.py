@@ -130,7 +130,8 @@ def window(x, windowname='hanning', normalize=False):
                 x = sp.swapaxes(x, 0, 1)
                 swap = 1
                 print('You shouldn\'t do that.')
-                print('The 1 dimension is the time (or frequency) incrementing dimension.')
+                print(
+                    'The 1 dimension is the time (or frequency) incrementing dimension.')
                 print(
                     'Swapping axes temporarily to be compliant with expectations. I\'ll fix them in your result')
 
@@ -219,27 +220,22 @@ def hanning(x, normalize=False):
     >>> xcos = A*np.cos(2*np.pi*freq*time)
     >>> x=np.dstack((xsin,xcos)) # assembling individual records. vstack
     >>> xw=vt.hanning(x)*x
-    >>> plt.subplot(2, 1, 1)
-    <matplotlib.axes._subplots.AxesSubplot object at ...>
-    >>> plt.plot(time.T,x[:,:,1].T)
+    >>> fig, (ax1, ax2) = plt.subplots(2, 1)
+    >>> ax1.plot(time.T,x[:,:,1].T)
     [<matplotlib.lines.Line2D object at ...>]
-    >>> plt.ylim([-20, 20])
+    >>> ax1.set_ylim([-20, 20])
     (-20, 20)
-    >>> plt.title('Unwindowed data, 2 records.')
+    >>> ax1.set_title('Unwindowed data, 2 records.')
     Text(0.5,1,'Unwindowed data, 2 records.')
-    >>> plt.ylabel('$x(t)$')
+    >>> ax1.set_ylabel('$x(t)$')
     Text(0,0.5,'$x(t)$')
-    >>> plt.subplot(2, 1, 2)
-    <matplotlib.axes._subplots.AxesSubplot object at ...>
-    >>> plt.title('Original (raw) data.')
-    Text(0.5,1,'Original (raw) data.')
-    >>> plt.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,'--',time[0,:],-vt.hanning(x)[0,:]*A,'--')
+    >>> ax2.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,'--',time[0,:],-vt.hanning(x)[0,:]*A,'--')
     [<matplotlib.lines.Line2D object at ...>]
-    >>> plt.ylabel('Hanning windowed $x(t)$')
+    >>> ax2.set_ylabel('Hanning windowed $x(t)$')
     Text(0,0.5,'Hanning windowed $x(t)$')
-    >>> plt.xlabel('time')
+    >>> ax2.set_xlabel('time')
     Text(0.5,0,'time')
-    >>> plt.title('Effect of window. Note the scaling to conserve ASD amplitude')
+    >>> ax2.set_title('Effect of window. Note the scaling to conserve ASD amplitude')
     Text(0.5,1,'Effect of window. Note the scaling to conserve ASD amplitude')
     """
 
@@ -247,7 +243,7 @@ def hanning(x, normalize=False):
         # Create Hanning windowing array of dimension n by N by nr
         # where N is number of data points and n is the number of number of inputs or outputs.
         # and nr is the number of records.
-        #print(len(x.shape))
+        # print(len(x.shape))
         swap = 0
         if len(x.shape) == 1:
             # We have either a scalar or 1D array
@@ -619,12 +615,12 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
         y = y * win
         x = x * win
         del win
-    #print(y.shape)
+    # print(y.shape)
     ffty = np.fft.rfft(y, axis=1) * dt
-    #print(ffty.shape)
-    #print(x.shape)
+    # print(ffty.shape)
+    # print(x.shape)
     fftx = np.fft.rfft(x, n, axis=1) * dt
-    #print(fftx.shape)
+    # print(fftx.shape)
     Pxy = np.conj(fftx) * ffty / (n * dt) * 2
 
     if len(Pxy.shape) == 3 and Pxy.shape[2] > 1 and ave:
@@ -698,33 +694,39 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
     ...     else:
     ...         Yout=yout+nr*np.random.normal(scale=.050*np.std(yout[0,:]), size=yout.shape) # 5% half the noise on output as on input
     ...         Ucomb=u+(1-nr)*np.random.normal(scale=.05*np.std(u), size=u.shape)#(1, len(tin))) #10% noise signal on input
-    >>> plt.plot(tin,Yout[0,:])
+    >>> fig, ax = plt.subplots()
+    >>> ax.plot(tin,Yout[0,:])
     [<matplotlib.lines.Line2...
     >>> Yout=Yout*np.std(Ucomb)/np.std(Yout)#40
-    >>> plt.title('time response')
+    >>> ax.set_title('time response')
     Text(0.5,1,'time response')
     >>> freq_vec, Pxx = vt.asd(Yout, tin, windowname="hanning", ave=bool(False))
-    >>> plt.plot(freq_vec, 20*np.log10(Pxx[0,:]))
+    >>> fig, ax = plt.subplots()
+    >>> ax.plot(freq_vec, 20*np.log10(Pxx[0,:]))
     [<matplotlib.lines.Line2D object at ...]
-    >>> plt.title('Raw ASDs')
+    >>> ax.set_title('Raw ASDs')
     Text(0.5,1,'Raw ASDs')
     >>> freq_vec, Pxx = vt.asd(Yout, tin, windowname="hanning", ave=bool(True))
-    >>> plt.plot(freq_vec, 20*np.log10(Pxx[0,:]))
+    >>> fig, ax = plt.subplots()
+    >>> ax.plot(freq_vec, 20*np.log10(Pxx[0,:]))
     [<matplotlib.lines.Line2D object at ...]
-    >>> plt.title('Averaged ASDs')
+    >>> ax.set_title('Averaged ASDs')
     Text(0.5,1,'Averaged ASDs')
     >>> f, Txy1, Txy2, coh, Txyv = vt.frfest(Yout, Ucomb, t,Hv=bool(True))
     >>> #fig_amp,=plt.plot(f[0,:],20*np.log10(np.abs(Txy1[0,:])),legend='$H_1$',f[0,:],20*np.log10(np.abs(Txy2[0,:])),legend='$H_2$',f[0,:],20*np.log10(np.abs(Txyv[0,:])),legend='$H_v$')
-    >>> (line1, line2, line3) = plt.plot(f,20*np.log10(np.abs(Txy1[0,:])),f,20*np.log10(np.abs(Txy2[0,:])),f,20*np.log10(np.abs(Txyv[0,:])))
-    >>> plt.title('FRF of ' + str(Yout.shape[2]) + ' averages.')
+    >>> fig, ax = plt.subplots()
+    >>> (line1, line2, line3) = ax.plot(f,20*np.log10(np.abs(Txy1[0,:])),f,20*np.log10(np.abs(Txy2[0,:])),f,20*np.log10(np.abs(Txyv[0,:])))
+    >>> ax.set_title('FRF of ' + str(Yout.shape[2]) + ' averages.')
     Text(0.5,1,...
-    >>> plt.legend((line1,line2,line3),('$H_1$','$H_2$','$H_v$'))
+    >>> ax.legend((line1,line2,line3),('$H_1$','$H_2$','$H_v$'))
     <matplotlib.legend.Legend object ...>
-    >>> plt.plot(f,180.0/np.pi*np.unwrap(np.angle(Txy1[0,:])),f,180.0/np.pi*np.unwrap(np.angle(Txy2[0,:])),f,180.0/np.pi*np.unwrap(np.angle(Txyv[0,:])))
+    >>> fig, ax = plt.subplots()
+    >>> ax.plot(f,180.0/np.pi*np.unwrap(np.angle(Txy1[0,:])),f,180.0/np.pi*np.unwrap(np.angle(Txy2[0,:])),f,180.0/np.pi*np.unwrap(np.angle(Txyv[0,:])))
     [<matplotlib.lines.Line2D object at ...]
-    >>> plt.title('FRF of ' + str(Yout.shape[2]) + ' averages.')
+    >>> ax.set_title('FRF of ' + str(Yout.shape[2]) + ' averages.')
     Text(0.5,1,...
-    >>> plt.plot(f,coh[0,:])
+    >>> fig, ax = plt.subplots()
+    >>> ax.plot(f,coh[0,:])
     [<matplotlib.lines.Line2D object at...
     >>> vt.frfplot(f,Txy1,freq_max=3.5)
 
@@ -757,8 +759,8 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
     # Note: Two different ways to ignore returned values shown
     Pff = asd(f, dt)[1]
     #print('works until here?')
-    #print(x.shape)
-    #print(f.shape)
+    # print(x.shape)
+    # print(f.shape)
     freq, Pxf = crsd(x, f, dt)
     _, Pxx = asd(x, dt)
 
@@ -1011,11 +1013,7 @@ def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
     >>> w=f*2*np.pi;
     >>> k=1e5;m=1;c=1;
     >>> tf=1./(m*(w*1j)**2+c*1j*w+k)
-    >>> plt.figure(1)
-    <matplotlib.figure.Figure...
     >>> vt.frfplot(f,tf)
-    >>> plt.figure(2)
-    <matplotlib.figure.Figure...
     >>> vt.frfplot(f,tf,5)
 
     Copyright J. Slater, Dec 17, 1994
@@ -1025,10 +1023,10 @@ def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
     freq = freq.reshape(1, -1)
     lenF = freq.shape[1]
     if len(H.shape) is 1:
-        H=H.reshape(1,-1)
+        H = H.reshape(1, -1)
 
-    if H.shape[0]>H.shape[1]:
-        H=H.T
+    if H.shape[0] > H.shape[1]:
+        H = H.T
 
     #    if lenF==1;
     #    F=(0:length(Xfer)-1)'*F;
@@ -1042,10 +1040,10 @@ def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
 
     # print(str(np.amin(freq)))
     inlow = int(lenF * (freq_min - np.amin(freq)
-                    ) // (np.amax(freq) - np.amin(freq)))
+                        ) // (np.amax(freq) - np.amin(freq)))
 
     inhigh = int(lenF * (freq_max - np.amin(freq)
-                     ) // (np.amax(freq) - np.amin(freq)) - 1)
+                         ) // (np.amax(freq) - np.amin(freq)) - 1)
     # if inlow<1,inlow=1;end
     # if inhigh>lenF,inhigh=lenF;end
     '''print('freq shape: {}'.format(freq.shape))
@@ -1056,8 +1054,8 @@ def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
     # print(H.shape)
     freq = freq[:, inlow:inhigh]
     mag = 20 * np.log10(np.abs(H))
-    #print(mag)
-    #print(mag.shape)
+    # print(mag)
+    # print(mag.shape)
     minmag = np.min(mag)
     maxmag = np.max(mag)
     phase = np.unwrap(np.angle(H)) * 180 / np.pi
@@ -1069,24 +1067,22 @@ def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
     minimag = np.amin(np.imag(H))
     maximag = np.amax(np.imag(H))
     if FLAG == 1:
-        plt.subplot(2, 1, 1)
-        plt.plot(freq.T, mag.T)
-        plt.xlabel('Frequency (Hz)')
-        plt.ylabel('Mag (dB)')
-        plt.grid()
-        plt.xlim(xmax=freq_max, xmin=freq_min)
-        plt.ylim(ymax=maxmag, ymin=minmag)
+        fig, (ax1, ax2) = plt.subplots(2, 1)
+        ax1.plot(freq.T, mag.T)
+        ax1.set_xlabel('Frequency (Hz)')
+        ax1.set_ylabel('Mag (dB)')
+        ax1.grid()
+        ax1.set_xlim(xmax=freq_max, xmin=freq_min)
+        ax1.set_ylim(ymax=maxmag, ymin=minmag)
 
-        plt.subplot(2, 1, 2)
-        plt.plot(freq.T, phase.T)
-        plt.xlabel('Frequency (Hz)')
-        plt.ylabel('Phase (deg)')
-        plt.grid()
-        plt.xlim(xmax=freq_max, xmin=freq_min)
-        plt.ylim(ymax=phmax, ymin=phmin)
+        ax2.plot(freq.T, phase.T)
+        ax2.set_xlabel('Frequency (Hz)')
+        ax2.set_ylabel('Phase (deg)')
+        ax2.grid()
+        ax2.set_xlim(xmax=freq_max, xmin=freq_min)
+        ax2.set_ylim(ymax=phmax, ymin=phmin)
 
-        plt.yticks(np.arange(phmin, (phmax + 45), 45))
-
+        ax2.set_yticks(np.arange(phmin, (phmax + 45), 45))
 
     # elif FLAG==2:
     # subplot(2,1,1)
