@@ -12,7 +12,7 @@ import warnings
 
 import numpy as np
 import control as ctrl
-from numpy import ma
+# from numpy import ma
 import scipy as sp
 import scipy.signal as sig
 import scipy.fftpack as fftpack
@@ -108,16 +108,17 @@ def window(x, windowname='hanning', normalize=False):
     """
 
     if isinstance(x, (list, tuple, np.ndarray)):
-        # Create Hanning windowing array of dimension n by N by nr
-        # where N is number of data points and n is the number of number of inputs or outputs.
-        # and nr is the number of records.
+        '''Create Hanning windowing array of dimension n by N by nr
+        where N is number of data points and n is the number of number of
+        inputs or outputs.
+        and nr is the number of records.'''
 
         swap = 0
         if len(x.shape) == 1:
             # We have either a scalar or 1D array
             if x.shape[0] == 1:
-                print(
-                    "x is a scalar... and shouldn\'t have entered this part of the loop.")
+                print("x is a scalar... and shouldn\'t have entered this \
+                      part of the loop.")
             else:
                 N = len(x)
 
@@ -129,10 +130,10 @@ def window(x, windowname='hanning', normalize=False):
                 x = sp.swapaxes(x, 0, 1)
                 swap = 1
                 print('You shouldn\'t do that.')
-                print(
-                    'The 1 dimension is the time (or frequency) incrementing dimension.')
-                print(
-                    'Swapping axes temporarily to be compliant with expectations. I\'ll fix them in your result')
+                print('The 1 dimension is the time (or frequency) \
+                       incrementing dimension.')
+                print('Swapping axes temporarily to be compliant with \
+                      expectations. I\'ll fix them in your result')
 
             N = x.shape[1]
             f = window(N, windowname=windowname)
@@ -168,15 +169,18 @@ def window(x, windowname='hanning', normalize=False):
         if windowname is 'hanning':
             f = np.sin(np.pi * np.arange(N) / (N - 1))**2 * np.sqrt(8 / 3)
         elif windowname is 'hamming':
-            f = (0.54 - 0.46 * np.cos(2 * np.pi *
-                                      (np.arange(N)) / (N - 1))) * np.sqrt(5000 / 1987)
+            f = (0.54 - 0.46 * np.cos(2 * np.pi * (np.arange(N)) / (N - 1)))\
+                * np.sqrt(5000 / 1987)
         elif windowname is 'blackman':
             print('blackman')
-            f = (0.42 - 0.5 * np.cos(2 * np.pi * (np.arange(N) + .5) / (N)) + .08 *
-                 np.cos(4 * np.pi * (np.arange(N) + .5) / (N))) * np.sqrt(5000 / 1523)
+            f = (0.42 - 0.5 * np.cos(2 * np.pi * (np.arange(N) + .5) / (N))
+                 + .08 * np.cos(4 * np.pi * (np.arange(N) + .5) / (N)))\
+                * np.sqrt(5000 / 1523)
         elif windowname is 'flatwin':
-            f = 1.0 - 1.933 * np.cos(2 * np.pi * (np.arange(N)) / (N - 1)) + 1.286 * np.cos(4 * np.pi * (np.arange(N)) / (
-                N - 1)) - 0.338 * np.cos(6 * np.pi * (np.arange(N)) / (N - 1)) + 0.032 * np.cos(8 * np.pi * (np.arange(N)) / (N - 1))
+            f = 1.0 - 1.933 * np.cos(2 * np.pi * (np.arange(N)) / (N - 1))\
+                    + 1.286 * np.cos(4 * np.pi * (np.arange(N)) / (N - 1))\
+                    - 0.338 * np.cos(6 * np.pi * (np.arange(N)) / (N - 1))\
+                    + 0.032 * np.cos(8 * np.pi * (np.arange(N)) / (N - 1))
         elif windowname is 'boxwin':
             f = np.ones((1, N))
         else:
@@ -189,8 +193,9 @@ def window(x, windowname='hanning', normalize=False):
 
 
 def hanning(x, normalize=False):
-    """returns w
-    Create a hanning window of length :math:`x`, or a hanning window sized to match :math:`x`
+    """returns window
+    Create a hanning window of length :math:`x`, or a hanning window sized
+    to match :math:`x`
     such that x*w is the windowed result.
 
     Parameters
@@ -240,10 +245,10 @@ def hanning(x, normalize=False):
     """
 
     if isinstance(x, (list, tuple, np.ndarray)):
-        # Create Hanning windowing array of dimension n by N by nr
-        # where N is number of data points and n is the number of number of inputs or outputs.
-        # and nr is the number of records.
-        # print(len(x.shape))
+        '''Create Hanning windowing array of dimension n by N by nr
+        where N is number of data points and n is the number of number of
+        inputs or outputs and nr is the number of records.'''
+
         swap = 0
         if len(x.shape) == 1:
             # We have either a scalar or 1D array
@@ -333,7 +338,8 @@ def expwin(x, ts=.75):
     x_windows=expwin(x)
     Returns x as the expwin windowing array x_windowed
     The windowed signal is then x*x_window
-    The optional second argument set the 5% "settling time" of the window. Default is ts=0.75
+    The optional second argument set the 5% "settling time" of the window.
+    Default is ts=0.75
     """
     print('expwin is untested')
     tc = -ts / np.log(.05)
@@ -408,8 +414,12 @@ def flatwin(x):
     else:
 
         n = x
-        f = np.reshape((1.0 - 1.933 * np.cos(2 * np.pi * (np.arange(n)) / (n - 1)) + 1.286 * np.cos(4 * np.pi * (np.arange(n)) / (n - 1)) -
-                        0.338 * np.cos(6 * np.pi * (np.arange(n)) / (n - 1)) + 0.032 * np.cos(8 * np.pi * (np.arange(n)) / (n - 1))), (1, -1))
+        f = np.reshape(
+                (1.0 - 1.933 * np.cos(2 * np.pi * (np.arange(n)) / (n - 1))
+                 + 1.286 * np.cos(4 * np.pi * (np.arange(n)) / (n - 1))
+                 - 0.338 * np.cos(6 * np.pi * (np.arange(n)) / (n - 1))
+                 + 0.032 * np.cos(8 * np.pi * (np.arange(n)) / (n - 1))),
+                (1, -1))
         f = f / np.linalg.norm(f) * np.sqrt(n)
 
     return f
@@ -528,7 +538,8 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     >>> time = np.arange(0,tfinal,1/sample_freq)
     >>> time = np.reshape(time, (1, -1))
     >>> x = A*np.sin(2*np.pi*sig_freq*time)
-    >>> x = x + np.random.normal(scale=np.sqrt(noise_power), size=(1, time.shape[1]))
+    >>> x = x + np.random.normal(scale=np.sqrt(noise_power),
+                                 size=(1, time.shape[1]))
     >>> plt.subplot(2,1,1)
     <matplotlib...>
     >>> plt.plot(time[0,:],x[0,:])
@@ -594,11 +605,11 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     # # Should use scipy.signal windows. I need to figure this out. Problem is: They don't scale the ASDs by the windowing "weakening".
 
     if windowname == "none":
-        a = 1
+        win = 1
     else:
         # print('This doesn\'t work yet')
         win = 1
-        if windowname == "hanning":  # BLACKWIN, BOXWIN, EXPWIN, HAMMWIN, FLATWIN and TRIWIN
+        if windowname == "hanning":
             # print('shape of x')
             # print(x.shape)
             win = window(x, windowname='hanning')
@@ -738,7 +749,8 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
 
     Modifications
     -------------
-    7/6/00: Changed default FRF calculation from H2 to H1, Added H1, H2, and Hv options.
+    7/6/00: Changed default FRF calculation from H2 to H1, Added H1, H2, and
+            Hv options.
     4/13/15: Converted to Python
 
     .. note:: Not comptible with scipy.signal functions
@@ -770,7 +782,8 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
     # Note Pfx=conj(Pxf) is applied in the H1 FRF estimation
     Txf1 = np.conj(Pxf / Pff)
     Txf2 = Pxx / Pxf
-    Txfv = Txf1 * 0  # Nulled to avoid output problems/simplify calls if unrequested
+    Txfv = Txf1 * 0  # Nulled to avoid output problems/simplify calls
+                     # if unrequested
 
     coh = (Pxf * np.conj(Pxf)).real / Pxx / Pff
 
@@ -795,7 +808,7 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
             # print(lam)
             vecs = vecs[:, index]
             # print(vecs)
-            #print(np.array([Txf1[0,i], -(vecs[0,0]/vecs[1,0]), -(vecs[1,0]/vecs[1,1]), Txf2[0,i]]))
+            # print(np.array([Txf1[0,i], -(vecs[0,0]/vecs[1,0]), -(vecs[1,0]/vecs[1,1]), Txf2[0,i]]))
             Txfv[0, i] = -(vecs[0, 0] / vecs[1, 0]) / alpha  # *np.sqrt(alpha)
             a = 1
             b = -Pxx[0, i] - Pff[0, i]
@@ -804,13 +817,13 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
             lambda1 = (-b - np.sqrt(b**2 - 4 * a * c)) / 2 / a
             # Txfv[0,i]=np.conj(Pxf[0,i])/(Pff[0,i]-lambda1)*alpha
             # print(Txfv[0,i])
-            #person = input('Next point: ')
-            #print(np.dot(frfm, vecs[:, 0]) - lam[0] * vecs[:, 0])
-            #print(np.dot(frfm, vecs[:, 1]) - lam[1] * vecs[:, 1])
+            # person = input('Next point: ')
+            # print(np.dot(frfm, vecs[:, 0]) - lam[0] * vecs[:, 0])
+            # print(np.dot(frfm, vecs[:, 1]) - lam[1] * vecs[:, 1])
 
     return freq, Txf1, Txf2, coh, Txfv
 
-    # def acorr(self, x, **kwargs):
+    '''# def acorr(self, x, **kwargs):
     # """
     # Plot the autocorrelation of `x`.
 
@@ -955,7 +968,7 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
     ##         kwargs.setdefault('linestyle', 'None')
     ##         a, = self.plot(lags, c, **kwargs)
     ##         b = None
-    # return lags, c, a, b
+    # return lags, c, a, b'''
 
 
 def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
