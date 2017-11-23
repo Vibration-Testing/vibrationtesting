@@ -134,6 +134,7 @@ def window(x, windowname='hanning', normalize=False):
                 print(
                     'Swapping axes temporarily to be compliant with expectations. I\'ll fix them in your result')
 
+            N = x.shape[1]
             f = window(N, windowname=windowname)
             f, _, _ = np.meshgrid(f, np.arange(
                 x.shape[0]), np.arange(x.shape[2]))
@@ -600,19 +601,19 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
         if windowname == "hanning":  # BLACKWIN, BOXWIN, EXPWIN, HAMMWIN, FLATWIN and TRIWIN
             # print('shape of x')
             # print(x.shape)
-            win = windowname(x, windowname='hanning')
+            win = window(x, windowname='hanning')
         elif windowname == "blackwin":
-            win = windowname(x, windowname='blackwin')
+            win = window(x, windowname='blackwin')
         elif windowname == "boxwin":
-            win = windowname(x, windowname='boxwin')
+            win = window(x, windowname='boxwin')
         elif windowname == "expwin":
-            win = windowname(x, windowname='expwin')
+            win = window(x, windowname='expwin')
         elif windowname == "hammwin":
-            win = windowname(x, windowname='hamming')
+            win = window(x, windowname='hamming')
         elif windowname == "triwin":
-            win = windowname(x, windowname='triwin')
+            win = window(x, windowname='triwin')
         elif windowname == "flatwin":
-            win = windowname(x, windowname='flatwin')
+            win = window(x, windowname='flatwin')
 
         y = y * win
         x = x * win
@@ -958,7 +959,7 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
 
 
 def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
-    """Frequency Response function pretty plotting. 
+    """Frequency Response function pretty plotting.
 
     Plots frequency response functions in a variety of formats
 
