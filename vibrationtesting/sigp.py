@@ -1369,7 +1369,7 @@ def so2ss(M, C, K, Bt, Cd, Cv, Ca):
     >>> Cd = Cv = np.zeros((1,2))
     >>> Ca = np.array([[1, 0]])
     >>> A, B, Css, D = vt.so2ss(M, C, K, Bt, Cd, Cv, Ca)
-    >>> np.set_printoptions(precision=4)
+    >>> np.set_printoptions(precision=4, suppress = True)
     >>> print('A: {}'.format(A))
     A:  [[ 0.      0.      1.      0.    ]
      [ 0.      0.      0.      1.    ]
