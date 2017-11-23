@@ -50,10 +50,7 @@ third dimension (2) indexes each data instance (experiment).
 http://python-control.readthedocs.io/en/latest/conventions.html#time-series-data
 
 Problem: This hasn't been fully implemented.
-I don't know which standard the package is following now!
-In order to be consistent with scipy and matlab, increasing time or frequency indices
-increases in the 0th dimension (0,1,2). The first dimension is the index.
-The second dimension is the realization number (for multiple runs/simulations/datasets).
+I don't know which standard the package is following now- a bit of both!
 """
 
 
@@ -92,30 +89,23 @@ def window(x, windowname='hanning', normalize=False):
     >>> xcos = A*np.cos(2*np.pi*freq*time) # assembling individual records. vstack assembles channels
     >>> x=np.dstack((xsin,xcos)) # assembling individual records. vstack
     >>> xw=vt.hanning(x)*x
-    >>> plt.subplot(2, 1, 1)
-    <matplotlib.axes._subplots.AxesSubplot object at ...>
-    >>> plt.plot(time.T,x.T)
+    >>> fig, (ax1, ax2) = plt.subplots(2,1)
+    >>> ax1.plot(time.T,x[:,:,1].T)
     [<matplotlib.lines.Line2D object at ...>]
-    >>> plt.ylim([-20, 20])
+    >>> ax1.set_ylim([-20, 20])
     (-20, 20)
-    >>> plt.title('Unwindowed data, 2 records.')
-    <matplotlib.text.Text object at ...>
-    >>> plt.ylabel('$x(t)$')
-    <matplotlib.text.Text object at ...>
-    >>> plt.subplot(2, 1, 2)
-    <matplotlib.axes._subplots.AxesSubplot object at ...>
-    >>> plt.title('Original (raw) data.')
-    <matplotlib.text.Text object at ...>
-    >>> plt.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,'--',time[0,:],-vt.hanning(x)[0,:]*A,'--')
+    >>> ax1.set_title('Original (raw) data.')
+    Text(0.5,1,'Original (raw) data.')
+    >>> ax1.set_ylabel('$x(t)$')
+    Text(0,0.5,'$x(t)$')
+    >>> ax2.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,'--',time[0,:],-vt.hanning(x)[0,:]*A,'--')
     [<matplotlib.lines.Line2D object at ...>]
-    >>> plt.ylabel('Hanning windowed $x(t)$')
-    <matplotlib.text.Text object at ...>
-    >>> plt.xlabel('time')
-    <matplotlib.text.Text object at ...>
-    >>> plt.title('Effect of window. Note the scaling to conserve ASD amplitude')
-    <matplotlib.text.Text object at ...>
-    >>> plt.show()
-
+    >>> ax2.set_ylabel('Hanning windowed $x(t)$')
+    Text(0,0.5,'Hanning windowed $x(t)$')
+    >>> ax2.set_xlabel('time')
+    Text(0.5,0,'time')
+    >>> ax2.set_title('Effect of window. Note the scaling to conserve ASD amplitude')
+    Text(0.5,1,'Effect of window. Note the scaling to conserve ASD amplitude')
     """
 
     if isinstance(x, (list, tuple, np.ndarray)):
@@ -132,13 +122,15 @@ def window(x, windowname='hanning', normalize=False):
             else:
                 N = len(x)
 
-            f = self.window(N, windowname=windowname)
+            f = window(N, windowname=windowname)
 
         elif len(x.shape) == 3:
 
             if x.shape[0] > x.shape[1]:
                 x = sp.swapaxes(x, 0, 1)
                 swap = 1
+                print('You shouldn\'t do that.')
+                print('The 1 dimension is the time (or frequency) incrementing dimension.')
                 print(
                     'Swapping axes temporarily to be compliant with expectations. I\'ll fix them in your result')
 
@@ -155,8 +147,12 @@ def window(x, windowname='hanning', normalize=False):
             if x.shape[0] > x.shape[1]:
                 x = sp.swapaxes(x, 0, 1)
                 swap = 1
-                print(
-                    'Swapping axes temporarily to be compliant with expectations. I\'ll fix them in your result')
+                print('You shouldn\'t do that.')
+                print('The 1 dimension is the time (or frequency) ' +
+                      'incrementing dimension.')
+                print('Swapping axes temporarily to be compliant with ' +
+                      'expectations.')
+                print('I\'ll reluctantly return a transposed result.')
 
             f = window(x.shape[1], windowname=windowname)
             f, _ = np.meshgrid(f, np.arange(x.shape[0]))
@@ -225,28 +221,26 @@ def hanning(x, normalize=False):
     >>> xw=vt.hanning(x)*x
     >>> plt.subplot(2, 1, 1)
     <matplotlib.axes._subplots.AxesSubplot object at ...>
-    >>> plt.plot(time.T,x.T)
+    >>> plt.plot(time.T,x[:,:,1].T)
     [<matplotlib.lines.Line2D object at ...>]
     >>> plt.ylim([-20, 20])
     (-20, 20)
     >>> plt.title('Unwindowed data, 2 records.')
-    <matplotlib.text.Text object at ...>
+    Text(0.5,1,'Unwindowed data, 2 records.')
     >>> plt.ylabel('$x(t)$')
-    <matplotlib.text.Text object at ...>
+    Text(0,0.5,'$x(t)$')
     >>> plt.subplot(2, 1, 2)
     <matplotlib.axes._subplots.AxesSubplot object at ...>
     >>> plt.title('Original (raw) data.')
-    <matplotlib.text.Text object at ...>
+    Text(0.5,1,'Original (raw) data.')
     >>> plt.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,'--',time[0,:],-vt.hanning(x)[0,:]*A,'--')
     [<matplotlib.lines.Line2D object at ...>]
     >>> plt.ylabel('Hanning windowed $x(t)$')
-    <matplotlib.text.Text object at ...>
+    Text(0,0.5,'Hanning windowed $x(t)$')
     >>> plt.xlabel('time')
-    <matplotlib.text.Text object at ...>
+    Text(0.5,0,'time')
     >>> plt.title('Effect of window. Note the scaling to conserve ASD amplitude')
-    <matplotlib.text.Text object at ...>
-    >>> plt.show()
-
+    Text(0.5,1,'Effect of window. Note the scaling to conserve ASD amplitude')
     """
 
     if isinstance(x, (list, tuple, np.ndarray)):
@@ -486,26 +480,25 @@ def asd(x, t, windowname="hanning", ave=bool(True)):
     >>> plt.plot(time[0,:],x[0,:])
     [<matplotlib.lines.Line2D object at ...>]
     >>> plt.title('Time history')
-    <matplotlib...>
+    Text(0.5,1,'Time history')
     >>> plt.xlabel('Time (sec)')
-    <matplotlib...>
+    Text(0.5,0,'Time (sec)')
     >>> plt.ylabel('$x(t)$')
-    <matplotlib...>
+    Text(0,0.5,'$x(t)$')
 
     Compute and plot the autospectrum density.
 
-    >>> freq_vec, Pxx = vt.asd(x, time, window="hanning", ave=bool(False))
+    >>> freq_vec, Pxx = vt.asd(x, time, windowname="hanning", ave=bool(False))
     >>> plt.subplot(2,1,2)
     <matplotlib...>
-    >>> plt.plot(freq_vec[0,:], 20*np.log10(Pxx[0,:,:]))
+    >>> plt.plot(freq_vec, 20*np.log10(Pxx[0,:]))
     [<matplotlib.lines.Line2D object at ...>]
     >>> plt.ylim([-400, 100])
     (-400, 100)
     >>> plt.xlabel('frequency [Hz]')
-    <matplotlib.text.Text object at ...>
+    Text(0.5,0,'frequency [Hz]')
     >>> plt.ylabel('PSD [V**2/Hz]')
-    <matplotlib.text.Text object at ...>
-    >>> plt.show()
+    Text(0,0.5,'PSD [V**2/Hz]')
 
     If we average the last half of the spectral density, to exclude the
     peak, we can recover the noise power on the signal.
@@ -546,26 +539,24 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     >>> plt.plot(time[0,:],x[0,:])
     [<matplotlib.lines.Line2D object at ...>]
     >>> plt.title('Time history')
-    <matplotlib...>
+    Text(0.5,1,'Time history')
     >>> plt.xlabel('Time (sec)')
-    <matplotlib...>
+    Text(0.5,0,'Time (sec)')
     >>> plt.ylabel('$x(t)$')
-    <matplotlib...>
+    Text(0,0.5,'$x(t)$')
 
     Compute and plot the autospectrum density.
-
-    >>> freq_vec, Pxx = vt.asd(x, time, window="hanning", ave=bool(False))
+    >>> freq_vec, Pxx = vt.asd(x, time, windowname="hanning", ave=bool(False))
     >>> plt.subplot(2,1,2)
     <matplotlib...>
-    >>> plt.plot(freq_vec[0,:], 20*np.log10(Pxx[0,:,:]))
+    >>> plt.plot(freq_vec, 20*np.log10(Pxx[0,:]))
     [<matplotlib.lines.Line2D object at ...>]
     >>> plt.ylim([-400, 100])
     (-400, 100)
     >>> plt.xlabel('frequency [Hz]')
-    <matplotlib.text.Text object at ...>
+    Text(0.5,0,'frequency [Hz]')
     >>> plt.ylabel('PSD [V**2/Hz]')
-    <matplotlib.text.Text object at ...>
-    >>> plt.show()
+    Text(0,0.5,'PSD [V**2/Hz]')
 
     If we average the last half of the spectral density, to exclude the
     peak, we can recover the noise power on the signal.
@@ -573,15 +564,10 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
 
     Now compute and plot the power spectrum.
     """
-    # t=np.reshape(t,(1,-1))
+    t_shape = t.shape
+    t = t.flatten()
+    dt = t[2] - t[1]
 
-    if t.shape[0] > 1:
-        dt = t[2] - t[1]
-    elif t.shape[1] > 1:
-        dt = t[2] - t[1]
-        print('t must be a scalar or size (n,1)')
-    elif t.shape[1] == 1 and t.shape[0] == 1:
-        dt = t[0]
     if dt <= 0:
         print('You sent in bad data. Delta t is negative. Please check your inputs.')
 
@@ -636,11 +622,12 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
         y = y * win
         x = x * win
         del win
-
+    #print(y.shape)
     ffty = np.fft.rfft(y, axis=1) * dt
-
+    #print(ffty.shape)
+    #print(x.shape)
     fftx = np.fft.rfft(x, n, axis=1) * dt
-
+    #print(fftx.shape)
     Pxy = np.conj(fftx) * ffty / (n * dt) * 2
 
     if len(Pxy.shape) == 3 and Pxy.shape[2] > 1 and ave:
@@ -707,47 +694,41 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
     >>> for i in np.arange(5): #was 2*50
     ...     u = np.random.normal(scale=np.sqrt(noise_power), size=tin.shape)
     ...     #print(u)
-    ...     t, yout, xout = ctrl.forced_response(sys, tin, u,rtol=1e-12,transpose=True)
+    ...     t, yout, xout = ctrl.forced_response(sys, tin, u,rtol=1e-12)#,transpose=True)
     ...     if 'Yout' in locals():
     ...         Yout=np.dstack((Yout,yout+nr*np.random.normal(scale=.050*np.std(yout[0,:]), size=yout.shape)))
     ...         Ucomb=np.dstack((Ucomb,u+(1-nr)*np.random.normal(scale=.05*np.std(u), size=u.shape)))
     ...     else:
     ...         Yout=yout+nr*np.random.normal(scale=.050*np.std(yout[0,:]), size=yout.shape) # 5% half the noise on output as on input
     ...         Ucomb=u+(1-nr)*np.random.normal(scale=.05*np.std(u), size=u.shape)#(1, len(tin))) #10% noise signal on input
-    >>> plt.plot(tin,Yout[:,0,:])
+    >>> plt.plot(tin,Yout[0,:])
+    [<matplotlib.lines.Line2...
     >>> Yout=Yout*np.std(Ucomb)/np.std(Yout)#40
-    [<matplotlib.lines.Line2D object at ...]
     >>> plt.title('time response')
-    <matplotlib.text.Text object...>
-    >>> plt.show()
-    >>> freq_vec, Pxx = vt.asd(Yout, tin, window="hanning", ave=bool(False))
-    >>> plt.plot(freq_vec[0,:], 20*np.log10(Pxx[0,:,:]))
+    Text(0.5,1,'time response')
+    >>> freq_vec, Pxx = vt.asd(Yout, tin, windowname="hanning", ave=bool(False))
+    >>> plt.plot(freq_vec, 20*np.log10(Pxx[0,:]))
     [<matplotlib.lines.Line2D object at ...]
     >>> plt.title('Raw ASDs')
-    <matplotlib.text.Text...>
-    >>> plt.show()
-    >>> freq_vec, Pxx = vt.asd(Yout, tin, window="hanning", ave=bool(True))
-    >>> plt.plot(freq_vec[0,:], 20*np.log10(Pxx[0,:]))
+    Text(0.5,1,'Raw ASDs')
+    >>> freq_vec, Pxx = vt.asd(Yout, tin, windowname="hanning", ave=bool(True))
+    >>> plt.plot(freq_vec, 20*np.log10(Pxx[0,:]))
     [<matplotlib.lines.Line2D object at ...]
     >>> plt.title('Averaged ASDs')
-    <matplotlib...>
-    >>> plt.show()
+    Text(0.5,1,'Averaged ASDs')
     >>> f, Txy1, Txy2, coh, Txyv = vt.frfest(Yout, Ucomb, t,Hv=bool(True))
     >>> #fig_amp,=plt.plot(f[0,:],20*np.log10(np.abs(Txy1[0,:])),legend='$H_1$',f[0,:],20*np.log10(np.abs(Txy2[0,:])),legend='$H_2$',f[0,:],20*np.log10(np.abs(Txyv[0,:])),legend='$H_v$')
-    >>> (line1, line2, line3) = plt.plot(f[0,:],20*np.log10(np.abs(Txy1[0,:])),f[0,:],20*np.log10(np.abs(Txy2[0,:])),f[0,:],20*np.log10(np.abs(Txyv[0,:])))
+    >>> (line1, line2, line3) = plt.plot(f,20*np.log10(np.abs(Txy1[0,:])),f,20*np.log10(np.abs(Txy2[0,:])),f,20*np.log10(np.abs(Txyv[0,:])))
     >>> plt.title('FRF of ' + str(Yout.shape[2]) + ' averages.')
-    <matplotlib.text.Text object at ...>
+    Text(0.5,1,...
     >>> plt.legend((line1,line2,line3),('$H_1$','$H_2$','$H_v$'))
     <matplotlib.legend.Legend object ...>
-    >>> plt.show()
-    >>> plt.plot(f[0,:],180.0/np.pi*np.unwrap(np.angle(Txy1[0,:])),f[0,:],180.0/np.pi*np.unwrap(np.angle(Txy2[0,:])),f[0,:],180.0/np.pi*np.unwrap(np.angle(Txyv[0,:])))
+    >>> plt.plot(f,180.0/np.pi*np.unwrap(np.angle(Txy1[0,:])),f,180.0/np.pi*np.unwrap(np.angle(Txy2[0,:])),f,180.0/np.pi*np.unwrap(np.angle(Txyv[0,:])))
     [<matplotlib.lines.Line2D object at ...]
     >>> plt.title('FRF of ' + str(Yout.shape[2]) + ' averages.')
-    <matplotlib.text.Text object at ...>
-    >>> plt.show()
-    >>> plt.plot(f[0,:],coh[0,:])
+    Text(0.5,1,...
+    >>> plt.plot(f,coh[0,:])
     [<matplotlib.lines.Line2D object at...
-    >>> plt.show()
     >>> vt.frfplot(f,Txy1,freq_max=3.5)
 
 
@@ -778,9 +759,9 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
 
     # Note: Two different ways to ignore returned values shown
     Pff = asd(f, dt)[1]
-    print('works until here?')
-    print(x.shape)
-    print(f.shape)
+    #print('works until here?')
+    #print(x.shape)
+    #print(f.shape)
     freq, Pxf = crsd(x, f, dt)
     _, Pxx = asd(x, dt)
 
@@ -976,7 +957,7 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
     # return lags, c, a, b
 
 
-def frfplt(freq, H, freq_min=0, freq_max=0, FLAG=1):
+def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
     """returns
 
     Plots frequency response functions in a variety of formats
@@ -1026,19 +1007,31 @@ def frfplt(freq, H, freq_min=0, freq_max=0, FLAG=1):
 
     :Example:
 
-    >>> f=(0:.01:100)';
-    >>> w=f*2*pi;
+    >>> import matplotlib.pyplot as plt
+    >>> import vibrationtesting as vt
+    >>> import numpy as np
+    >>> f=np.linspace(0,100,10000).reshape(-1,1);
+    >>> w=f*2*np.pi;
     >>> k=1e5;m=1;c=1;
-    >>> tf=1./(m*(w*j).^2+c*j*w+k);
-    >>> figure(1);frfplot(f,tf)
-    >>> figure(2);frfplot(f,tf,5)
+    >>> tf=1./(m*(w*1j)**2+c*1j*w+k)
+    >>> plt.figure(1)
+    <matplotlib.figure.Figure...
+    >>> vt.frfplot(f,tf)
+    >>> plt.figure(2)
+    <matplotlib.figure.Figure...
+    >>> vt.frfplot(f,tf,5)
 
     Copyright J. Slater, Dec 17, 1994
     Updated April 27, 1995
     Ported to Python, July 1, 2015
     """
     freq = freq.reshape(1, -1)
-    lenF = freq.shape[0]
+    lenF = freq.shape[1]
+    if len(H.shape) is 1:
+        H=H.reshape(1,-1)
+
+    if H.shape[0]>H.shape[1]:
+        H=H.T
 
     #    if lenF==1;
     #    F=(0:length(Xfer)-1)'*F;
@@ -1051,21 +1044,25 @@ def frfplt(freq, H, freq_min=0, freq_max=0, FLAG=1):
         raise ValueError('freq_min must be less than freq_max.')
 
     # print(str(np.amin(freq)))
-    inlow = lenF * (freq_min - np.amin(freq)
-                    ) // (np.amax(freq) - np.amin(freq))
+    inlow = int(lenF * (freq_min - np.amin(freq)
+                    ) // (np.amax(freq) - np.amin(freq)))
 
-    inhigh = lenF * (freq_max - np.amin(freq)
-                     ) // (np.amax(freq) - np.amin(freq)) - 1
+    inhigh = int(lenF * (freq_max - np.amin(freq)
+                     ) // (np.amax(freq) - np.amin(freq)) - 1)
     # if inlow<1,inlow=1;end
     # if inhigh>lenF,inhigh=lenF;end
-    print(H.shape)
+    '''print('freq shape: {}'.format(freq.shape))
+    print('H shape: {}'.format(H.shape))
+    print('Index of low frequency: {}'.format(inlow))
+    print('Index of high frequency: {}'.format(inhigh))'''
     H = H[:, inlow:inhigh]
     # print(H.shape)
     freq = freq[:, inlow:inhigh]
     mag = 20 * np.log10(np.abs(H))
-
-    minmag = np.amin(mag)
-    maxmag = np.amax(mag)
+    #print(mag)
+    #print(mag.shape)
+    minmag = np.min(mag)
+    maxmag = np.max(mag)
     phase = np.unwrap(np.angle(H)) * 180 / np.pi
     #    phmin_max=[min(phase)//45)*45 ceil(max(max(phase))/45)*45];
     phmin = np.amin(phase) // 45 * 45.0
@@ -1092,7 +1089,7 @@ def frfplt(freq, H, freq_min=0, freq_max=0, FLAG=1):
         plt.ylim(ymax=phmax, ymin=phmin)
 
         plt.yticks(np.arange(phmin, (phmax + 45), 45))
-        plt.show()
+
 
     # elif FLAG==2:
     # subplot(2,1,1)
