@@ -54,3 +54,8 @@ The usage documentation is far behind the current code, while the reference is w
 If you wish to install the current version of the software, read the instructions in `Contributing.rst <https://github.com/Vibration-Testing/vibrationtesting/blob/master/CONTRIBUTING.rst>`_
 
 That should be it. Please note issues on the `issues tab <https://github.com/Vibration-Testing/vibrationtesting/issues>`_ on github.
+
+Quick notes:
+-------------
+
+The `convention used for the signal processing <http://python-control.readthedocs.io/en/latest/conventions.html#time-series-convention>`_ is that of the `python controls module <http://python-control.readthedocs.io/en/latest/>`_. 
