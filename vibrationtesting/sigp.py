@@ -22,7 +22,8 @@ import matplotlib.pyplot as plt
 rcParams = matplotlib.rcParams
 
 
-"""Notes:
+"""
+Notes:
 ------
 Sept. 3, 2016
 Development of windows in scipy.signal has been rapid and
@@ -61,7 +62,6 @@ def window(x, windowname='hanning', normalize=False):
 
     Parameters
     ----------
-
     x:                 1) Integer. Number of points in desired hanning windows.
                        2) Array to which window needs to be applied.
     windowname:        One of: hanning, hamming, blackman, flatwin, boxwin
@@ -69,12 +69,11 @@ def window(x, windowname='hanning', normalize=False):
 
     Returns
     -------
-
     w: 1) hanning window array of size x
        2) windowing array. Windowed array is then x*w
 
-    :Example:
-
+    Example
+    -------
     >>> import numpy as np
     >>> import vibrationtesting as vt
     >>> import matplotlib.pyplot as plt
@@ -194,18 +193,18 @@ def hanning(x, normalize=False):
     such that x*w is the windowed result.
 
     Parameters
-
+    ----------
     x:                 1) Integer. Number of points in desired hanning windows.
                        2) Array to which window needs to be applied.
     normalize (False): Adjust power level (for use in ASD) to 1
 
     Returns
-
+    -------
     w: 1) hanning window array of size x
        2) windowing array. Windowed array is then x*w
 
-    :Example:
-
+    Example
+    -------
     >>> import numpy as np
     >>> import vibrationtesting as vt
     >>> import matplotlib.pyplot as plt
@@ -248,8 +247,8 @@ def hanning(x, normalize=False):
         if len(x.shape) == 1:
             # We have either a scalar or 1D array
             if x.shape[0] == 1:
-                print(
-                    " x is a scalar... and shouldn\'t have entered this part of the loop.")
+                print("x is a scalar... and shouldn\'t have \
+                       entered this part of the loop.")
             else:
                 N = len(x)
             f = hanning(N)
@@ -261,8 +260,8 @@ def hanning(x, normalize=False):
             if x.shape[0] > x.shape[1]:
                 x = sp.swapaxes(x, 0, 1)
                 swap = 1
-                print(
-                    'Swapping axes temporarily to be compliant with expectations. I\'ll fix them in your result')
+                print('Swapping axes temporarily to be compliant with \
+                      expectations. I\'ll fix them in your result')
 
             f = hanning(x.shape[1])
             f, _, _ = np.meshgrid(f, np.arange(
@@ -278,8 +277,8 @@ def hanning(x, normalize=False):
             if x.shape[0] > x.shape[1]:
                 x = sp.swapaxes(x, 0, 1)
                 swap = 1
-                print(
-                    'Swapping axes temporarily to be compliant with expectations. I\'ll fix them in your result')
+                print('Swapping axes temporarily to be compliant with \
+                      expectations. I\'ll fix them in your result')
 
             f = hanning(x.shape[1])
             f, _ = np.meshgrid(f, np.arange(x.shape[0]))
@@ -318,8 +317,9 @@ def blackwin(x):
     else:
 
         n = x
-        f = np.reshape((0.42 - 0.5 * np.cos(2 * np.pi * (np.arange(n) + .5)) / (n) + .08 *
-                        np.cos(4 * np.pi * (np.arange(n) + .5)) / (n)) * np.sqrt(5000 / 1523), (1, -1))
+        f = np.reshape((0.42 - 0.5 * np.cos(2 * np.pi * (np.arange(n) + .5)) /
+                        (n) + .08 * np.cos(4 * np.pi * (np.arange(n) + .5)) /
+                        (n)) * np.sqrt(5000 / 1523), (1, -1))
         f = f / np.linalg.norm(f) * np.sqrt(n)
 
     return f
@@ -348,7 +348,7 @@ def expwin(x, ts=.75):
     else:
         n = x
         v = (n - 1) / n * np.arange(n) + (n - 1) / n / 2
-        f = exp(-v / tc / (n - 1))
+        f = np.exp(-v / tc / (n - 1))
         f = f / np.linalg.norm(f) * np.sqrt(n)
         f = np.reshape(f, (1, -1))
         f = f / np.linalg.norm(f) * np.sqrt(n)
@@ -377,8 +377,9 @@ def hammwin(x):
     else:
 
         n = x
-        f = np.reshape((0.54 - 0.46 * np.cos(2 * np.pi *
-                                             (np.arange(n)) / (n - 1))) * np.sqrt(5000 / 1987), (1, -1))
+        f = np.reshape((0.54 - 0.46 * np.cos(2 * np.pi * (np.arange(n)) /
+                                             (n - 1))) * np.sqrt(5000 / 1987),
+                       (1, -1))
         f = f / np.linalg.norm(f) * np.sqrt(n)
 
     return f
@@ -450,8 +451,8 @@ def asd(x, t, windowname="hanning", ave=bool(True)):
     """
     Calculate the autospectrum (power spectrum) density of a signal x
 
-    :Example:
-
+    Example
+    -------
     >>> from scipy import signal
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
@@ -506,8 +507,8 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     """
     Calculate the cross spectrum (power spectrum) density between two signals.
 
-    :Example:
-
+    Example
+    -------
     >>> from scipy import signal
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
@@ -557,12 +558,13 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
 
     Now compute and plot the power spectrum.
     """
-    t_shape = t.shape
+    # t_shape = t.shape
     t = t.flatten()
     dt = t[2] - t[1]
 
     if dt <= 0:
-        print('You sent in bad data. Delta t is negative. Please check your inputs.')
+        print('You sent in bad data. Delta t is negative. \
+              Please check your inputs.')
 
     if len(x.shape) == 1:
         x = sp.expand_dims(x, axis=0)
@@ -590,27 +592,27 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     #         y=y.reshape(may(y.shape),-1,1)
     # # Should use scipy.signal windows. I need to figure this out. Problem is: They don't scale the ASDs by the windowing "weakening".
 
-    if window == "none":
+    if windowname == "none":
         a = 1
     else:
-        #print('This doesn\'t work yet')
+        # print('This doesn\'t work yet')
         win = 1
-        if window == "hanning":  # BLACKWIN, BOXWIN, EXPWIN, HAMMWIN, FLATWIN and TRIWIN
-            #print('shape of x')
+        if windowname == "hanning":  # BLACKWIN, BOXWIN, EXPWIN, HAMMWIN, FLATWIN and TRIWIN
+            # print('shape of x')
             # print(x.shape)
-            win = window(x, windowname='hanning')
-        elif window == "blackwin":
-            win = window(x, windowname='blackwin')
-        elif window == "boxwin":
-            win = window(x, windowname='boxwin')
-        elif window == "expwin":
-            win = window(x, windowname='expwin')
-        elif window == "hammwin":
-            win = window(x, windowname='hamming')
-        elif window == "triwin":
-            win = window(x, windowname='triwin')
-        elif window == "flatwin":
-            win = window(x, windowname='flatwin')
+            win = windowname(x, windowname='hanning')
+        elif windowname == "blackwin":
+            win = windowname(x, windowname='blackwin')
+        elif windowname == "boxwin":
+            win = windowname(x, windowname='boxwin')
+        elif windowname == "expwin":
+            win = windowname(x, windowname='expwin')
+        elif windowname == "hammwin":
+            win = windowname(x, windowname='hamming')
+        elif windowname == "triwin":
+            win = windowname(x, windowname='triwin')
+        elif windowname == "flatwin":
+            win = windowname(x, windowname='flatwin')
 
         y = y * win
         x = x * win
@@ -633,7 +635,7 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
 
 
 def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,options)
-    """returns freq, H1, H2, coh, Hv
+    """Returns freq, H1, H2, coh, Hv
 
     Estimates the :math:`H(j\\omega)` Frequency Response Functions (FRFs) between :math:`x` and :math:`f`.
 
@@ -666,8 +668,8 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
 
     Currently ``window`` and ``ave`` are locked to default values.
 
-    :Example:
-
+    Example
+    --------
     >>> import control as ctrl
     >>> import matplotlib.pyplot as plt
     >>> import vibrationtesting as vt
@@ -733,8 +735,8 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
 
     Copyright 1994 by Joseph C. Slater
 
-    :Modifications:
-
+    Modifications
+    -------------
     7/6/00: Changed default FRF calculation from H2 to H1, Added H1, H2, and Hv options.
     4/13/15: Converted to Python
 
@@ -758,7 +760,7 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
 
     # Note: Two different ways to ignore returned values shown
     Pff = asd(f, dt)[1]
-    #print('works until here?')
+    # print('works until here?')
     # print(x.shape)
     # print(f.shape)
     freq, Pxf = crsd(x, f, dt)
@@ -772,17 +774,16 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
     coh = (Pxf * np.conj(Pxf)).real / Pxx / Pff
 
     if Hv:
-        import numpy.linalg as la
         for i in np.arange(Pxx.shape[1]):
             frfm = np.array(
                 [[Pff[0, i], np.conj(Pxf[0, i])], [Pxf[0, i], Pxx[0, i]]])
-            #print('index number ' + str(i))
+            # print('index number ' + str(i))
             # print(frfm)
             alpha = 1  # np.sqrt(Pff[0,i]/Pxx[0,i])
             # print(alpha)
             frfm = np.array([[Pff[0, i], alpha * np.conj(Pxf[0, i])],
                              [alpha * Pxf[0, i], alpha**2 * Pxx[0, i]]])
-            #print('new frfm')
+            # print('new frfm')
             # print(frfm)
             lam, vecs = la.eigh(frfm)
             # print(lam)
@@ -957,7 +958,7 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
 
 
 def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
-    """returns
+    """Frequency Response function pretty plotting. 
 
     Plots frequency response functions in a variety of formats
 
@@ -986,21 +987,21 @@ def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
     =======  =============================================================
     FLAG     Plot Type
     -------  -------------------------------------------------------------
-    1 (def)   Magnitude and Phase versus F
-    2         Magnitude and Phase versus log10(F)
-    3         Bodelog  (Magnitude and Phase versus log10(w))
-    4         Real and Imaginary
-    5         Nyquist  (Real versus Imaginary)
-    6         Magnitude versus F
-    7         Phase versus F
-    8         Real versus F
-    9         Imaginary versus F
-    10         Magnitude versus log10(F)
-    11         Phase versus log10(F)
-    12         Real versus log10(F)
-    13         Imaginary versus log10(F)
-    14         Magnitude versus log10(w)
-    15         Phase versus log10(w)
+    1 (def)  Magnitude and Phase versus F
+    2        Magnitude and Phase versus log10(F)
+    3        Bodelog  (Magnitude and Phase versus log10(w))
+    4        Real and Imaginary
+    5        Nyquist  (Real versus Imaginary)
+    6        Magnitude versus F
+    7        Phase versus F
+    8        Real versus F
+    9        Imaginary versus F
+    10       Magnitude versus log10(F)
+    11       Phase versus log10(F)
+    12       Real versus log10(F)
+    13       Imaginary versus log10(F)
+    14       Magnitude versus log10(w)
+    15       Phase versus log10(w)
     =======  =============================================================
 
 
@@ -1067,7 +1068,7 @@ def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
     minimag = np.amin(np.imag(H))
     maximag = np.amax(np.imag(H))
     if FLAG == 1:
-        fig, (ax1, ax2) = plt.subplots(2, 1)
+        _, (ax1, ax2) = plt.subplots(2, 1)
         ax1.plot(freq.T, mag.T)
         ax1.set_xlabel('Frequency (Hz)')
         ax1.set_ylabel('Mag (dB)')
@@ -1083,6 +1084,8 @@ def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
         ax2.set_ylim(ymax=phmax, ymin=phmin)
 
         ax2.set_yticks(np.arange(phmin, (phmax + 45), 45))
+    else:
+        print("Sorry, that option isn't supported yet")
 
     # elif FLAG==2:
     # subplot(2,1,1)
@@ -1257,16 +1260,16 @@ def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
 
 
 def xcorr(t, x, y, zeropad=True):
-
+    '''Sorry, no docs or tests yet'''
     tau = t
-    sx = len(x)
-    sy = len(y)
-    if zeropad == True:
-        Xn = sp.fft(x, n=len(x) * 2)
-        Yn = sp.conj(sp.fft(y, n=len(x) * 2))
+    # sx = len(x)
+    # sy = len(y)
+    if zeropad is True:
+        Xn = np.fft.rfft(x, n=len(x) * 2)
+        Yn = np.conj(sp.fft(y, n=len(x) * 2))
     else:
-        Xn = sp.fft(x)
-        Yn = sp.conj(sp.fft(y))
+        Xn = np.fft.rfft(x)
+        Yn = np.conj(np.fft.rfft(y))
 
     xcor = sp.real(fftpack.fftshift(sp.ifft(Xn * Yn)))
     dt = t[1] - t[0]
@@ -1274,103 +1277,6 @@ def xcorr(t, x, y, zeropad=True):
     tau = sp.linspace(-len(xcor) / 2 * dt - dt / 2,
                       len(xcor) / 2 * dt - dt / 2, len(xcor))
     return tau, xcor
-
-
-'''
-    function [tout,crcorout]=crcor(x,y,dt,type,ave)
-%CRCOR Cross correlation.
-% [Tau,COR]=CRCOR(X,Y,DT,TYPE,AVE) returns the Cross Correlation
-% between signals X and Y.
-% [Tau,COR]=CRCOR(X,X,DT,TYPE,AVE) returns the Auto Correlation
-% of the signal X.
-% DT is the time between samples.
-% If DT is the time vector, DT is extracted as T(2)-T(1).
-% TYPE is the type of correlation. TYPE = 1 causes CRCOR
-% to return the linear correlation function. TYPE = 2
-% causes CRCOR to return the circular correlation function.
-% The default value is 1.
-% If X and Y are matrices, averaging will be performed on the
-% Correlations unless AVE is set to 'noave'. TYPE and AVE are
-% optional. Either can be left out.
-%
-% COH(X,Y,DT,N,AVE) plots the Correlation if there are no ouput
-% arguments. Click in the region of interest to zoom in.
-% Each click will double the size of the plot. Double click
-% to return to full scale.
-%
-% See also TFEST, ASD, COH, CRSD, and TFPLOT.
-
-%	Copyright (c) 1994 by Joseph C. Slater
-sy=size(y);
-sy=size(y);
-if nargin==3
-  type=1;
-  ave='yes';
- elseif nargin==4
-  if strcmp(type,'noave')
-   ave=n;
-   type=1;
-  else
-   ave='yes';
-  end
-end
-
-if isempty(type)
-  type=1;
-end
-
-sx=size(x);
-nc=sx(2);
-
-if type==1
-  n=sx(1)*2;
- else
-  n=sx(1);
-end
-
-if length(dt)~=1
- dt=dt(2)-dt(1);
-end
-
-tmax=dt*(length(x)-1);
-t=(-tmax:(2*tmax/(n-1)):tmax)'-(tmax/(n-1));
-
-X=fft(x,n);
-Y=fft(y,n);
-pxy=real(ifft(conj(X).*Y));
-
-crcr=fftshift(real(pxy));
-crcr=crcr(1:length(crcr),:);
-
-if nc~=1 & ~strcmp(ave,'noave')
- crcr=mean(crcr')';
-end
-
-if nargout==0
- plot(t,crcr)
- %logo
- if type==1
-   text1='Linear ';
-  else
-   text1='Circular ';
- end
- if x==y
-   text2='Auto ';
-  else
-   text2='Cross ';
- end
- text3=[text1 text2 'Correlation'];
- title(text3)
- xlabel('Time')
- ylabel(text3)
- grid
- zoom on
- return
-end
-
-crcorout=crcr;
-tout=t;
-'''
 
 
 def d2c(Ad, Bd, C, D, dt):
@@ -1399,7 +1305,7 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
     obtains the computed FRF of a state space system between selected input
     and output over frequency range of interest.
     """
-    #A, B, C, D = ctrl.ssdata(sys)
+    # A, B, C, D = ctrl.ssdata(sys)
     sa = A.shape[0]
     omega = sp.linspace(omega_low, omega_high, 1000)
     H = omega * 1j
@@ -1452,20 +1358,3 @@ def damp(A):
             print('      {:.3f}        {:+.3f}      {:.3f}       {:.3f}         {:.3f}'.
                   format(float(sp.real(pole)), float(sp.imag(pole)),
                          float(abs(pole)), float(d0), float(f0)))
-
-
-if __name__ == "__main__":
-    import doctest
-    #import vibrationtesting as vt
-    # doctest.testmod(optionflags=doctest.ELLIPSIS)
-    doctest.run_docstring_examples(
-        frfest, globals(), optionflags=doctest.ELLIPSIS)
-    # doctest.run_docstring_examples(asd,globals(),optionflags=doctest.ELLIPSIS)
-    """ What this does.
-    python (name of this file)  -v
-    will test all of the examples in the help.
-
-    Leaving off -v will run the tests without any output. Success will return nothing.
-
-    See the doctest section of the Sphinx manual.
-    """
