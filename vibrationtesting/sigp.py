@@ -57,8 +57,8 @@ I don't know which standard the package is following now- a bit of both!
 
 def window(x, windowname='hanning', normalize=False):
     """returns w
-    Create a  window of length :math:`x`, or a hanning window sized to match :math:`x`
-    such that x*w is the windowed result.
+    Create a  window of length :math:`x`, or a hanning window sized to match
+    :math:`x` that x*w is the windowed result.
 
     Parameters
     ----------
@@ -807,8 +807,8 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):
     # Note Pfx=conj(Pxf) is applied in the H1 FRF estimation
     Txf1 = np.conj(Pxf / Pff)
     Txf2 = Pxx / Pxf
-    Txfv = Txf1 * 0  # Nulled to avoid output problems/simplify calls
-                     # if unrequested
+    # Nulled to avoid output problems/simplify calls if unrequested
+    Txfv = np.zeros_like(Txf1)
 
     coh = (Pxf * np.conj(Pxf)).real / Pxx / Pff
 
