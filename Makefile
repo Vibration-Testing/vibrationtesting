@@ -57,7 +57,7 @@ release: clean
 	printf '\nUpgrade vibration testing with release and sha256 sum:'
 	printf '\nOK, no sha256 sum yet:'
 	twine upload dist/*
-	shasum -a 256 dist/*.tar.gz
+	shasum -a 256 dist/*.whl
 
 wheel:
 	rm -rf dist
