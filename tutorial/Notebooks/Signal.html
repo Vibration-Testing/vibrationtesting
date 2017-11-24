@@ -1,0 +1,1730 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Signal Processing for Vibration Testing &#8212; Vibration Testing 0.1a01 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1a01',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Ho-Kalman Identification Example" href="Ho-Kalman-Demo.html" />
+    <link rel="prev" title="Tutorial" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 8ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<div class="section" id="Signal-Processing-for-Vibration-Testing">
+<h1>Signal Processing for Vibration Testing<a class="headerlink" href="#Signal-Processing-for-Vibration-Testing" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [47]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+<span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">import</span> <span class="nn">control</span> <span class="kn">as</span> <span class="nn">ctrl</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="kn">as</span> <span class="nn">vt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="kn">as</span> <span class="nn">sp</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The autoreload extension is already loaded. To reload it, use:
+  %reload_ext autoreload
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [48]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">sample_freq</span> <span class="o">=</span> <span class="mf">1e3</span>
+<span class="n">noise_power</span> <span class="o">=</span> <span class="mf">0.001</span> <span class="o">*</span> <span class="n">sample_freq</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>\
+              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>\
+              <span class="p">[</span><span class="o">-</span><span class="mi">200</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="o">-.</span><span class="mi">2</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">],</span>\
+              <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">200</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="o">-.</span><span class="mi">2</span><span class="p">]])</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+<span class="n">C</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">35</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">ctrl</span><span class="o">.</span><span class="n">ss</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span>
+<span class="n">tin</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">204.8</span><span class="p">,</span> <span class="n">num</span> <span class="o">=</span> <span class="mi">2048</span><span class="p">,</span> <span class="n">endpoint</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span>
+<span class="n">nr</span><span class="o">=.</span><span class="mi">5</span>   <span class="c1"># 0 is all noise on input</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="k">if</span> <span class="s1">&#39;Yout&#39;</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">():</span> <span class="k">del</span><span class="p">(</span><span class="n">Yout</span><span class="p">);</span> <span class="k">del</span><span class="p">(</span><span class="n">Ucomb</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span> <span class="c1">#was 2*50</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">noise_power</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">tin</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">t</span><span class="p">,</span> <span class="n">yout</span><span class="p">,</span> <span class="n">xout</span> <span class="o">=</span> <span class="n">ctrl</span><span class="o">.</span><span class="n">forced_response</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span> <span class="n">tin</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span><span class="n">rtol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span><span class="n">transpose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;Yout&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
+        <span class="n">Yout</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">((</span><span class="n">Yout</span><span class="p">,</span><span class="n">yout</span><span class="o">+</span><span class="n">nr</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=.</span><span class="mo">050</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">yout</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">yout</span><span class="o">.</span><span class="n">shape</span><span class="p">)))</span>
+        <span class="n">Ucomb</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">((</span><span class="n">Ucomb</span><span class="p">,</span><span class="n">u</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">nr</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=.</span><span class="mo">05</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">)))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># 5% half the noise on output as on input</span>
+        <span class="n">Yout</span><span class="o">=</span><span class="n">yout</span><span class="o">+</span><span class="n">nr</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=.</span><span class="mo">050</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">yout</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]),</span> <span class="n">size</span><span class="o">=</span><span class="n">yout</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="c1"># 10% noise signal on input</span>
+        <span class="n">Ucomb</span><span class="o">=</span><span class="n">u</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">nr</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=.</span><span class="mo">05</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="c1">#(1, len(tin)))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">tin</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[27]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>(2048,)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">yout</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[26]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>(2, 2048)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">Yout</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[25]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>(2, 2048, 3)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [49]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Simultaneously plot all outputs resulting from the first excitation</span>
+<span class="c1"># This really makes no practical sense to do... but this is how you do it.</span>
+<span class="c1"># Note that we have to swap axes since we want to plot along the 2nd dimension (1)</span>
+<span class="c1"># but pyplot.plot plots along the first (0th) dimension. The notation used for data</span>
+<span class="c1"># mores sense when plotting all outputs on the same dimension in the next cell.</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tin</span><span class="p">,</span><span class="n">sp</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">Yout</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">],</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (sec)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$y_n$, $n = 0, 1$&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;$y_n$ versus time, $n = 0, 1$, first ``experiment&quot;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[49]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>Text(0.5,1,&#39;$y_n$ versus time, $n = 0, 1$, first ``experiment&quot;&#39;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorial_Notebooks_Signal_7_1.png" src="../../_images/tutorial_Notebooks_Signal_7_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [50]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Simultaneously plot all outputs resulting from the first excitation</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tin</span><span class="p">,</span><span class="n">Yout</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,:])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$y_0$&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;$y_0$ versus time, all ``experiments&quot;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[50]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>Text(0.5,1,&#39;$y_0$ versus time, all ``experiments&quot;&#39;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorial_Notebooks_Signal_8_1.png" src="../../_images/tutorial_Notebooks_Signal_8_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [51]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tin</span><span class="p">,</span> <span class="n">Yout</span><span class="p">[</span><span class="mi">1</span><span class="p">,:,:])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (sec)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$y_1$&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;$y_1$ versus time, all ``experiments&quot;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[51]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>Text(0.5,1,&#39;$y_1$ versus time, all ``experiments&quot;&#39;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorial_Notebooks_Signal_9_1.png" src="../../_images/tutorial_Notebooks_Signal_9_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [54]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">Yout</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[54]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>(2, 2048, 3)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [55]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">vt</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">Yout</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[55]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>(2, 2048, 3)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [52]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">vt</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">Yout</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,:])</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+length = 2
+(2048, 3)
+Swapping axes temporarily to be compliant with expectations. I&#39;ll fix them in your result
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[52]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>(2048, 3)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [61]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">vt</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">Yout</span><span class="p">)[</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[61]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>(2048, 3)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [58]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vt</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">Yout</span><span class="p">)[</span><span class="mi">0</span><span class="p">,:,:])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[58]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>[&lt;matplotlib.lines.Line2D at 0x1c1e3ffc18&gt;,
+ &lt;matplotlib.lines.Line2D at 0x1c1e3ffd68&gt;,
+ &lt;matplotlib.lines.Line2D at 0x1c1e3ffeb8&gt;]
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorial_Notebooks_Signal_14_1.png" src="../../_images/tutorial_Notebooks_Signal_14_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [62]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Here we are windowing the first output. Note that [0,:,:] strips off the first dimension</span>
+<span class="c1"># If hanning is applied to Yout[0,:,:] it will fail to operate as expected because the first</span>
+<span class="c1"># dimension (0) is now the time index, where Hanning expects it to be the second.</span>
+<span class="c1"># The code should be improved to allow application to a desired index. For another day...</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tin</span><span class="p">,</span> <span class="n">vt</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">Yout</span><span class="p">)[</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">*</span><span class="n">Yout</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,:])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (sec)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Hanning windowed $y_0$&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Windowed $y_0$ versus time, all ``experiments&quot;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[62]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>Text(0.5,1,&#39;Windowed $y_0$ versus time, all ``experiments&quot;&#39;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorial_Notebooks_Signal_15_1.png" src="../../_images/tutorial_Notebooks_Signal_15_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [63]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Note that each layer is a new dataset. Here we plot all 3 datasets on top of each other,</span>
+<span class="c1"># numbers 0, 1 and 2, for all outputs</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tin</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">Yout</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tin</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">Yout</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tin</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">Yout</span><span class="p">[:,:,</span><span class="mi">2</span><span class="p">]))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Time response&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (sec)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Response (all outputs, all experiments)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[63]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>Text(0,0.5,&#39;Response (all outputs, all experiments)&#39;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorial_Notebooks_Signal_16_1.png" src="../../_images/tutorial_Notebooks_Signal_16_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [64]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Note that each layer is a new dataset. Here we plot all 3 datasets on top of each other,</span>
+<span class="c1"># numbers 0, 1 and 2</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tin</span><span class="p">,</span><span class="n">sp</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">vt</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">Yout</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">Yout</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tin</span><span class="p">,</span><span class="n">sp</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">vt</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">Yout</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="n">Yout</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tin</span><span class="p">,</span><span class="n">sp</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">vt</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">Yout</span><span class="p">[:,:,</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="n">Yout</span><span class="p">[:,:,</span><span class="mi">2</span><span class="p">]))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Time response&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (sec)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Response (all outputs, all experiments)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+length = 2
+(2, 2048)
+length = 2
+(2, 2048)
+length = 2
+(2, 2048)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[64]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>Text(0,0.5,&#39;Response (all outputs, all experiments)&#39;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorial_Notebooks_Signal_17_2.png" src="../../_images/tutorial_Notebooks_Signal_17_2.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [65]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Note that each layer is a new dataset. Here we plot all 3 datasets on top of each other,</span>
+<span class="c1"># numbers 0, 1 and 2</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tin</span><span class="p">,</span><span class="n">vt</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">Yout</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,:])</span><span class="o">*</span><span class="n">Yout</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,:])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tin</span><span class="p">,</span><span class="n">vt</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">Yout</span><span class="p">[</span><span class="mi">1</span><span class="p">,:,:])</span><span class="o">*</span><span class="n">Yout</span><span class="p">[</span><span class="mi">1</span><span class="p">,:,:])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Time response&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (sec)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Response (all outputs, all experiments)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+length = 2
+(2048, 3)
+Swapping axes temporarily to be compliant with expectations. I&#39;ll fix them in your result
+length = 2
+(2048, 3)
+Swapping axes temporarily to be compliant with expectations. I&#39;ll fix them in your result
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[65]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>Text(0,0.5,&#39;Response (all outputs, all experiments)&#39;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorial_Notebooks_Signal_18_2.png" src="../../_images/tutorial_Notebooks_Signal_18_2.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [66]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Note that each layer is a new dataset. Here we plot all 3 datasets on top of each other,</span>
+<span class="c1"># numbers 0, 1 and 2</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tin</span><span class="p">,</span><span class="n">vt</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="n">Yout</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,:],</span> <span class="n">windowname</span> <span class="o">=</span> <span class="s1">&#39;hanning&#39;</span><span class="p">)</span><span class="o">*</span><span class="n">Yout</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,:])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tin</span><span class="p">,</span><span class="n">vt</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="n">Yout</span><span class="p">[</span><span class="mi">1</span><span class="p">,:,:],</span> <span class="n">windowname</span> <span class="o">=</span> <span class="s1">&#39;hanning&#39;</span><span class="p">)</span><span class="o">*</span><span class="n">Yout</span><span class="p">[</span><span class="mi">1</span><span class="p">,:,:])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Time response&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (sec)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Response (all outputs, all experiments)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+You shouldn&#39;t do that.
+The 1 dimension is the time (or frequency) incrementing dimension.
+Swapping axes temporarily to be compliant with expectations.
+I&#39;ll reluctantly return a transposed result.
+You shouldn&#39;t do that.
+The 1 dimension is the time (or frequency) incrementing dimension.
+Swapping axes temporarily to be compliant with expectations.
+I&#39;ll reluctantly return a transposed result.
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[66]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>Text(0,0.5,&#39;Response (all outputs, all experiments)&#39;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorial_Notebooks_Signal_19_2.png" src="../../_images/tutorial_Notebooks_Signal_19_2.png" />
+</div>
+</div>
+<p>Working up until this point.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [67]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vt</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="n">Yout</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,:],</span> <span class="n">windowname</span> <span class="o">=</span> <span class="s1">&#39;flatwin&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+You shouldn&#39;t do that.
+The 1 dimension is the time (or frequency) incrementing dimension.
+Swapping axes temporarily to be compliant with expectations.
+I&#39;ll reluctantly return a transposed result.
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[67]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>[&lt;matplotlib.lines.Line2D at 0x1c1ebf5860&gt;,
+ &lt;matplotlib.lines.Line2D at 0x1c1ebf59b0&gt;,
+ &lt;matplotlib.lines.Line2D at 0x1c1ebf5b00&gt;]
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorial_Notebooks_Signal_21_2.png" src="../../_images/tutorial_Notebooks_Signal_21_2.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [68]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="nb">len</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">Yout</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,:],</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[68]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>3
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [69]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vt</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">windowname</span> <span class="o">=</span> <span class="s1">&#39;flatwin&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[69]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>[&lt;matplotlib.lines.Line2D at 0x1c1eace898&gt;]
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorial_Notebooks_Signal_23_1.png" src="../../_images/tutorial_Notebooks_Signal_23_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [70]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="p">(</span><span class="mf">0.42</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">)</span><span class="o">+.</span><span class="mi">5</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">N</span><span class="p">))</span><span class="o">+.</span><span class="mi">08</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">4.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">)</span><span class="o">+.</span><span class="mi">5</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">N</span><span class="p">)))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">5000</span><span class="o">/</span><span class="mi">1523</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[70]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>array([  6.44696791e-04,   5.86783754e-03,   1.66570121e-02,
+         3.36658780e-02,   5.77967856e-02,   9.01129953e-02,
+         1.31731188e-01,   1.83701668e-01,   2.46884563e-01,
+         3.21830713e-01,   4.08675768e-01,   5.07055254e-01,
+         6.16047171e-01,   7.34146972e-01,   8.59277831e-01,
+         9.88836858e-01,   1.11977570e+00,   1.24871179e+00,
+         1.37206445e+00,   1.48620859e+00,   1.58763746e+00,
+         1.67312513e+00,   1.73987959e+00,   1.78567749e+00,
+         1.80897276e+00,   1.80897276e+00,   1.78567749e+00,
+         1.73987959e+00,   1.67312513e+00,   1.58763746e+00,
+         1.48620859e+00,   1.37206445e+00,   1.24871179e+00,
+         1.11977570e+00,   9.88836858e-01,   8.59277831e-01,
+         7.34146972e-01,   6.16047171e-01,   5.07055254e-01,
+         4.08675768e-01,   3.21830713e-01,   2.46884563e-01,
+         1.83701668e-01,   1.31731188e-01,   9.01129953e-02,
+         5.77967856e-02,   3.36658780e-02,   1.66570121e-02,
+         5.86783754e-03,   6.44696791e-04])
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">)</span><span class="o">+.</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="mf">1.2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[18]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>array([-0.30901699,  0.80901699, -1.        ,  0.80901699, -0.30901699,
+       -0.30901699,  0.80901699, -1.        ,  0.80901699, -0.30901699,
+       -0.30901699,  0.80901699, -1.        ,  0.80901699, -0.30901699,
+       -0.30901699,  0.80901699, -1.        ,  0.80901699, -0.30901699,
+       -0.30901699,  0.80901699, -1.        ,  0.80901699, -0.30901699,
+       -0.30901699,  0.80901699, -1.        ,  0.80901699, -0.30901699,
+       -0.30901699,  0.80901699, -1.        ,  0.80901699, -0.30901699,
+       -0.30901699,  0.80901699, -1.        ,  0.80901699, -0.30901699,
+       -0.30901699,  0.80901699, -1.        ,  0.80901699, -0.30901699,
+       -0.30901699,  0.80901699, -1.        ,  0.80901699, -0.30901699])
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">Ucomb</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[19]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>(1, 2048, 3)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [71]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1">#Yout=Yout*np.std(Ucomb)/np.std(Yout)#40 I don&#39;t recall what this does. Normalizes some amplitudes, clearly.</span>
+<span class="c1">#plt.title(&#39;time response&#39;)</span>
+<span class="c1">#plt.show()</span>
+<span class="c1">#vt.hanning(Yout)</span>
+<span class="n">freq_vec</span><span class="p">,</span> <span class="n">Pxx</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">asd</span><span class="p">(</span><span class="n">Yout</span><span class="p">,</span> <span class="n">tin</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="s2">&quot;hanning&quot;</span><span class="p">,</span> <span class="n">ave</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="bp">True</span><span class="p">))</span>
+<span class="n">freq_vec</span><span class="p">,</span> <span class="n">Pyy</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">asd</span><span class="p">(</span><span class="n">Ucomb</span><span class="p">,</span> <span class="n">tin</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="s2">&quot;hanning&quot;</span><span class="p">,</span> <span class="n">ave</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="bp">True</span><span class="p">))</span>
+
+<span class="n">freq_vec</span><span class="p">,</span> <span class="n">Pxy</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">crsd</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">Yout</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,:],</span><span class="mi">0</span><span class="p">),</span> <span class="n">Ucomb</span><span class="p">,</span> <span class="n">tin</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="s2">&quot;hanning&quot;</span><span class="p">,</span> <span class="n">ave</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="bp">True</span><span class="p">))</span>
+<span class="n">Pxx</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[71]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>(2, 1025)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="nb">abs</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[21]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>1.0
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [72]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq_vec</span><span class="p">,</span><span class="mi">20</span><span class="o">*</span><span class="n">sp</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Pxx</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span><span class="o">/</span><span class="n">Pxy</span><span class="p">[</span><span class="mi">0</span><span class="p">,:])),</span><span class="s1">&#39;-g&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq_vec</span><span class="p">,</span><span class="mi">20</span><span class="o">*</span><span class="n">sp</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Pxy</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span><span class="o">/</span><span class="n">Pyy</span><span class="p">[</span><span class="mi">0</span><span class="p">,:])),</span><span class="s1">&#39;-b&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[72]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>[&lt;matplotlib.lines.Line2D at 0x1c1eaf2b38&gt;]
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorial_Notebooks_Signal_29_1.png" src="../../_images/tutorial_Notebooks_Signal_29_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [73]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">Pxx</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[73]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>(2, 1025)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [80]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq_vec</span><span class="p">,</span> <span class="mi">20</span><span class="o">*</span><span class="n">sp</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">Pxx</span><span class="p">[:,:]</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Raw ASDs&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorial_Notebooks_Signal_31_0.png" src="../../_images/tutorial_Notebooks_Signal_31_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [82]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">freq_vec</span><span class="p">,</span> <span class="n">Pxx</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">asd</span><span class="p">(</span><span class="n">Yout</span><span class="p">,</span> <span class="n">tin</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="s2">&quot;hanning&quot;</span><span class="p">,</span> <span class="n">ave</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="bp">True</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">freq_vec</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="k">print</span><span class="p">((</span><span class="mi">20</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">Pxx</span><span class="p">))</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Pxx</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq_vec</span><span class="p">,</span> <span class="mi">20</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">Pxx</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Averaged ASDs&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(1025,)
+(2, 1025)
+(2, 1025)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorial_Notebooks_Signal_32_1.png" src="../../_images/tutorial_Notebooks_Signal_32_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [85]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">f</span><span class="p">,</span> <span class="n">Txy1</span><span class="p">,</span> <span class="n">Txy2</span><span class="p">,</span> <span class="n">coh</span><span class="p">,</span> <span class="n">Txyv</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">frfest</span><span class="p">(</span><span class="n">Yout</span><span class="p">,</span> <span class="n">Ucomb</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">Hv</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="bp">True</span><span class="p">))</span>
+<span class="c1">#fig_amp,=plt.plot(f[0,:],20*np.log10(np.abs(Txy1[0,:])),legend=&#39;$H_1$&#39;,f[0,:],20*np.log10(np.abs(Txy2[0,:])),legend=&#39;$H_2$&#39;,f[0,:],20*np.log10(np.abs(Txyv[0,:])),legend=&#39;$H_v$&#39;)</span>
+<span class="p">(</span><span class="n">line1</span><span class="p">,</span> <span class="n">line2</span><span class="p">,</span> <span class="n">line3</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="mi">20</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Txy1</span><span class="p">[</span><span class="mi">0</span><span class="p">,:])),</span><span class="n">f</span><span class="p">,</span><span class="mi">20</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Txy2</span><span class="p">[</span><span class="mi">0</span><span class="p">,:])),</span><span class="n">f</span><span class="p">,</span><span class="mi">20</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Txyv</span><span class="p">[</span><span class="mi">0</span><span class="p">,:])))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;FRF of &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">Yout</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39; averages.&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">((</span><span class="n">line1</span><span class="p">,</span><span class="n">line2</span><span class="p">,</span><span class="n">line3</span><span class="p">),(</span><span class="s1">&#39;$H_1$&#39;</span><span class="p">,</span><span class="s1">&#39;$H_2$&#39;</span><span class="p">,</span><span class="s1">&#39;$H_v$&#39;</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="mf">180.0</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">unwrap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">Txy1</span><span class="p">[</span><span class="mi">0</span><span class="p">,:])),</span><span class="n">f</span><span class="p">,</span><span class="mf">180.0</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">unwrap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">Txy2</span><span class="p">[</span><span class="mi">0</span><span class="p">,:])),</span><span class="n">f</span><span class="p">,</span><span class="mf">180.0</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">unwrap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">Txyv</span><span class="p">[</span><span class="mi">0</span><span class="p">,:])))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;FRF of &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">Yout</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39; averages.&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">coh</span><span class="p">[</span><span class="mi">0</span><span class="p">,:])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">vt</span><span class="o">.</span><span class="n">frfplot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">Txy1</span><span class="p">,</span><span class="n">freq_max</span><span class="o">=</span><span class="mf">3.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+works until here?
+(2, 2048, 3)
+(1, 2048, 3)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorial_Notebooks_Signal_33_1.png" src="../../_images/tutorial_Notebooks_Signal_33_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorial_Notebooks_Signal_33_2.png" src="../../_images/tutorial_Notebooks_Signal_33_2.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorial_Notebooks_Signal_33_3.png" src="../../_images/tutorial_Notebooks_Signal_33_3.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">AttributeError</span>                            Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-85-d630a4a440c2&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-intense-fg ansi-bold">     10</span> plt<span class="ansi-blue-fg">.</span>plot<span class="ansi-blue-fg">(</span>f<span class="ansi-blue-fg">,</span>coh<span class="ansi-blue-fg">[</span><span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">,</span><span class="ansi-blue-fg">:</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     11</span> plt<span class="ansi-blue-fg">.</span>show<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">---&gt; 12</span><span class="ansi-red-fg"> </span>vt<span class="ansi-blue-fg">.</span>frfplot<span class="ansi-blue-fg">(</span>f<span class="ansi-blue-fg">,</span>Txy1<span class="ansi-blue-fg">,</span>freq_max<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">3.5</span><span class="ansi-blue-fg">)</span>
+
+<span class="ansi-red-fg">AttributeError</span>: module &#39;vibrationtesting&#39; has no attribute &#39;frfplot&#39;
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">freq_vec</span><span class="o">.</span><span class="n">shape</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq_vec</span><span class="p">,</span> <span class="mi">20</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">Pxx</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">Pxx</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">vt</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">Yout</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">vttools</span> <span class="kn">as</span> <span class="nn">vt</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">linalg</span>
+<span class="n">sample_freq</span> <span class="o">=</span> <span class="mf">1e3</span>
+<span class="n">tfinal</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">sig_freq</span><span class="o">=</span><span class="mi">1</span><span class="c1">#50</span>
+<span class="n">A</span><span class="o">=</span><span class="mi">10</span>
+<span class="n">noise_power</span> <span class="o">=</span> <span class="mf">0.0001</span> <span class="o">*</span> <span class="n">sample_freq</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">noise_power</span> <span class="o">=</span> <span class="n">A</span><span class="o">/</span><span class="mf">1e2</span>
+<span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">tfinal</span><span class="p">,</span><span class="mi">1</span><span class="o">/</span><span class="n">sample_freq</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">A</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">sig_freq</span><span class="o">*</span><span class="n">time</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">x_sig</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">noise_power</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">x_sig</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span><span class="n">x_sig</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Time history&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (sec)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$x(t)$&#39;</span><span class="p">)</span>
+<span class="n">freq_vec</span><span class="p">,</span> <span class="n">Pxx</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">asd</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s2">&quot;hanning&quot;</span><span class="p">,</span> <span class="n">ave</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="bp">False</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1">#plt.plot(freq_vec[0,:], 20*np.log10(Pxx[0,:,:]))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">400</span><span class="p">,</span> <span class="mi">100</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;frequency [Hz]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;PSD [V**2/Hz]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">x_sig</span><span class="o">.</span><span class="n">shape</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">vttools</span> <span class="kn">as</span> <span class="nn">vt</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">vt</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">a</span><span class="o">=</span><span class="n">vt</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="n">win</span><span class="o">=</span><span class="n">vt</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="k">print</span><span class="p">(</span><span class="s1">&#39;reshape is NOT what you want. You want SWAPAXES&#39;</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">a</span><span class="p">,(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">a</span><span class="p">,(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))))</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">b</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">win2</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">win2</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">c</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">((</span><span class="n">b</span><span class="p">,</span><span class="n">b</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">c</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">win3</span><span class="o">=</span><span class="n">vt</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">win3</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">win3</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [46]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">vt</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+You shouldn&#39;t do that.
+The 1 dimension is the time (or frequency) incrementing dimension.
+Swapping axes temporarily to be compliant with expectations.
+I&#39;ll reluctantly return a transposed result.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[46]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>(50, 1)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [87]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">help</span><span class="p">(</span><span class="n">vt</span><span class="o">.</span><span class="n">frfest</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Help on function frfest in module vibrationtesting.sigp:
+
+frfest(x, f, dt, window=&#39;hanning&#39;, ave=True, Hv=False)
+    returns freq, H1, H2, coh, Hv
+
+    Estimates the :math:`H(j\omega)` Frequency Response Functions (FRFs) between :math:`x` and :math:`f`.
+
+        - parameters using ``:param &lt;name&gt;: &lt;description&gt;``
+        - type of parameters ``:type &lt;name&gt;: &lt;description&gt;``
+        - returns using ``:returns: &lt;description&gt;``
+        - examples (doctest)
+        - seealso using ``.. seealso:: text``
+        - notes using ``.. note:: text``
+        - warning using ``.. warning:: text``
+        - todo ``.. todo:: text``
+
+
+    :param x: output or response of system
+    :param f: input to system
+    :param dt: time step or time array
+    :param window: name of data window to apply
+    :param ave: apply averaging
+    :param Hv: calculate :math:`H_v` Frequency Response Function Estimation
+    :type x: float array
+    :type f: float array
+    :type dt: float
+    :type window: string
+    :type ave: Boolean
+    :type Hv: Boolean
+    :returns: freq, H1, H2, coh, Hv
+    :return freq: frequency vector
+    :type freq: float array
+    :rtype: float array, float array, float array, float array, float array
+
+    Currently ``window`` and ``ave`` are locked to default values.
+
+    :Example:
+
+    &gt;&gt;&gt; import control as ctrl
+    &gt;&gt;&gt; import matplotlib.pyplot as plt
+    &gt;&gt;&gt; import vibrationtesting as vt
+    &gt;&gt;&gt; import numpy as np
+    &gt;&gt;&gt; sample_freq = 1e3
+    &gt;&gt;&gt; noise_power = 0.001 * sample_freq / 2
+    &gt;&gt;&gt; A = np.array([[0, 0, 1, 0],              [0, 0, 0, 1],              [-200, 100, -.2, .1],              [100, -200, .1, -.2]])
+    &gt;&gt;&gt; B = np.array([[0], [0], [1], [0]])
+    &gt;&gt;&gt; C = np.array([[35, 0, 0, 0], [0, 35, 0, 0]])
+    &gt;&gt;&gt; D = np.array([[0], [0]])
+    &gt;&gt;&gt; sys = ctrl.ss(A, B, C, D)
+    &gt;&gt;&gt; tin = np.arange(0, 51.2, .1)
+    &gt;&gt;&gt; nr=.5   # 0 is all noise on input
+    &gt;&gt;&gt; for i in np.arange(5): #was 2*50
+    ...     u = np.random.normal(scale=np.sqrt(noise_power), size=tin.shape)
+    ...     #print(u)
+    ...     t, yout, xout = ctrl.forced_response(sys, tin, u,rtol=1e-12,transpose=True)
+    ...     if &#39;Yout&#39; in locals():
+    ...         Yout=np.dstack((Yout,yout+nr*np.random.normal(scale=.050*np.std(yout[0,:]), size=yout.shape)))
+    ...         Ucomb=np.dstack((Ucomb,u+(1-nr)*np.random.normal(scale=.05*np.std(u), size=u.shape)))
+    ...     else:
+    ...         Yout=yout+nr*np.random.normal(scale=.050*np.std(yout[0,:]), size=yout.shape) # 5% half the noise on output as on input
+    ...         Ucomb=u+(1-nr)*np.random.normal(scale=.05*np.std(u), size=u.shape)#(1, len(tin))) #10% noise signal on input
+    &gt;&gt;&gt; plt.plot(tin,Yout[:,0,:])
+    [&lt;matplotlib.lines.Line2...
+    &gt;&gt;&gt; Yout=Yout*np.std(Ucomb)/np.std(Yout)#40
+    &gt;&gt;&gt; plt.title(&#39;time response&#39;)
+    Text(0.5,1,&#39;time response&#39;)
+    &gt;&gt;&gt; freq_vec, Pxx = vt.asd(Yout, tin, windowname=&#34;hanning&#34;, ave=bool(False))
+    &gt;&gt;&gt; plt.plot(freq_vec, 20*np.log10(Pxx[0,:]))
+    [&lt;matplotlib.lines.Line2D object at ...]
+    &gt;&gt;&gt; plt.title(&#39;Raw ASDs&#39;)
+    Text(0.5,1,&#39;Raw ASDs&#39;)
+    &gt;&gt;&gt; freq_vec, Pxx = vt.asd(Yout, tin, windowname=&#34;hanning&#34;, ave=bool(True))
+    &gt;&gt;&gt; plt.plot(freq_vec, 20*np.log10(Pxx[0,:]))
+    [&lt;matplotlib.lines.Line2D object at ...]
+    &gt;&gt;&gt; plt.title(&#39;Averaged ASDs&#39;)
+    Text(0.5,1,&#39;Averaged ASDs&#39;)
+    &gt;&gt;&gt; f, Txy1, Txy2, coh, Txyv = vt.frfest(Yout, Ucomb, t,Hv=bool(True))
+    &gt;&gt;&gt; #fig_amp,=plt.plot(f[0,:],20*np.log10(np.abs(Txy1[0,:])),legend=&#39;$H_1$&#39;,f[0,:],20*np.log10(np.abs(Txy2[0,:])),legend=&#39;$H_2$&#39;,f[0,:],20*np.log10(np.abs(Txyv[0,:])),legend=&#39;$H_v$&#39;)
+    &gt;&gt;&gt; (line1, line2, line3) = plt.plot(f,20*np.log10(np.abs(Txy1[0,:])),f,20*np.log10(np.abs(Txy2[0,:])),f,20*np.log10(np.abs(Txyv[0,:])))
+    &gt;&gt;&gt; plt.title(&#39;FRF of &#39; + str(Yout.shape[2]) + &#39; averages.&#39;)
+    Text(0.5,1,&#39;FRF of &#39; + str(Yout.shape[2]) + &#39; averages.&#39;)
+    &gt;&gt;&gt; plt.legend((line1,line2,line3),(&#39;$H_1$&#39;,&#39;$H_2$&#39;,&#39;$H_v$&#39;))
+    &lt;matplotlib.legend.Legend object ...&gt;
+    &gt;&gt;&gt; plt.plot(f,180.0/np.pi*np.unwrap(np.angle(Txy1[0,:])),f,180.0/np.pi*np.unwrap(np.angle(Txy2[0,:])),f,180.0/np.pi*np.unwrap(np.angle(Txyv[0,:])))
+    [&lt;matplotlib.lines.Line2D object at ...]
+    &gt;&gt;&gt; plt.title(&#39;FRF of &#39; + str(Yout.shape[2]) + &#39; averages.&#39;)
+    Text(0.5,1,&#39;FRF of &#39; + str(Yout.shape[2]) + &#39; averages.&#39;)
+    &gt;&gt;&gt; plt.plot(f,coh[0,:])
+    [&lt;matplotlib.lines.Line2D object at...
+    &gt;&gt;&gt; vt.frfplot(f,Txy1,freq_max=3.5)
+
+
+    Copyright 1994 by Joseph C. Slater
+
+    :Modifications:
+
+    7/6/00: Changed default FRF calculation from H2 to H1, Added H1, H2, and Hv options.
+    4/13/15: Converted to Python
+
+    .. note:: Not comptible with scipy.signal functions
+    .. seealso:: :func:`asd`, :func:`crsd`, :func:`frfplot`.
+    .. warning:: hanning window cannot be selected yet. Averaging cannot be unslected yet.
+    .. todo:: Fix averaging, windowing, multiple input.
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [103]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="k">del</span> <span class="n">Yout</span>
+<span class="n">sample_freq</span> <span class="o">=</span> <span class="mf">1e3</span>
+<span class="n">noise_power</span> <span class="o">=</span> <span class="mf">0.001</span> <span class="o">*</span> <span class="n">sample_freq</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">200</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="o">-.</span><span class="mi">2</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">200</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="o">-.</span><span class="mi">2</span><span class="p">]])</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+<span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">35</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">ctrl</span><span class="o">.</span><span class="n">ss</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span>
+<span class="n">tin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">51.2</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">nr</span><span class="o">=.</span><span class="mi">5</span>   <span class="c1"># 0 is all noise on input</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span> <span class="c1">#was 2*50</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">noise_power</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">tin</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="c1">#print(u)</span>
+    <span class="n">t</span><span class="p">,</span> <span class="n">yout</span><span class="p">,</span> <span class="n">xout</span> <span class="o">=</span> <span class="n">ctrl</span><span class="o">.</span><span class="n">forced_response</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span> <span class="n">tin</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span><span class="n">rtol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">)</span><span class="c1">#,transpose=True)</span>
+    <span class="k">if</span> <span class="s1">&#39;Yout&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
+        <span class="n">Yout</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">((</span><span class="n">Yout</span><span class="p">,</span><span class="n">yout</span><span class="o">+</span><span class="n">nr</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=.</span><span class="mo">050</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">yout</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]),</span> <span class="n">size</span><span class="o">=</span><span class="n">yout</span><span class="o">.</span><span class="n">shape</span><span class="p">)))</span>
+        <span class="n">Ucomb</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">((</span><span class="n">Ucomb</span><span class="p">,</span><span class="n">u</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">nr</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=.</span><span class="mo">05</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">)))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Yout</span><span class="o">=</span><span class="n">yout</span><span class="o">+</span><span class="n">nr</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=.</span><span class="mo">050</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">yout</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]),</span> <span class="n">size</span><span class="o">=</span><span class="n">yout</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="c1"># 5% half the noise on output as on input</span>
+        <span class="n">Ucomb</span><span class="o">=</span><span class="n">u</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">nr</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=.</span><span class="mo">05</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="c1">#(1, len(tin))) #10% noise signal on input</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [104]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">Yout</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[104]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>(2, 512, 5)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [105]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">Ucomb</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[105]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>(1, 512, 5)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [106]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">f</span><span class="p">,</span> <span class="n">Txy1</span><span class="p">,</span> <span class="n">Txy2</span><span class="p">,</span> <span class="n">coh</span><span class="p">,</span> <span class="n">Txyv</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">frfest</span><span class="p">(</span><span class="n">Yout</span><span class="p">,</span> <span class="n">Ucomb</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span><span class="n">Hv</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="bp">True</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(1, 512, 5)
+(1, 257, 5)
+(1, 512, 5)
+(1, 257, 5)
+works until here?
+(2, 512, 5)
+(1, 512, 5)
+(1, 512, 5)
+(1, 257, 5)
+(2, 512, 5)
+(2, 257, 5)
+(2, 512, 5)
+(2, 257, 5)
+(2, 512, 5)
+(2, 257, 5)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [99]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">Yout</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[99]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>(512, 2, 5)
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Vibration Testing</a></h1>
+
+
+
+<p class="blurb">Vibration Testing Analysis</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorial</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Signal Processing for Vibration Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ho-Kalman-Demo.html">Ho-Kalman Identification Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ho-Kalman-Demo.html#New-functions-available">New functions available</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Figures.html">Figure generation for Vibration Testing manuscript</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">Reference</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/tutorial/Notebooks/Signal.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Joseph C. Slater.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../_sources/tutorial/Notebooks/Signal.ipynb.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

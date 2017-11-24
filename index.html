@@ -1,0 +1,160 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>The Vibration Testing Module &#8212; Vibration Testing 0.1a01 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1a01',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="the-vibration-testing-module">
+<h1>The Vibration Testing Module<a class="headerlink" href="#the-vibration-testing-module" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="http://badge.fury.io/py/vibrationtesting"><img alt="https://badge.fury.io/py/vibrationtesting.png/" src="https://badge.fury.io/py/vibrationtesting.png/" /></a>
+<a class="reference external image-reference" href="https://travis-ci.org/vibrationtesting/vibrationtesting"><img alt="https://travis-ci.org/vibrationtesting/vibrationtesting.svg?branch=master" src="https://travis-ci.org/vibrationtesting/vibrationtesting.svg?branch=master" /></a>
+<a class="reference external image-reference" href="https://img.shields.io/pypi/v/vibrationtesting"><img alt="https://img.shields.io/pypi/v/vibrationtesting.svg" src="https://img.shields.io/pypi/v/vibrationtesting.svg" /></a>
+<p>Joseph C. Slater</p>
+<p>Welcome to the <cite>Vibration Testing</cite> module. This module has three separate pieces in varying degrees of completion:</p>
+<ul class="simple">
+<li>Signal processing</li>
+<li>Model identification (Modal Analysis)</li>
+<li>Model updating</li>
+</ul>
+<p>If you are looking for a <a class="reference external" href="https://github.com/Vibration-Testing/Vibration-Testing-Matlab">Matlab version</a>, one does exist, but is not being actively developed by me. You’ll find more features hear. Volunteering to support Open Source is much more rewarding than volunteering to support Matlab.</p>
+<p>This software is nominally provided without support, etc., but I will certainly answer a question or two. If you have professional-level needs please <a class="reference external" href="mailto:joseph&#46;c&#46;slater&#37;&#52;&#48;gmail&#46;com">contact the authors</a>. Further, please also <a class="reference external" href="https://github.com/Vibration-Testing/vibrationtesting/issues">submit bug reports</a> with code indicating the error.</p>
+<p>For more information, please see the <a class="reference external" href="http://Vibration-Testing.github.io/vibrationtesting/">documentation for the Python version</a> but please excuse that it is still under development. Such documentation has never existed for the other ports of the module so this is taking some time. We don’t need feedback at this time, but we will take assistance in improving documentation and code.</p>
+<div class="section" id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Installing_Python.html">Installing Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#easy-installation">Easy Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installation-of-current-development-version">Installation of current development version</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/index.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/Notebooks/Signal.html">Signal Processing for Vibration Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/Notebooks/Ho-Kalman-Demo.html">Ho-Kalman Identification Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/Notebooks/Ho-Kalman-Demo.html#New-functions-available">New functions available</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/Notebooks/Figures.html">Figure generation for Vibration Testing manuscript</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/index.html">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/signal.html">Signal Processing (<code class="docutils literal"><span class="pre">vibrationtesting.sigp</span></code>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/signal.html#sigp-signal-processing-for-vibration-testing"><code class="docutils literal"><span class="pre">sigp</span></code> – Signal Processing for Vibration Testing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="download-tutorial-notebooks">
+<h3>Download Tutorial Notebooks<a class="headerlink" href="#download-tutorial-notebooks" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="indices-and-tables">
+<h4>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">Vibration Testing</a></h1>
+
+
+
+<p class="blurb">Vibration Testing Analysis</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/index.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/index.html">Reference</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Joseph C. Slater.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
