@@ -12,7 +12,7 @@ vibration_testing: A package for signal processing, modal analysis, and model up
 
 Joseph C. Slater
 
-This is the software repository for  Vibration Testing, not the `online manual <http://Vibration-Testing.github.io/vibrationtesting/>`_. (Link not yet live)
+This is the software repository for  Vibration Testing, not the `online manual <http://Vibration-Testing.github.io/vibrationtesting/>`_. 
 
 Welcome to `Vibration Testing <http://Vibration-Testing.github.io/vibrationtesting/>`_.
 
