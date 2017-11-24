@@ -18,7 +18,7 @@ vibration_testing: A package for signal processing, modal analysis, and model up
 
 Joseph C. Slater
 
-This is the software repository for  Vibration Testing, not the `online manual <http://Vibration-Testing.github.io/vibrationtesting/>`_.
+This is the software repository for  Vibration Testing, not the `online manual <http://Vibration-Testing.github.io/vibrationtesting/>`_. (Link not yet live)
 
 Welcome to `Vibration Testing <http://Vibration-Testing.github.io/vibrationtesting/>`_.
 
@@ -42,9 +42,9 @@ where ``--user`` isn't necessary if you are using a locally installed version of
 
 To run, I recommend you open a `Jupyter <https://jupyter.org>`_ notebook by using ``jupyter notebook`` and then type::
 
-  import vibration_toolbox as vtb
+  import vibrationtesting as vt
 
-For examples, see the `JupyterNotebooks folder <https://github.com/Vibration-Testing/vibrationtesting/tree/master/JupyterNotebooks>`_. Some of these have interactive capabilities that are only apparent when you run them yourself instead of just looking at them on github. Unfortunately our organization of these still leaves a little to be desired.
+For examples, see the `JupyterNotebooks folder <https://github.com/Vibration-Testing/vibrationtesting/tree/master/JupyterNotebooks>`_. (In flux- also look in doc/Tutorials for now) Some of these have interactive capabilities that are only apparent when you run them yourself instead of just looking at them on github. Unfortunately our organization of these still leaves a little to be desired.
 
 Installation of current code
 ____________________________
@@ -58,4 +58,4 @@ That should be it. Please note issues on the `issues tab <https://github.com/Vib
 Quick notes:
 -------------
 
-The `convention used for the signal processing <http://python-control.readthedocs.io/en/latest/conventions.html#time-series-convention>`_ is that of the `python controls module <http://python-control.readthedocs.io/en/latest/>`_. 
+The `convention used for the signal processing <http://python-control.readthedocs.io/en/latest/conventions.html#time-series-convention>`_ is that of the `python controls module <http://python-control.readthedocs.io/en/latest/>`_.

@@ -1,34 +1,39 @@
-.. Vibration Toolbox documentation master file, created by
+.. Vibration Testing documentation master file, created by
    sphinx-quickstart on Sun Apr  9 10:02:35 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
 =============================================
-The Engineering Vibration Toolbox for Python
+The Vibration Testing Module
 =============================================
 
 .. .. include:: <isonum.txt>
-.. image:: https://badge.fury.io/py/vibration_toolbox.png/
-   :target: http://badge.fury.io/py/vibration_toolbox
+.. image:: https://badge.fury.io/py/vibrationtesting.png/
+   :target: http://badge.fury.io/py/vibrationtesting
 
-.. image:: https://travis-ci.org/vibrationtoolbox/vibration_toolbox.svg?branch=master
-   :target: https://travis-ci.org/vibrationtoolbox/vibration_toolbox
+.. image:: https://travis-ci.org/vibrationtesting/vibrationtesting.svg?branch=master
+   :target: https://travis-ci.org/vibrationtesting/vibrationtesting
 
-.. image:: https://img.shields.io/pypi/v/vibration_toolbox.svg
-   :target: https://img.shields.io/pypi/v/vibration_toolbox
+.. image:: https://img.shields.io/pypi/v/vibrationtesting.svg
+   :target: https://img.shields.io/pypi/v/vibrationtesting
 
-.. #image:: https://coveralls.io/repos/vibrationtoolbox/vibration_toolbox/badge.png?branch=master
-..  #:target: https://coveralls.io/r/vibrationtoolbox/vibration_toolbox
+.. #image:: https://coveralls.io/repos/vibrationtesting/vibrationtesting/badge.png?branch=master
+..  #:target: https://coveralls.io/r/vibrationtesting/vibrationtesting
 
 
-Joseph C. Slater and Raphael Timbó
+Joseph C. Slater
 
-Welcome to `Engineering Vibration Toolbox <http://vibrationtoolbox.github.io/vibration_toolbox/>`_.
-Originally written for `Matlab <http://www.mathworks.com>`_\®, this `Python <http://python.org>`_ version is a completely new design build for modern education. This is an *educational* set of codes intended primarily for
-demonstration of concepts. You may find them useful for application, but that
-isn't the intent. If you have professional-level needs please `contact the authors <mailto:joseph.c.slater@gmail.com>`_.
+Welcome to the `Vibration Testing` module. This module has three separate pieces in varying degrees of completion:
 
-For more information, please see the `documentation for the Python version <http://vibrationtoolbox.github.io/vibration_toolbox/>`_ but please excuse that it is still under development. Such documentation has never existed for the other ports of the toolbox so this is taking some time. We don't need feedback at this time, but we will take assistance in improving documentation and code.
+- Signal processing
+- Model identification (Modal Analysis)
+- Model updating
+
+If you are looking for a `Matlab version <https://github.com/Vibration-Testing/Vibration-Testing-Matlab>`_, one does exist, but is not being actively developed by me. You'll find more features hear. Volunteering to support Open Source is much more rewarding than volunteering to support Matlab.
+
+This software is nominally provided without support, etc., but I will certainly answer a question or two. If you have professional-level needs please `contact the authors <mailto:joseph.c.slater@gmail.com>`_. Further, please also `submit bug reports<https://github.com/Vibration-Testing/vibrationtesting/issues>`_ with code indicating the error.
+
+For more information, please see the `documentation for the Python version <http://vibrationtesting.github.io/vibrationtesting/>`_ but please excuse that it is still under development. Such documentation has never existed for the other ports of the toolbox so this is taking some time. We don't need feedback at this time, but we will take assistance in improving documentation and code.
 
 Table of Contents
 -----------------
