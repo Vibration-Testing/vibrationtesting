@@ -12,10 +12,10 @@ vttools.conf module
     :undoc-members:
     :show-inheritance:
 
-vttools.sigp module
+vttools.signal module
 -------------------
 
-.. automodule:: vttools.sigp
+.. automodule:: vttools.signal
     :members:
     :undoc-members:
     :show-inheritance:

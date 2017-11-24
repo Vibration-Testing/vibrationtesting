@@ -1,9 +1,9 @@
 """
 ================================================
-Signal processing (:mod:`vibrationtesting.sigp`)
+Signal processing (:mod:`vibrationtesting.signal`)
 ================================================
 
-.. module:: sigp
+.. module:: signal
 
 Convolution
 ===========
@@ -77,7 +77,7 @@ if 'pytest' in sys.argv[0]:
     print('Setting backend to agg to run tests')
     mpl.use('agg')
 
-from .sigp import *
+from .signal import *
 
 """
 np.set_printoptions(edgeitems=3, infstr='inf', linewidth=75,
