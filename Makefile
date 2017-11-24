@@ -1,7 +1,7 @@
 # This Makefile was created by transforming the one for oct2py
 # The line #------------------ shows where editing to date has been completed
 # for the first attempt.
-# Note: This is meant for vibration_toolbox developer use only
+# Note: This is meant for vibrationtesting developer use only
 
 .PHONY: all clean test cover release gh-pages docs
 

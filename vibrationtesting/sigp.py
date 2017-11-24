@@ -19,7 +19,7 @@ import scipy.fftpack as fftpack
 import scipy.linalg as la
 import matplotlib
 import matplotlib.pyplot as plt
-rcParams = matplotlib.rcParams
+# rcParams = matplotlib.rcParams
 
 
 """
@@ -27,7 +27,7 @@ Notes:
 ------
 Sept. 3, 2016
 Development of windows in scipy.signal has been rapid and
-determining what I should build into this toolbox, or simply leverage
+determining what I should build into this module, or simply leverage
 from scipy.signal has been a moving target.
 It's now apparent that creating or returning a window is pointless. Further,
 Applying should be a relatively simple code obviating much of any need for the
@@ -72,8 +72,8 @@ def window(x, windowname='hanning', normalize=False):
     w: 1) hanning window array of size x
        2) windowing array. Windowed array is then x*w
 
-    Example
-    -------
+    Examples
+    --------
     >>> import numpy as np
     >>> import vibrationtesting as vt
     >>> import matplotlib.pyplot as plt
@@ -477,8 +477,8 @@ def asd(x, t, windowname="hanning", ave=bool(True)):
     Pxx : array
           Autospectrum (n x N) or (n x N x m) if not averaged.
 
-    Example
-    -------
+    Examples
+    --------
     >>> from scipy import signal
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
@@ -688,19 +688,20 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):
         - warning using ``.. warning:: text``
         - todo ``.. todo:: text``
 
-
     :param x: output or response of system
     :param f: input to system
     :param dt: time step or time array
     :param window: name of data window to apply
     :param ave: apply averaging
     :param Hv: calculate :math:`H_v` Frequency Response Function Estimation
+
     :type x: float array
     :type f: float array
     :type dt: float
     :type window: string
     :type ave: Boolean
     :type Hv: Boolean
+
     :returns: freq, H1, H2, coh, Hv
     :return freq: frequency vector
     :type freq: float array
@@ -772,8 +773,8 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):
     [<matplotlib.lines.Line2D object at...
     >>> vt.frfplot(f,Txy1,freq_max=3.5)
 
-    Modifications
-    -------------
+    Notes
+    -----
     7/6/00: Changed default FRF calculation from H2 to H1, Added H1, H2, and
             Hv options.
     4/13/15: Converted to Python
@@ -1044,8 +1045,8 @@ def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
     =======  =============================================================
 
 
-    :Example:
-
+    Examples
+    --------
     >>> import matplotlib.pyplot as plt
     >>> import vibrationtesting as vt
     >>> import numpy as np
