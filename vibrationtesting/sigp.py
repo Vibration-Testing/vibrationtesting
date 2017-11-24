@@ -193,7 +193,8 @@ def window(x, windowname='hanning', normalize=False):
 
 
 def hanning(x, normalize=False):
-    """returns window
+    """Returns hanning window
+
     Create a hanning window of length :math:`x`, or a hanning window sized
     to match :math:`x`
     such that x*w is the windowed result.
@@ -209,8 +210,8 @@ def hanning(x, normalize=False):
     w: 1) hanning window array of size x
        2) windowing array. Windowed array is then x*w
 
-    Example
-    -------
+    Examples
+    --------
     >>> import numpy as np
     >>> import vibrationtesting as vt
     >>> import matplotlib.pyplot as plt
@@ -303,9 +304,8 @@ def hanning(x, normalize=False):
 
 
 def blackwin(x):
-    """
-    w=blackwin(n)
-    Return the n point Blackman window
+    """Return the n point Blackman window
+
     x_windows=blackwin(x)
     Returns x as the Blackman windowing array x_window
     The windowed signal is then x*x_window
@@ -332,8 +332,8 @@ def blackwin(x):
 
 
 def expwin(x, ts=.75):
-    """
-    w=expwin(n)
+    """Return the n point exponential window
+
     Return the n point exponential window
     x_windows=expwin(x)
     Returns x as the expwin windowing array x_windowed
@@ -364,9 +364,8 @@ def expwin(x, ts=.75):
 
 
 def hammwin(x):
-    """
-    w=hammwin(n)
-    Return the n point hamming window
+    """Return the n point hamming window
+
     x_windows=hamming(x)
     Returns x as the hamming windowingarray x_windowed
     The windowed signal is then x*x_window
@@ -393,9 +392,8 @@ def hammwin(x):
 
 
 def flatwin(x):
-    """
-    w=flatwin(n)
-    Return the n point flat top window
+    """Return the n point flat top window
+
     x_windows=flatwin(x)
     Returns x as the flat top windowing array x_windowed
     The windowed signal is then x*x_window
@@ -426,9 +424,8 @@ def flatwin(x):
 
 
 def boxwin(x):
-    """
-    w=boxwin(n)
-    Return the n point box window (uniform)
+    """Return the n point box window (uniform)
+
     x_windows=boxwin(x)
     Returns x as the boxwin windowing array x_windowed
     The windowed signal is then x*x_window
@@ -459,8 +456,26 @@ def hannwin(x):
 
 
 def asd(x, t, windowname="hanning", ave=bool(True)):
-    """
-    Calculate the autospectrum (power spectrum) density of a signal x
+    """Return autospectrum (power spectrum) density of a signal x
+
+    Parameters
+    ----------
+    x : array
+        Data array (n x N x m) where n is the number of sensors, m the
+        number of experiments.
+    t : array
+        Time array (1 x N)
+    windowname : string
+        Name of windowing function to use
+    ave : bool, optional
+        Average result or not?
+
+    Returns
+    -------
+    f : array
+        Frequency vector (1 x N)
+    Pxx : array
+          Autospectrum (n x N) or (n x N x m) if not averaged.
 
     Example
     -------
@@ -518,8 +533,27 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     """
     Calculate the cross spectrum (power spectrum) density between two signals.
 
-    Example
+        Parameters
+    ----------
+    x, y : arrays
+        Data array (n x N x m) where n is the number of sensors, m the
+        number of experiments.
+    t : array
+        Time array (1 x N)
+    windowname : string
+        Name of windowing function to use
+    ave : bool, optional
+        Average result or not?
+
+    Returns
     -------
+    f : array
+        Frequency vector (1 x N)
+    Pxy : array
+          Autospectrum (n x N) or (n x N x m) if not averaged.
+
+    Examples
+    --------
     >>> from scipy import signal
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
@@ -538,8 +572,7 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     >>> time = np.arange(0,tfinal,1/sample_freq)
     >>> time = np.reshape(time, (1, -1))
     >>> x = A*np.sin(2*np.pi*sig_freq*time)
-    >>> x = x + np.random.normal(scale=np.sqrt(noise_power),
-                                 size=(1, time.shape[1]))
+    >>> x = x + np.random.normal(scale=np.sqrt(noise_power), size=(1, time.shape[1]))
     >>> plt.subplot(2,1,1)
     <matplotlib...>
     >>> plt.plot(time[0,:],x[0,:])
@@ -563,12 +596,6 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     Text(0.5,0,'frequency [Hz]')
     >>> plt.ylabel('PSD [V**2/Hz]')
     Text(0,0.5,'PSD [V**2/Hz]')
-
-    If we average the last half of the spectral density, to exclude the
-    peak, we can recover the noise power on the signal.
-
-
-    Now compute and plot the power spectrum.
     """
     # t_shape = t.shape
     t = t.flatten()
@@ -646,10 +673,11 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     return f, Pxy
 
 
-def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,options)
+def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):
     """Returns freq, H1, H2, coh, Hv
 
-    Estimates the :math:`H(j\\omega)` Frequency Response Functions (FRFs) between :math:`x` and :math:`f`.
+    Estimates the :math:`H(j\\omega)` Frequency Response Functions (FRFs)
+    between :math:`x` and :math:`f`.
 
         - parameters using ``:param <name>: <description>``
         - type of parameters ``:type <name>: <description>``
@@ -680,7 +708,7 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
 
     Currently ``window`` and ``ave`` are locked to default values.
 
-    Example
+    Examples
     --------
     >>> import control as ctrl
     >>> import matplotlib.pyplot as plt
@@ -743,9 +771,6 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
     >>> ax.plot(f,coh[0,:])
     [<matplotlib.lines.Line2D object at...
     >>> vt.frfplot(f,Txy1,freq_max=3.5)
-
-
-    Copyright 1994 by Joseph C. Slater
 
     Modifications
     -------------
@@ -1329,7 +1354,8 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
     i = 0
     for i in sp.arange(len(omega)):
         w = omega[i]
-        H[i] = (C@la.solve(w * 1j * sp.eye(sa) - A, B) + D)[out_index, in_index]
+        H[i] = (C@la.solve(w * 1j * sp.eye(sa) - A, B) + D)[out_index,
+                                                            in_index]
     return omega, H
 
 
@@ -1409,6 +1435,8 @@ def so2ss(M, C, K, Bt, Cd, Cv, Ca):
 
 
 def damp(A):
+    '''Display natural frequencies and damping ratios of state matrix.
+    '''
 
     # Original Author: Kai P. Mueller <mueller@ifr.ing.tu-bs.de> for Octave
     # Created: September 29, 1997.
