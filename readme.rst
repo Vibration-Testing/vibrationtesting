@@ -1,6 +1,7 @@
-vibration_testing: A package for signal processing, modal analysis, and model updating
-=============================================
+Vibration Testing:
+==================
 
+A package for signal processing, modal analysis, and model reduction and model updating
 
 .. .. include:: <isonum.txt>
 .. image:: https://badge.fury.io/py/vibrationtesting.png/
@@ -11,8 +12,9 @@ vibration_testing: A package for signal processing, modal analysis, and model up
 
 
 Joseph C. Slater
+----------------
 
-This is the software repository for  Vibration Testing, not the `online manual <http://Vibration-Testing.github.io/vibrationtesting/>`_. 
+This is the software repository for  Vibration Testing, not the `online manual <http://Vibration-Testing.github.io/vibrationtesting/>`_.
 
 Welcome to `Vibration Testing <http://Vibration-Testing.github.io/vibrationtesting/>`_.
 
@@ -28,7 +30,7 @@ Installation is made easy with ``pip`` (or ``pip3``), with releases as we have t
 to create a full first release. Much of it works already, but I certainly need
 issue reports (on `github <http://github.com/Vibration-Testing/vibrationtesting>`_) when something is not working as it should.
 
-To install ( **not be available** until release on `PyPI <http://pypi.python.org>`_ as ``vibrationtesting``)::
+To install as ``vibrationtesting``)::
 
   pip install --user vibrationtesting
 
@@ -43,13 +45,13 @@ For examples, see the `JupyterNotebooks folder <https://github.com/Vibration-Tes
 Installation of current code
 ____________________________
 
-The usage documentation is far behind the current code, while the reference is way ahead of the released code due to the `autodoc <http://www.sphinx-doc.org/en/stable/ext/autodoc.html>`_ capability of `Sphinx <http://www.sphinx-doc.org/en/stable/>`_. Especially as of early 2017, the code is in flux. So is the documentation. Releases to `pypi <https://pypi.python.org/pypi>`_ are far behind current status as stopping to deploy would cost more time that it is worth. I have the objective of releasing a first non-beta version at the end of May 2018, but even this cannot be promised.
+The usage documentation is far behind the current code, while the reference is way ahead of the released code due to the `autodoc  <http://www.sphinx-doc.org/en/stable/ext/autodoc.html>`_ capability of `Sphinx  <http://www.sphinx-doc.org/en/stable/>`_. Especially as of 2017, the code is in flux. So is the documentation. Releases to `PyPI <https://pypi.python.org/pypi>`_ are far behind current status as stopping to deploy would cost more time that it is worth. I have the objective of releasing a first non-beta version at the end of May 2018, but even this cannot be promised.
 
-If you wish to install the current version of the software, read the instructions in `Contributing.rst <https://github.com/Vibration-Testing/vibrationtesting/blob/master/CONTRIBUTING.rst>`_
+If you wish to install the current version of the software, read the instructions in `Contributing.rst  <https://github.com/Vibration-Testing/vibrationtesting/blob/master/CONTRIBUTING.rst>`_
 
-That should be it. Please note issues on the `issues tab <https://github.com/Vibration-Testing/vibrationtesting/issues>`_ on github.
+That should be it. Please note issues on the `issues tab  <https://github.com/Vibration-Testing/vibrationtesting/issues>`_ on github.
 
 Quick notes:
 -------------
 
-The `convention used for the signal processing <http://python-control.readthedocs.io/en/latest/conventions.html#time-series-convention>`_ is that of the `python controls module <http://python-control.readthedocs.io/en/latest/>`_.
+The `convention used for the signal processing  <http://python-control.readthedocs.io/en/latest/conventions.html#time-series-convention>`_ is that of the `python controls module  <http://python-control.readthedocs.io/en/latest/>`_.

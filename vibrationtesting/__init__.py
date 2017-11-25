@@ -1,27 +1,9 @@
 """
-================================================
+==================================================
 Signal processing (:mod:`vibrationtesting.signal`)
-================================================
+==================================================
 
 .. module:: signal
-
-Convolution
-===========
-
-Don't believe any of this!   It's still not updated!
-
-
-
-.. autosummary::
-   :toctree: generated/
-
-   convolve    -- N-dimensional convolution.
-   correlate   -- N-dimensional correlation.
-   fftconvolve -- N-dimensional convolution using the FFT.
-   convolve2d  -- 2-dimensional convolution (more options).
-   correlate2d -- 2-dimensional correlation (more options).
-   sepfir2d    -- Convolve with a 2-D separable FIR filter.
-
 
 Window functions
 ================
@@ -29,24 +11,17 @@ Window functions
 .. autosummary::
    :toctree: generated/
 
-   get_window        -- Return a window of a given length and type.
    barthann          -- Bartlett-Hann window
    bartlett          -- Bartlett window
    blackman          -- Blackman window
-   blackmanharris    -- Minimum 4-term Blackman-Harris window
-   bohman            -- Bohman window
    boxcar            -- Boxcar window
    chebwin           -- Dolph-Chebyshev window
-   cosine            -- Cosine window
    flattop           -- Flat top window
    gaussian          -- Gaussian window
    general_gaussian  -- Generalized Gaussian window
    hamming           -- Hamming window
    hann              -- Hann window
-   kaiser            -- Kaiser window
-   nuttall           -- Nuttall's minimum 4-term Blackman-Harris window
    parzen            -- Parzen window
-   slepian           -- Slepian window
    triang            -- Triangular window
 
 
@@ -65,7 +40,7 @@ Peak finding
 from __future__ import division, print_function, absolute_import
 
 __title__ = 'vibrationtesting'
-__version__ = '0.1a01'
+__version__ = '0.1b02'
 __author__ = u'Joseph C. Slater'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2002-2017 Joseph C. Slater'
