@@ -1,0 +1,411 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>System Manipulation (vibrationtesting.system) &#8212; Vibration Testing 0.1b03 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1b03',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Signal Processing (vibrationtesting.signal)" href="signal.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="system-manipulation-vibrationtesting-system">
+<h1>System Manipulation (<code class="xref py py-mod docutils literal"><span class="pre">vibrationtesting.system</span></code>)<a class="headerlink" href="#system-manipulation-vibrationtesting-system" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="system-system-solvers-and-manipulators">
+<h2><a class="reference internal" href="#module-system" title="system"><code class="xref py py-mod docutils literal"><span class="pre">system</span></code></a> – System Solvers and Manipulators<a class="headerlink" href="#system-system-solvers-and-manipulators" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-system"></span><p>Created on 14 May 2015
+&#64;author: Joseph C. Slater</p>
+<dl class="function">
+<dt id="system.c2d">
+<code class="descclassname">system.</code><code class="descname">c2d</code><span class="sig-paren">(</span><em>A</em>, <em>B</em>, <em>C</em>, <em>D</em>, <em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#c2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.c2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert continuous state system to discrete time
+Converts a set of continuous state space system matrices to their
+discrete counterpart.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>A, B, C, D</strong> : float arrays</p>
+<blockquote>
+<div><p>State space system matrices</p>
+</div></blockquote>
+<p><strong>dt</strong> : float</p>
+<blockquote>
+<div><p>Time step of discrete system</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>Ad, Bd, C, D</strong> : float arrays</p>
+<blockquote class="last">
+<div><p>Discrete state space system matrices</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Zero-order hold solution</p>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#system.d2c" title="system.d2c"><code class="xref py py-func docutils literal"><span class="pre">d2c()</span></code></a>.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>   <span class="mf">0.</span> <span class="p">,</span>  <span class="mf">1.</span>    <span class="p">,</span>  <span class="mf">0.</span>    <span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>   <span class="mf">0.</span> <span class="p">,</span>  <span class="mf">0.</span>    <span class="p">,</span>  <span class="mf">1.</span>    <span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.4</span><span class="p">,</span>  <span class="mf">1.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0058</span><span class="p">,</span>  <span class="mf">0.0014</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.4</span><span class="p">,</span>  <span class="mf">0.0016</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0038</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">A3</span><span class="p">,</span> <span class="n">A4</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="go">[[ 0.      0.      1.      0.    ]</span>
+<span class="go"> [ 0.      0.      0.      1.    ]</span>
+<span class="go"> [-1.4     1.2    -0.0058  0.0014]</span>
+<span class="go"> [ 0.8    -1.4     0.0016 -0.0038]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0058</span><span class="p">,</span> <span class="mf">0.0014</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Ad</span><span class="p">,</span> <span class="n">Bd</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">c2d</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Ad</span><span class="p">)</span>
+<span class="go">[[ 0.9999  0.0001  0.01    0.    ]</span>
+<span class="go"> [ 0.      0.9999  0.      0.01  ]</span>
+<span class="go"> [-0.014   0.012   0.9999  0.0001]</span>
+<span class="go"> [ 0.008  -0.014   0.0001  0.9999]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Bd</span><span class="p">)</span>
+<span class="go">[[ 0.  ]</span>
+<span class="go"> [ 0.  ]</span>
+<span class="go"> [ 0.  ]</span>
+<span class="go"> [ 0.01]]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="system.d2c">
+<code class="descclassname">system.</code><code class="descname">d2c</code><span class="sig-paren">(</span><em>Ad</em>, <em>Bd</em>, <em>C</em>, <em>D</em>, <em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#d2c"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.d2c" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns continuous A, B, C, D from discrete
+Converts a set of digital state space system matrices to their
+continuous counterpart.
+Parameters
+———-
+Ad, Bd, C, D : float arrays</p>
+<blockquote>
+<div>Discrete state space system matrices</div></blockquote>
+<dl class="docutils">
+<dt>dt <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd>Time step of discrete system</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>A, B, C, D</strong> : float arrays</p>
+<blockquote class="last">
+<div><p>State space system matrices</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Zero-order hold solution</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">discrepancies between <a class="reference internal" href="#system.c2d" title="system.c2d"><code class="xref py py-func docutils literal"><span class="pre">c2d()</span></code></a> and <a class="reference internal" href="#system.d2c" title="system.d2c"><code class="xref py py-func docutils literal"><span class="pre">d2c()</span></code></a> are due to     typing truncation errors.</p>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#system.c2d" title="system.c2d"><code class="xref py py-func docutils literal"><span class="pre">c2d()</span></code></a>.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.9999</span><span class="p">,</span><span class="mf">0.0001</span><span class="p">,</span><span class="mf">0.01</span><span class="p">,</span><span class="mf">0.</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span><span class="mf">0.9999</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.01</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.014</span><span class="p">,</span><span class="mf">0.012</span><span class="p">,</span><span class="mf">0.9999</span><span class="p">,</span><span class="mf">0.0001</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.008</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.014</span><span class="p">,</span><span class="mf">0.0001</span><span class="p">,</span><span class="mf">0.9999</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Ad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">A3</span><span class="p">,</span> <span class="n">A4</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Ad</span><span class="p">)</span>
+<span class="go">[[ 0.9999  0.0001  0.01    0.    ]</span>
+<span class="go"> [ 0.      0.9999  0.      0.01  ]</span>
+<span class="go"> [-0.014   0.012   0.9999  0.0001]</span>
+<span class="go"> [ 0.008  -0.014   0.0001  0.9999]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span>  <span class="p">],</span> <span class="p">[</span> <span class="mf">0.</span>  <span class="p">],</span> <span class="p">[</span> <span class="mf">0.</span>  <span class="p">],</span> <span class="p">[</span> <span class="mf">0.01</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0058</span><span class="p">,</span> <span class="mf">0.0014</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">d2c</span><span class="p">(</span><span class="n">Ad</span><span class="p">,</span> <span class="n">Bd</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="go">[[-0.003   0.004   1.0001 -0.0001]</span>
+<span class="go"> [-0.004  -0.003  -0.      1.0001]</span>
+<span class="go"> [-1.4001  1.2001 -0.003   0.004 ]</span>
+<span class="go"> [ 0.8001 -1.4001  0.006  -0.003 ]]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="system.damp">
+<code class="descclassname">system.</code><code class="descname">damp</code><span class="sig-paren">(</span><em>A</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#damp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.damp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display natural frequencies and damping ratios of state matrix.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="system.so2ss">
+<code class="descclassname">system.</code><code class="descname">so2ss</code><span class="sig-paren">(</span><em>M</em>, <em>C</em>, <em>K</em>, <em>Bt</em>, <em>Cd</em>, <em>Cv</em>, <em>Ca</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#so2ss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.so2ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns A, B, C, D
+Given second order linear matrix equation of the form
+<span class="math">\(M\ddot{x} + C \dot{x} + K x= \tilde{B} u\)</span>
+and
+<span class="math">\(y = C_d x + + C_v \dot{x} + C_a\ddot{x}\)</span>
+returns the state space form equations
+<span class="math">\(\dot{z} = A z + B u\)</span>,
+<span class="math">\(y = C z + D u\)</span></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>M: float array</strong></p>
+<blockquote>
+<div><p>Mass matrix</p>
+</div></blockquote>
+<p><strong>C: float array</strong></p>
+<blockquote>
+<div><p>Damping matrix</p>
+</div></blockquote>
+<p><strong>K:  float array</strong></p>
+<blockquote>
+<div><p>Stiffness matrix</p>
+</div></blockquote>
+<p><strong>Bt: float array</strong></p>
+<blockquote>
+<div><p>Input matrix</p>
+</div></blockquote>
+<p><strong>Cd: float array</strong></p>
+<blockquote>
+<div><p>Displacement sensor output matrix</p>
+</div></blockquote>
+<p><strong>Cv: float array</strong></p>
+<blockquote>
+<div><p>Velocimeter output matrix</p>
+</div></blockquote>
+<p><strong>Ca: float array</strong></p>
+<blockquote>
+<div><p>Accelerometer output matrix</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A: float array</p>
+<blockquote>
+<div><p>State matrix</p>
+</div></blockquote>
+<p>B: float array</p>
+<blockquote>
+<div><p>Input matrix</p>
+</div></blockquote>
+<p>C: float array</p>
+<blockquote>
+<div><p>Output matrix</p>
+</div></blockquote>
+<p>D: float array</p>
+<blockquote class="last">
+<div><p>Pass through matrix</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Cd</span> <span class="o">=</span> <span class="n">Cv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Ca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Css</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">so2ss</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">Bt</span><span class="p">,</span> <span class="n">Cd</span><span class="p">,</span> <span class="n">Cv</span><span class="p">,</span> <span class="n">Ca</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;A: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
+<span class="go">A:  [[ 0.      0.      1.      0.    ]</span>
+<span class="go"> [ 0.      0.      0.      1.    ]</span>
+<span class="go"> [-1.4     1.2    -0.0058  0.0014]</span>
+<span class="go"> [ 0.8    -1.4     0.0016 -0.0038]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;B: &#39;</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+<span class="go">B:  [[ 0.]</span>
+<span class="go"> [ 0.]</span>
+<span class="go"> [ 0.]</span>
+<span class="go"> [ 1.]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;C: &#39;</span><span class="p">,</span> <span class="n">Css</span><span class="p">)</span>
+<span class="go">C:  [[-1.4     1.2    -0.0058  0.0014]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;D: &#39;</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span>
+<span class="go">D:  [[-0.2]]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="system.ssfrf">
+<code class="descclassname">system.</code><code class="descname">ssfrf</code><span class="sig-paren">(</span><em>A</em>, <em>B</em>, <em>C</em>, <em>D</em>, <em>omega_low</em>, <em>omega_high</em>, <em>in_index</em>, <em>out_index</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#ssfrf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.ssfrf" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns
+obtains the computed FRF of a state space system between selected input
+and output over frequency range of interest.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>A, B, C, D</strong> : float arrays</p>
+<blockquote>
+<div><p>state system matrices</p>
+</div></blockquote>
+<p><strong>omega_low, omega_high: floats</strong></p>
+<blockquote>
+<div><p>low and high frequencies for evaluation</p>
+</div></blockquote>
+<p><strong>in_index, out_index</strong> : ints</p>
+<blockquote>
+<div><p>input and output numbers (starting at 1)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>omega</strong> : float array</p>
+<blockquote>
+<div><p>frequency vector</p>
+</div></blockquote>
+<p><strong>H</strong> : float array</p>
+<blockquote class="last">
+<div><p>frequency response function</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>   <span class="mf">0.</span> <span class="p">,</span>  <span class="mf">1.</span>    <span class="p">,</span>  <span class="mf">0.</span>    <span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>   <span class="mf">0.</span> <span class="p">,</span>  <span class="mf">0.</span>    <span class="p">,</span>  <span class="mf">1.</span>    <span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.4</span><span class="p">,</span>  <span class="mf">1.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0058</span><span class="p">,</span>  <span class="mf">0.0014</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.4</span><span class="p">,</span>  <span class="mf">0.0016</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0038</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">A3</span><span class="p">,</span> <span class="n">A4</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="go">[[ 0.      0.      1.      0.    ]</span>
+<span class="go"> [ 0.      0.      0.      1.    ]</span>
+<span class="go"> [-1.4     1.2    -0.0058  0.0014]</span>
+<span class="go"> [ 0.8    -1.4     0.0016 -0.0038]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0058</span><span class="p">,</span> <span class="mf">0.0014</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">omega</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">ssfrf</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vt</span><span class="o">.</span><span class="n">frfplot</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Vibration Testing</a></h1>
+
+
+
+<p class="blurb">Vibration Testing Analysis</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="signal.html">Signal Processing (<code class="docutils literal"><span class="pre">vibrationtesting.signal</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">System Manipulation (<code class="docutils literal"><span class="pre">vibrationtesting.system</span></code>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#system-system-solvers-and-manipulators"><code class="docutils literal"><span class="pre">system</span></code> – System Solvers and Manipulators</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/reference/system.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Joseph C. Slater.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../_sources/reference/system.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

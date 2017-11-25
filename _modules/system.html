@@ -1,0 +1,384 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>system &#8212; Vibration Testing 0.1b03 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1b03',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for system</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 14 May 2015</span>
+<span class="sd">@author: Joseph C. Slater</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Joseph C. Slater&quot;</span>
+
+<span class="n">__docformat__</span> <span class="o">=</span> <span class="s1">&#39;reStructuredText&#39;</span>
+
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="c1"># import control as ctrl</span>
+<span class="kn">import</span> <span class="nn">scipy.signal</span> <span class="k">as</span> <span class="nn">sig</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="k">as</span> <span class="nn">la</span>
+
+
+<div class="viewcode-block" id="d2c"><a class="viewcode-back" href="../reference/system.html#system.d2c">[docs]</a><span class="k">def</span> <span class="nf">d2c</span><span class="p">(</span><span class="n">Ad</span><span class="p">,</span> <span class="n">Bd</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns continuous A, B, C, D from discrete</span>
+<span class="sd">    Converts a set of digital state space system matrices to their</span>
+<span class="sd">    continuous counterpart.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Ad, Bd, C, D : float arrays</span>
+<span class="sd">        Discrete state space system matrices</span>
+<span class="sd">    dt  : float</span>
+<span class="sd">        Time step of discrete system</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A, B, C, D : float arrays</span>
+<span class="sd">        State space system matrices</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
+<span class="sd">    &gt;&gt;&gt; A1 = np.array([[ 0.9999,0.0001,0.01,0.]])</span>
+<span class="sd">    &gt;&gt;&gt; A2 = np.array([[ 0.,0.9999,0.,0.01]])</span>
+<span class="sd">    &gt;&gt;&gt; A3 = np.array([[-0.014,0.012,0.9999,0.0001]])</span>
+<span class="sd">    &gt;&gt;&gt; A4 = np.array([[ 0.008, -0.014,0.0001,0.9999]])</span>
+<span class="sd">    &gt;&gt;&gt; Ad = np.concatenate((A1, A2, A3, A4))</span>
+<span class="sd">    &gt;&gt;&gt; print(Ad)</span>
+<span class="sd">    [[ 0.9999  0.0001  0.01    0.    ]</span>
+<span class="sd">     [ 0.      0.9999  0.      0.01  ]</span>
+<span class="sd">     [-0.014   0.012   0.9999  0.0001]</span>
+<span class="sd">     [ 0.008  -0.014   0.0001  0.9999]]</span>
+<span class="sd">    &gt;&gt;&gt; Bd = np.array([[ 0.  ], [ 0.  ], [ 0.  ], [ 0.01]])</span>
+<span class="sd">    &gt;&gt;&gt; C = np.array([[-1.4, 1.2, -0.0058, 0.0014]])</span>
+<span class="sd">    &gt;&gt;&gt; D = np.array([[-0.2]])</span>
+<span class="sd">    &gt;&gt;&gt; A, B, *_ = vt.d2c(Ad, Bd, C, D, 0.01)</span>
+<span class="sd">    &gt;&gt;&gt; print(A)</span>
+<span class="sd">    [[-0.003   0.004   1.0001 -0.0001]</span>
+<span class="sd">     [-0.004  -0.003  -0.      1.0001]</span>
+<span class="sd">     [-1.4001  1.2001 -0.003   0.004 ]</span>
+<span class="sd">     [ 0.8001 -1.4001  0.006  -0.003 ]]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    .. note:: Zero-order hold solution</span>
+<span class="sd">    .. note:: discrepancies between :func:`c2d` and :func:`d2c` are due to \</span>
+<span class="sd">    typing truncation errors.</span>
+<span class="sd">    .. seealso:: :func:`c2d`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Old school (very old)</span>
+    <span class="c1"># A = la.logm(Ad) / dt</span>
+    <span class="c1"># B = la.solve((Ad - np.eye(A.shape[0])), A) @ Bd</span>
+    <span class="n">sa</span> <span class="o">=</span> <span class="n">Ad</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">sb</span> <span class="o">=</span> <span class="n">Bd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">AAd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">Ad</span><span class="p">,</span>                  <span class="n">Bd</span><span class="p">)),</span>
+                     <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">sb</span><span class="p">,</span> <span class="n">sa</span><span class="p">)),</span>  <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">sb</span><span class="p">)))))</span>
+    <span class="n">AA</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">logm</span><span class="p">(</span><span class="n">AAd</span><span class="p">)</span><span class="o">/</span><span class="n">dt</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">AA</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">sa</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">sa</span><span class="p">]</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">AA</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">sa</span><span class="p">,</span> <span class="n">sa</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span></div>
+
+
+<div class="viewcode-block" id="c2d"><a class="viewcode-back" href="../reference/system.html#system.c2d">[docs]</a><span class="k">def</span> <span class="nf">c2d</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert continuous state system to discrete time</span>
+<span class="sd">    Converts a set of continuous state space system matrices to their</span>
+<span class="sd">    discrete counterpart.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A, B, C, D : float arrays</span>
+<span class="sd">        State space system matrices</span>
+<span class="sd">    dt : float</span>
+<span class="sd">        Time step of discrete system</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Ad, Bd, C, D : float arrays</span>
+<span class="sd">        Discrete state space system matrices</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
+<span class="sd">    &gt;&gt;&gt; A1 = np.array([[ 0.,   0. ,  1.    ,  0.    ]])</span>
+<span class="sd">    &gt;&gt;&gt; A2 = np.array([[ 0.,   0. ,  0.    ,  1.    ]])</span>
+<span class="sd">    &gt;&gt;&gt; A3 = np.array([[-1.4,  1.2, -0.0058,  0.0014]])</span>
+<span class="sd">    &gt;&gt;&gt; A4 = np.array([[ 0.8, -1.4,  0.0016, -0.0038]])</span>
+<span class="sd">    &gt;&gt;&gt; A = np.concatenate((A1, A2, A3, A4))</span>
+<span class="sd">    &gt;&gt;&gt; print(A)</span>
+<span class="sd">    [[ 0.      0.      1.      0.    ]</span>
+<span class="sd">     [ 0.      0.      0.      1.    ]</span>
+<span class="sd">     [-1.4     1.2    -0.0058  0.0014]</span>
+<span class="sd">     [ 0.8    -1.4     0.0016 -0.0038]]</span>
+<span class="sd">    &gt;&gt;&gt; B = np.array([[ 0.], [ 0.], [ 0.], [ 1.]])</span>
+<span class="sd">    &gt;&gt;&gt; C = np.array([[-1.4, 1.2, -0.0058, 0.0014]])</span>
+<span class="sd">    &gt;&gt;&gt; D = np.array([[-0.2]])</span>
+<span class="sd">    &gt;&gt;&gt; Ad, Bd, *_ = vt.c2d(A, B, C, D, 0.01)</span>
+<span class="sd">    &gt;&gt;&gt; print(Ad)</span>
+<span class="sd">    [[ 0.9999  0.0001  0.01    0.    ]</span>
+<span class="sd">     [ 0.      0.9999  0.      0.01  ]</span>
+<span class="sd">     [-0.014   0.012   0.9999  0.0001]</span>
+<span class="sd">     [ 0.008  -0.014   0.0001  0.9999]]</span>
+<span class="sd">    &gt;&gt;&gt; print(Bd)</span>
+<span class="sd">    [[ 0.  ]</span>
+<span class="sd">     [ 0.  ]</span>
+<span class="sd">     [ 0.  ]</span>
+<span class="sd">     [ 0.01]]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    .. note:: Zero-order hold solution</span>
+<span class="sd">    .. seealso:: :func:`d2c`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">Ad</span><span class="p">,</span> <span class="n">Bd</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">cont2discrete</span><span class="p">((</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">),</span> <span class="n">dt</span><span class="p">)</span>
+    <span class="c1"># Ad = la.expm(A * dt)</span>
+    <span class="c1"># Bd = la.solve(A, (Ad - np.eye(A.shape[0]))) @ B</span>
+    <span class="k">return</span> <span class="n">Ad</span><span class="p">,</span> <span class="n">Bd</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span></div>
+
+
+<div class="viewcode-block" id="ssfrf"><a class="viewcode-back" href="../reference/system.html#system.ssfrf">[docs]</a><span class="k">def</span> <span class="nf">ssfrf</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">omega_low</span><span class="p">,</span> <span class="n">omega_high</span><span class="p">,</span> <span class="n">in_index</span><span class="p">,</span> <span class="n">out_index</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;returns</span>
+<span class="sd">    obtains the computed FRF of a state space system between selected input</span>
+<span class="sd">    and output over frequency range of interest.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A, B, C, D : float arrays</span>
+<span class="sd">                 state system matrices</span>
+<span class="sd">    omega_low, omega_high: floats</span>
+<span class="sd">                 low and high frequencies for evaluation</span>
+<span class="sd">    in_index, out_index : ints</span>
+<span class="sd">                input and output numbers (starting at 1)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    omega : float array</span>
+<span class="sd">            frequency vector</span>
+<span class="sd">    H : float array</span>
+<span class="sd">        frequency response function</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
+<span class="sd">    &gt;&gt;&gt; A1 = np.array([[ 0.,   0. ,  1.    ,  0.    ]])</span>
+<span class="sd">    &gt;&gt;&gt; A2 = np.array([[ 0.,   0. ,  0.    ,  1.    ]])</span>
+<span class="sd">    &gt;&gt;&gt; A3 = np.array([[-1.4,  1.2, -0.0058,  0.0014]])</span>
+<span class="sd">    &gt;&gt;&gt; A4 = np.array([[ 0.8, -1.4,  0.0016, -0.0038]])</span>
+<span class="sd">    &gt;&gt;&gt; A = np.concatenate((A1, A2, A3, A4))</span>
+<span class="sd">    &gt;&gt;&gt; print(A)</span>
+<span class="sd">    [[ 0.      0.      1.      0.    ]</span>
+<span class="sd">     [ 0.      0.      0.      1.    ]</span>
+<span class="sd">     [-1.4     1.2    -0.0058  0.0014]</span>
+<span class="sd">     [ 0.8    -1.4     0.0016 -0.0038]]</span>
+<span class="sd">    &gt;&gt;&gt; B = np.array([[ 0.], [ 0.], [ 0.], [ 1.]])</span>
+<span class="sd">    &gt;&gt;&gt; C = np.array([[-1.4, 1.2, -0.0058, 0.0014]])</span>
+<span class="sd">    &gt;&gt;&gt; D = np.array([[-0.2]])</span>
+<span class="sd">    &gt;&gt;&gt; omega, H = vt.ssfrf(A, B, C, D, 0, 3.5, 1, 1)</span>
+<span class="sd">    &gt;&gt;&gt; vt.frfplot(omega, H)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># A, B, C, D = ctrl.ssdata(sys)</span>
+    <span class="n">sa</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">omega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">omega_low</span><span class="p">,</span> <span class="n">omega_high</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">omega</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">omega</span><span class="p">):</span>
+<div class="viewcode-block" id="so2ss"><a class="viewcode-back" href="../reference/system.html#system.so2ss">[docs]</a>        <span class="n">H</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">C</span><span class="nd">@la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">sa</span><span class="p">)</span> <span class="o">-</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span> <span class="o">+</span> <span class="n">D</span><span class="p">)[</span><span class="n">out_index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                                                            <span class="n">in_index</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">omega</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">H</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">so2ss</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">Bt</span><span class="p">,</span> <span class="n">Cd</span><span class="p">,</span> <span class="n">Cv</span><span class="p">,</span> <span class="n">Ca</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;returns A, B, C, D</span>
+<span class="sd">    Given second order linear matrix equation of the form</span>
+<span class="sd">    :math:`M\\ddot{x} + C \\dot{x} + K x= \\tilde{B} u`</span>
+<span class="sd">    and</span>
+<span class="sd">    :math:`y = C_d x + + C_v \\dot{x} + C_a\\ddot{x}`</span>
+<span class="sd">    returns the state space form equations</span>
+<span class="sd">    :math:`\\dot{z} = A z + B u`,</span>
+<span class="sd">    :math:`y = C z + D u`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    M: float array</span>
+<span class="sd">        Mass matrix</span>
+<span class="sd">    C: float array</span>
+<span class="sd">        Damping matrix</span>
+<span class="sd">    K:  float array</span>
+<span class="sd">        Stiffness matrix</span>
+<span class="sd">    Bt: float array</span>
+<span class="sd">        Input matrix</span>
+<span class="sd">    Cd: float array</span>
+<span class="sd">        Displacement sensor output matrix</span>
+<span class="sd">    Cv: float array</span>
+<span class="sd">        Velocimeter output matrix</span>
+<span class="sd">    Ca: float array</span>
+<span class="sd">        Accelerometer output matrix</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A: float array</span>
+<span class="sd">        State matrix</span>
+<span class="sd">    B: float array</span>
+<span class="sd">        Input matrix</span>
+<span class="sd">    C: float array</span>
+<span class="sd">        Output matrix</span>
+<span class="sd">    D: float array</span>
+<span class="sd">        Pass through matrix</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
+<span class="sd">    &gt;&gt;&gt; M = np.array([[2, 1], [1, 3]])</span>
+<span class="sd">    &gt;&gt;&gt; K = np.array([[2, -1], [-1, 3]])</span>
+<span class="sd">    &gt;&gt;&gt; C = np.array([[0.01, 0.001], [0.001, 0.01]])</span>
+<span class="sd">    &gt;&gt;&gt; Bt = np.array([[0], [1]])</span>
+<span class="sd">    &gt;&gt;&gt; Cd = Cv = np.zeros((1,2))</span>
+<span class="sd">    &gt;&gt;&gt; Ca = np.array([[1, 0]])</span>
+<span class="sd">    &gt;&gt;&gt; A, B, Css, D = vt.so2ss(M, C, K, Bt, Cd, Cv, Ca)</span>
+<span class="sd">    &gt;&gt;&gt; print(&#39;A: {}&#39;.format(A))</span>
+<span class="sd">    A:  [[ 0.      0.      1.      0.    ]</span>
+<span class="sd">     [ 0.      0.      0.      1.    ]</span>
+<span class="sd">     [-1.4     1.2    -0.0058  0.0014]</span>
+<span class="sd">     [ 0.8    -1.4     0.0016 -0.0038]]</span>
+<span class="sd">    &gt;&gt;&gt; print(&#39;B: &#39;, B)</span>
+<span class="sd">    B:  [[ 0.]</span>
+<span class="sd">     [ 0.]</span>
+<span class="sd">     [ 0.]</span>
+<span class="sd">     [ 1.]]</span>
+<span class="sd">    &gt;&gt;&gt; print(&#39;C: &#39;, Css)</span>
+<span class="sd">    C:  [[-1.4     1.2    -0.0058  0.0014]]</span>
+<span class="sd">    &gt;&gt;&gt; print(&#39;D: &#39;, D)</span>
+<span class="sd">    D:  [[-0.2]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">M</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))),</span>
+                   <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="o">-</span><span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">),</span> <span class="o">-</span><span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">C</span><span class="p">)))))</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Bt</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">Bt</span><span class="p">))</span>
+<div class="viewcode-block" id="damp"><a class="viewcode-back" href="../reference/system.html#system.damp">[docs]</a>    <span class="n">C_ss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">Cd</span> <span class="o">-</span> <span class="n">Ca</span><span class="nd">@la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">),</span> <span class="n">Cv</span> <span class="o">-</span> <span class="n">Ca</span><span class="nd">@la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">C</span><span class="p">)))</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">Ca</span><span class="nd">@la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">Bt</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C_ss</span><span class="p">,</span> <span class="n">D</span></div>
+
+
+<span class="k">def</span> <span class="nf">damp</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Display natural frequencies and damping ratios of state matrix.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c1"># Original Author: Kai P. Mueller &lt;mueller@ifr.ing.tu-bs.de&gt; for Octave</span>
+    <span class="c1"># Created: September 29, 1997.</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;............... Eigenvalue ...........     Damping     Frequency&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------[re]---------[im]--------[abs]----------------------[Hz]&quot;</span><span class="p">)</span>
+    <span class="n">e</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">e</span><span class="p">)):</span>
+        <span class="n">pole</span> <span class="o">=</span> <span class="n">e</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="n">d0</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">pole</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">pole</span><span class="p">)))</span>
+        <span class="n">f0</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">pole</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">pole</span><span class="p">))</span> <span class="o">&lt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">pole</span><span class="p">))):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;      </span><span class="si">{:.3f}</span><span class="s1">                    </span><span class="si">{:.3f}</span><span class="s1">       </span><span class="se">\</span>
+<span class="s1">                  </span><span class="si">{:.3f}</span><span class="s1">         </span><span class="si">{:.3f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">pole</span><span class="p">)),</span>
+                  <span class="nb">float</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">pole</span><span class="p">)),</span> <span class="nb">float</span><span class="p">(</span><span class="n">d0</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">f0</span><span class="p">)))</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;      </span><span class="si">{:.3f}</span><span class="s1">        </span><span class="si">{:+.3f}</span><span class="s1">      </span><span class="si">{:.3f}</span><span class="s1">       </span><span class="se">\</span>
+<span class="s1">                  </span><span class="si">{:.3f}</span><span class="s1">         </span><span class="si">{:.3f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">pole</span><span class="p">)),</span>
+                  <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">pole</span><span class="p">)),</span> <span class="nb">float</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">pole</span><span class="p">)),</span> <span class="nb">float</span><span class="p">(</span><span class="n">d0</span><span class="p">),</span>
+                  <span class="nb">float</span><span class="p">(</span><span class="n">f0</span><span class="p">)))</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Vibration Testing</a></h1>
+
+
+
+<p class="blurb">Vibration Testing Analysis</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Joseph C. Slater.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
