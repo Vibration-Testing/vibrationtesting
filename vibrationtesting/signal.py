@@ -582,6 +582,7 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     >>> time = np.reshape(time, (1, -1))
     >>> x = A*np.sin(2*np.pi*sig_freq*time)
     >>> x = x + np.random.normal(scale=np.sqrt(noise_power), size=(1, time.shape[1]))
+    >>> fig = plt.figure()
     >>> plt.subplot(2,1,1)
     <matplotlib...>
     >>> plt.plot(time[0,:],x[0,:])

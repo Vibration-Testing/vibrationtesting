@@ -17,7 +17,7 @@ import scipy.linalg as la
 
 
 def d2c(Ad, Bd, C, D, dt):
-    """Returns continuous A, B, C, D from discrete A, B, C, D
+    """Returns continuous A, B, C, D from discrete Ad, Bd, C, D
     Converts a set of digital state space system matrices to their
     continuous counterpart.
     """
@@ -28,6 +28,28 @@ def d2c(Ad, Bd, C, D, dt):
 
 def c2d(A, B, C, D, dt):
     """Returns discrete Ad, Bd, C, D from continuous A, B, C, D
+    Converts a set of continuous state space system matrices to their
+    discrete counterpart.
+
+    Parameters
+    ----------
+
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import vibrationtesting as vt
+    >>> M = np.array([[2, 1],[1, 3]])
+    >>> K = np.array([[2, -1],[-1, 3]])
+    >>> C = np.array([[0.01, 0.001],[0.001, 0.01]])
+    >>> Bt = np.array([[0],[1]])
+    >>> Cd = Cv = np.zeros((1,2))
+    >>> Ca = np.array([[1, 0]])
+    >>> A, B, Css, D = vt.so2ss(M, C, K, Bt, Cd, Cv, Ca)
+
     Converts a set of digital state space system matrices to their
     continuous counterpart.
     Simply calls scipy.signal.cont2discrete
@@ -49,8 +71,7 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
     omega = np.linspace(omega_low, omega_high, 1000)
     H = omega * 1j
     i = 0
-    for i in np.arange(len(omega)):
-        w = omega[i]
+    for i, w in enumerate(omega):
         H[i] = (C@la.solve(w * 1j * np.eye(sa) - A, B) + D)[out_index,
                                                             in_index]
     return omega, H
@@ -68,30 +89,30 @@ def so2ss(M, C, K, Bt, Cd, Cv, Ca):
 
     Parameters
     ----------
-    M: array
+    M: float array
         Mass matrix
-    C: array
+    C: float array
         Damping matrix
-    K:  array
+    K:  float array
         Stiffness matrix
-    Bt: array
+    Bt: float array
         Input matrix
-    Cd: array
+    Cd: float array
         Displacement sensor output matrix
-    Cv: array
+    Cv: float array
         Velocimeter output matrix
-    Ca: array
+    Ca: float array
         Accelerometer output matrix
 
     Returns
     -------
-    A: array
+    A: float array
         State matrix
-    B: array
+    B: float array
         Input matrix
-    C: array
+    C: float array
         Output matrix
-    D: array
+    D: float array
         Pass through matrix
 
     Examples
