@@ -193,7 +193,7 @@ def window(x, windowname='hanning', normalize=False):
             print("I don't recognize that window name. Sorry")
 
         if normalize is True:
-            f = f / np.linalg.norm(f) * np.sqrt(N)
+            f = f / la.norm(f) * np.sqrt(N)
     return f
 
 
@@ -309,7 +309,7 @@ def hanning(x, normalize=False):
         # print(N)
         f = np.sin(np.pi * np.arange(N) / (N - 1))**2 * np.sqrt(8 / 3)
         if normalize is True:
-            f = f / np.linalg.norm(f) * np.sqrt(N)
+            f = f / la.norm(f) * np.sqrt(N)
     return f
 
 
@@ -336,7 +336,7 @@ def blackwin(x):
         f = np.reshape((0.42 - 0.5 * np.cos(2 * np.pi * (np.arange(n) + .5)) /
                         (n) + .08 * np.cos(4 * np.pi * (np.arange(n) + .5)) /
                         (n)) * np.sqrt(5000 / 1523), (1, -1))
-        f = f / np.linalg.norm(f) * np.sqrt(n)
+        f = f / la.norm(f) * np.sqrt(n)
 
     return f
 
@@ -366,9 +366,9 @@ def expwin(x, ts=.75):
         n = x
         v = (n - 1) / n * np.arange(n) + (n - 1) / n / 2
         f = np.exp(-v / tc / (n - 1))
-        f = f / np.linalg.norm(f) * np.sqrt(n)
+        f = f / la.norm(f) * np.sqrt(n)
         f = np.reshape(f, (1, -1))
-        f = f / np.linalg.norm(f) * np.sqrt(n)
+        f = f / la.norm(f) * np.sqrt(n)
 
     return f
 
@@ -396,7 +396,7 @@ def hammwin(x):
         f = np.reshape((0.54 - 0.46 * np.cos(2 * np.pi * (np.arange(n)) /
                                              (n - 1))) * np.sqrt(5000 / 1987),
                        (1, -1))
-        f = f / np.linalg.norm(f) * np.sqrt(n)
+        f = f / la.norm(f) * np.sqrt(n)
 
     return f
 
@@ -428,7 +428,7 @@ def flatwin(x):
                  - 0.338 * np.cos(6 * np.pi * (np.arange(n)) / (n - 1))
                  + 0.032 * np.cos(8 * np.pi * (np.arange(n)) / (n - 1))),
                 (1, -1))
-        f = f / np.linalg.norm(f) * np.sqrt(n)
+        f = f / la.norm(f) * np.sqrt(n)
 
     return f
 
@@ -455,14 +455,13 @@ def boxwin(x):
         n = x
         # f=np.reshape((1.0-1.933*np.cos(2*np.pi*(np.arange(n))/(n-1))+1.286*np.cos(4*np.pi*(np.arange(n))/(n-1))-0.338*np.cos(6*np.pi*(np.arange(n))/(n-1))+0.032*np.cos(8*np.pi*(np.arange(n))/(n-1))),(1,-1))
         f = np.reshape(np.ones((1, n)), (1, -1))
-        f = f / np.linalg.norm(f) * np.sqrt(n)
+        f = f / la.norm(f) * np.sqrt(n)
 
     return f
 
 
-def hannwin(x):
-    f = hanning(x)
-    return f
+def hannwin(*args, **kwargs):
+    return hanning(*args, **kwargs)
 
 
 def asd(x, t, windowname="hanning", ave=bool(True)):
@@ -470,21 +469,21 @@ def asd(x, t, windowname="hanning", ave=bool(True)):
 
     Parameters
     ----------
-    x : array
+    x : float array
         Data array (n x N x m) where n is the number of sensors, m the
         number of experiments.
-    t : array
+    t : float array
         Time array (1 x N)
     windowname : string
-        Name of windowing function to use
-    ave : bool, optional
+        Name of windowing function to use. See `window`.
+    ave : bool, optional(True)
         Average result or not?
 
     Returns
     -------
-    f : array
+    f : float array
         Frequency vector (1 x N)
-    Pxx : array
+    Pxx : float array
           Autospectrum (n x N) or (n x N x m) if not averaged.
 
     Examples
@@ -493,7 +492,7 @@ def asd(x, t, windowname="hanning", ave=bool(True)):
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
     >>> import vibrationtesting as vt
-    >>> from numpy import linalg
+    >>> import numpy.linalg as la
 
     Generate a 5 second test signal, a 10 V sine wave at 50 Hz, corrupted by
     0.001 V**2/Hz of white noise sampled at 1 kHz.
@@ -568,7 +567,7 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
     >>> import vibrationtesting as vt
-    >>> from numpy import linalg
+    >>> import numpy.linalg as la
 
     Generate a 5 second test signal, a 10 V sine wave at 50 Hz, corrupted by
     0.001 V**2/Hz of white noise sampled at 1 kHz.
