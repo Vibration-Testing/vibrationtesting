@@ -20,6 +20,7 @@ def d2c(Ad, Bd, C, D, dt):
     """Returns continuous A, B, C, D from discrete
     Converts a set of digital state space system matrices to their
     continuous counterpart.
+
     Parameters
     ----------
     Ad, Bd, C, D : float arrays
@@ -62,6 +63,7 @@ def d2c(Ad, Bd, C, D, dt):
     typing truncation errors.
     .. seealso:: :func:`c2d`.
     """
+
     # Old school (very old)
     # A = la.logm(Ad) / dt
     # B = la.solve((Ad - np.eye(A.shape[0])), A) @ Bd
