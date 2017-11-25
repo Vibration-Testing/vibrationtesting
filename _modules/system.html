@@ -62,6 +62,7 @@
     <span class="sd">&quot;&quot;&quot;Returns continuous A, B, C, D from discrete</span>
 <span class="sd">    Converts a set of digital state space system matrices to their</span>
 <span class="sd">    continuous counterpart.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    Ad, Bd, C, D : float arrays</span>
@@ -104,6 +105,7 @@
 <span class="sd">    typing truncation errors.</span>
 <span class="sd">    .. seealso:: :func:`c2d`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="c1"># Old school (very old)</span>
     <span class="c1"># A = la.logm(Ad) / dt</span>
     <span class="c1"># B = la.solve((Ad - np.eye(A.shape[0])), A) @ Bd</span>
