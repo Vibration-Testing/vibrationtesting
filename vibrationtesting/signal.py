@@ -289,8 +289,8 @@ def hanning(x, normalize=False):
         elif len(x.shape) == 2:
             # f,_=np.meshgrid(f[0,:],np.arange(x.shape[0]))
             # print('b')
-            print('length = 2')
-            print(x.shape)
+            # print('length = 2')
+            # print(x.shape)
             if x.shape[0] > x.shape[1]:
                 x = sp.swapaxes(x, 0, 1)
                 swap = 1
