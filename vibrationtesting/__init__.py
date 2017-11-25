@@ -3,7 +3,6 @@
 Signal processing (:mod:`vibrationtesting.signal`)
 ==================================================
 
-.. module:: signal
 
 Window functions
 ================
@@ -53,6 +52,7 @@ if 'pytest' in sys.argv[0]:
     mpl.use('agg')
 
 from .signal import *
+from .system import *
 
 """
 np.set_printoptions(edgeitems=3, infstr='inf', linewidth=75,
