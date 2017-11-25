@@ -524,10 +524,10 @@ def asd(x, t, windowname="hanning", ave=bool(True)):
     [<matplotlib.lines.Line2D object at ...>]
     >>> ax2.set_ylim([-400, 100])
     (-400, 100)
-    >>> ax2.set_xlabel('frequency [Hz]')
-    Text(0.5,0,'frequency [Hz]')
-    >>> ax2.set_ylabel('PSD [V**2/Hz]')
-    Text(0,0.5,'PSD [V**2/Hz]')
+    >>> ax2.set_xlabel('frequency (Hz)')
+    Text(0.5,0,'frequency (Hz)')
+    >>> ax2.set_ylabel('PSD (V**2/Hz)')
+    Text(0,0.5,'PSD (V**2/Hz)')
 
     If we average the last half of the spectral density, to exclude the
     peak, we can recover the noise power on the signal.
@@ -602,7 +602,7 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     >>> plt.ylim([-400, 100])
     (-400, 100)
     >>> plt.xlabel('frequency (Hz)')
-    Text(0.5,0,'frequency [Hz]')
+    Text(0.5,0,'frequency (Hz)')
     >>> plt.ylabel('PSD (V**2/Hz)')
     Text(0,0.5,'PSD (V**2/Hz)')
     >>> fig.tight_layout()
