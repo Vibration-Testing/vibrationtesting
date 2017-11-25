@@ -601,10 +601,11 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     [<matplotlib.lines.Line2D object at ...>]
     >>> plt.ylim([-400, 100])
     (-400, 100)
-    >>> plt.xlabel('frequency [Hz]')
+    >>> plt.xlabel('frequency (Hz)')
     Text(0.5,0,'frequency [Hz]')
-    >>> plt.ylabel('PSD [V**2/Hz]')
-    Text(0,0.5,'PSD [V**2/Hz]')
+    >>> plt.ylabel('PSD (V**2/Hz)')
+    Text(0,0.5,'PSD (V**2/Hz)')
+    >>> fig.tight_layout()
     """
     # t_shape = t.shape
     t = t.flatten()
@@ -688,33 +689,33 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):
     Estimates the :math:`H(j\\omega)` Frequency Response Functions (FRFs)
     between :math:`x` and :math:`f`.
 
-        - parameters using ``:param <name>: <description>``
-        - type of parameters ``:type <name>: <description>``
-        - returns using ``:returns: <description>``
-        - examples (doctest)
-        - seealso using ``.. seealso:: text``
-        - notes using ``.. note:: text``
-        - warning using ``.. warning:: text``
-        - todo ``.. todo:: text``
+    Parameters
+    ----------
+    x : float array
+        output or response of system
+    f : float array
+        input to system
+    dt : float
+        time step of samples
+    window : string - locked to Hanning
+        name of leakage window to use
+    ave : bool, optional(True)- currently locked
+        whether or not to average PSDs and ASDs or calculate raw FRFs
+    Hv : bool, optional(False)
+        calculate the :math:`H_v` frequency response function
 
-    :param x: output or response of system
-    :param f: input to system
-    :param dt: time step or time array
-    :param window: name of data window to apply
-    :param ave: apply averaging
-    :param Hv: calculate :math:`H_v` Frequency Response Function Estimation
-
-    :type x: float array
-    :type f: float array
-    :type dt: float
-    :type window: string
-    :type ave: Boolean
-    :type Hv: Boolean
-
-    :returns: freq, H1, H2, coh, Hv
-    :return freq: frequency vector
-    :type freq: float array
-    :rtype: float array, float array, float array, float array, float array
+    Returns
+    -------
+    freq : float array
+        frequency vector (1xN)
+    H1 :  float array
+        :math:`H_1` Frequency Response Function estimate, (nxN) or (nxNxm)
+    H2 :  float array
+            :math:`H_2` Frequency Response Function estimate, (nxN) or (nxNxm)
+    coh :  float array
+        :math:`\gamma^2` Coherance Function estimate, (nxN)
+    Hv : float array
+            :math:`H_v` Frequency Response Function estimate, (nxN) or (nxNxm)
 
     Currently ``window`` and ``ave`` are locked to default values.
 
@@ -784,11 +785,9 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):
 
     Notes
     -----
-    7/6/00: Changed default FRF calculation from H2 to H1, Added H1, H2, and
-            Hv options.
     4/13/15: Converted to Python
 
-    .. note:: Not comptible with scipy.signal functions
+    .. note:: Not compatible with scipy.signal functions
     .. seealso:: :func:`asd`, :func:`crsd`, :func:`frfplot`.
     .. warning:: hanning window cannot be selected yet. Averaging cannot be unslected yet.
     .. todo:: Fix averaging, windowing, multiple input.
@@ -1117,7 +1116,7 @@ def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
     minimag = np.amin(np.imag(H))
     maximag = np.amax(np.imag(H))
     if FLAG == 1:
-        _, (ax1, ax2) = plt.subplots(2, 1)
+        fig, (ax1, ax2) = plt.subplots(2, 1)
         ax1.plot(freq.T, mag.T)
         ax1.set_xlabel('Frequency (Hz)')
         ax1.set_ylabel('Mag (dB)')
@@ -1133,6 +1132,7 @@ def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
         ax2.set_ylim(ymax=phmax, ymin=phmin)
 
         ax2.set_yticks(np.arange(phmin, (phmax + 45), 45))
+        fig.tight_layout()
     else:
         print("Sorry, that option isn't supported yet")
 
