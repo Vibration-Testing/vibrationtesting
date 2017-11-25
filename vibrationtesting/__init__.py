@@ -23,23 +23,11 @@ Window functions
    parzen            -- Parzen window
    triang            -- Triangular window
 
-
-
-Peak finding
-============
-
-.. autosummary::
-   :toctree: generated/
-
-   find_peaks_cwt -- Attempt to find the peaks in the given 1-D array
-   argrelmin      -- Calculate the relative minima of data
-   argrelmax      -- Calculate the relative maxima of data
-   argrelextrema  -- Calculate the relative extrema of data
 """
 from __future__ import division, print_function, absolute_import
 
 __title__ = 'vibrationtesting'
-__version__ = '0.1b02'
+__version__ = '0.1b03'
 __author__ = u'Joseph C. Slater'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2002-2017 Joseph C. Slater'
