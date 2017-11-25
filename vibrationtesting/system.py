@@ -200,31 +200,14 @@ def so2ss(M, C, K, Bt, Cd, Cv, Ca):
 
     Parameters
     ----------
-    M: float array
-        Mass matrix
-    C: float array
-        Damping matrix
-    K:  float array
-        Stiffness matrix
-    Bt: float array
-        Input matrix
-    Cd: float array
-        Displacement sensor output matrix
-    Cv: float array
-        Velocimeter output matrix
-    Ca: float array
-        Accelerometer output matrix
+    M, C, K, Bt, Cd, Cv, Cd: float arrays
+        Mass , damping, stiffness, input, displacement sensor, velocimeter,
+        and accelerometer matrices
 
     Returns
     -------
-    A: float array
-        State matrix
-    B: float array
-        Input matrix
-    C: float array
-        Output matrix
-    D: float array
-        Pass through matrix
+    A, B, C, D: float arrays
+        State matrices
 
     Examples
     --------
