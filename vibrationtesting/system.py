@@ -12,7 +12,7 @@ import warnings
 
 import numpy as np
 # import control as ctrl
-# import scipy.signal as sig
+import scipy.signal as sig
 import scipy.linalg as la
 
 
@@ -39,16 +39,16 @@ def d2c(Ad, Bd, C, D, dt):
     >>> A2 = np.array([[ 0.,0.9999,0.,0.01]])
     >>> A3 = np.array([[-0.014,0.012,0.9999,0.0001]])
     >>> A4 = np.array([[ 0.008, -0.014,0.0001,0.9999]])
-    >>> A = np.concatenate((A1, A2, A3, A4))
-    >>> print(A)
+    >>> Ad = np.concatenate((A1, A2, A3, A4))
+    >>> print(Ad)
     [[ 0.9999  0.0001  0.01    0.    ]
      [ 0.      0.9999  0.      0.01  ]
      [-0.014   0.012   0.9999  0.0001]
      [ 0.008  -0.014   0.0001  0.9999]]
-    >>> B = np.array([[ 0.  ], [ 0.  ], [ 0.  ], [ 0.01]])
+    >>> Bd = np.array([[ 0.  ], [ 0.  ], [ 0.  ], [ 0.01]])
     >>> C = np.array([[-1.4, 1.2, -0.0058, 0.0014]])
     >>> D = np.array([[-0.2]])
-    >>> A, B, *_ = vt.d2c(A, B, C, D, 0.01)
+    >>> A, B, *_ = vt.d2c(Ad, Bd, C, D, 0.01)
     >>> print(A)
     [[-0.003   0.004   1.0001 -0.0001]
      [-0.004  -0.003  -0.      1.0001]
@@ -62,8 +62,16 @@ def d2c(Ad, Bd, C, D, dt):
     typing truncation errors.
     .. seealso:: :func:`c2d`.
     """
-    A = la.logm(Ad) / dt
-    B = la.solve((Ad - np.eye(A.shape[0])), A) @ Bd
+    # Old school (very old)
+    # A = la.logm(Ad) / dt
+    # B = la.solve((Ad - np.eye(A.shape[0])), A) @ Bd
+    sa = Ad.shape[0]
+    sb = Bd.shape[1]
+    AAd = np.vstack((np.hstack((Ad,                  Bd)),
+                     np.hstack((np.zeros((sb, sa)),  np.eye(sb)))))
+    AA = la.logm(AAd)/dt
+    A = AA[0:sa, 0:sa]
+    B = AA[0:sa, sa:]
     return A, B, C, D
 
 
@@ -119,9 +127,9 @@ def c2d(A, B, C, D, dt):
     .. seealso:: :func:`d2c`.
     """
 
-    # Ad, Bd, _, _, _ = sig.cont2discrete((A, B, C, D), dt)
-    Ad = la.expm(A * dt)
-    Bd = la.solve(A, (Ad - np.eye(A.shape[0]))) @ B
+    Ad, Bd, _, _, _ = sig.cont2discrete((A, B, C, D), dt)
+    # Ad = la.expm(A * dt)
+    # Bd = la.solve(A, (Ad - np.eye(A.shape[0]))) @ B
     return Ad, Bd, C, D
 
 
