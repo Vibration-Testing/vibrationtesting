@@ -12,4 +12,3 @@ Please excuse the mess while this is brought online.
 
    Notebooks/Signal.ipynb
    Notebooks/Ho-Kalman-Demo.ipynb
-   Notebooks/Figures.ipynb

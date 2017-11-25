@@ -201,51 +201,16 @@ returns the state space form equations
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>M: float array</strong></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>M, C, K, Bt, Cd, Cv, Cd: float arrays</strong></p>
 <blockquote>
-<div><p>Mass matrix</p>
-</div></blockquote>
-<p><strong>C: float array</strong></p>
-<blockquote>
-<div><p>Damping matrix</p>
-</div></blockquote>
-<p><strong>K:  float array</strong></p>
-<blockquote>
-<div><p>Stiffness matrix</p>
-</div></blockquote>
-<p><strong>Bt: float array</strong></p>
-<blockquote>
-<div><p>Input matrix</p>
-</div></blockquote>
-<p><strong>Cd: float array</strong></p>
-<blockquote>
-<div><p>Displacement sensor output matrix</p>
-</div></blockquote>
-<p><strong>Cv: float array</strong></p>
-<blockquote>
-<div><p>Velocimeter output matrix</p>
-</div></blockquote>
-<p><strong>Ca: float array</strong></p>
-<blockquote>
-<div><p>Accelerometer output matrix</p>
+<div><p>Mass , damping, stiffness, input, displacement sensor, velocimeter,
+and accelerometer matrices</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A: float array</p>
-<blockquote>
-<div><p>State matrix</p>
-</div></blockquote>
-<p>B: float array</p>
-<blockquote>
-<div><p>Input matrix</p>
-</div></blockquote>
-<p>C: float array</p>
-<blockquote>
-<div><p>Output matrix</p>
-</div></blockquote>
-<p>D: float array</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A, B, C, D: float arrays</p>
 <blockquote class="last">
-<div><p>Pass through matrix</p>
+<div><p>State matrices</p>
 </div></blockquote>
 </td>
 </tr>
