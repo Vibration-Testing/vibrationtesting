@@ -58,19 +58,23 @@ I don't know which standard the package is following now- a bit of both!
 def window(x, windowname='hanning', normalize=False):
     """returns w
     Create a  window of length :math:`x`, or a hanning window sized to match
-    :math:`x` that x*w is the windowed result.
+    :math:`x` that :math:`x\\times w` is the windowed result.
 
     Parameters
     ----------
-    x:                 1) Integer. Number of points in desired hanning windows.
-                       2) Array to which window needs to be applied.
-    windowname:        One of: hanning, hamming, blackman, flatwin, boxwin
-    normalize (False): Adjust power level (for use in ASD) to 1
+    x: integer, float array
+       | If integer- number of points in desired hanning windows.
+       | If array- array provides size of window returned.
+    windowname: string
+       One of: hanning, hamming, blackman, flatwin, boxwin
+    normalize: bool
+       Adjust power level (for use in ASD) to 1
 
     Returns
     -------
-    w: 1) hanning window array of size x
-       2) windowing array. Windowed array is then x*w
+    w: float array
+       | window array of size x
+       | window array. Windowed array is then :math:`x\\times w`
 
     Examples
     --------
@@ -105,6 +109,7 @@ def window(x, windowname='hanning', normalize=False):
     Text(0.5,0,'time')
     >>> ax2.set_title('Effect of window. Note the scaling to conserve ASD amplitude')
     Text(0.5,1,'Effect of window. Note the scaling to conserve ASD amplitude')
+    >>> fig.tight_layout()
     """
 
     if isinstance(x, (list, tuple, np.ndarray)):
