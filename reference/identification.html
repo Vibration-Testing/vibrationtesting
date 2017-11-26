@@ -1,0 +1,255 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Modal Analysis and System Identification (identification) &#8212; Vibration Testing 0.1b04 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1b04',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="System Manipulation (system)" href="system.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-identification">
+<span id="modal-analysis-and-system-identification-identification"></span><h1>Modal Analysis and System Identification (<a class="reference internal" href="#module-identification" title="identification"><code class="xref py py-mod docutils literal"><span class="pre">identification</span></code></a>)<a class="headerlink" href="#module-identification" title="Permalink to this headline">¶</a></h1>
+<p>Created on Nov. 26, 2017
+&#64;author: Joseph C. Slater</p>
+<dl class="function">
+<dt id="identification.mdof_cf">
+<code class="descclassname">identification.</code><code class="descname">mdof_cf</code><span class="sig-paren">(</span><em>f</em>, <em>TF</em>, <em>Fmin=None</em>, <em>Fmax=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/identification.html#mdof_cf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#identification.mdof_cf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Curve fit to multiple degree of freedom FRF</p>
+<p>If Fmin and Fmax are not entered, the first and last elements of TF are
+used.</p>
+<p>If the first column of TF is a collocated (input and output location are
+the same), then the mode shape returned is the mass normalized mode shape.
+This can then be used to generate an identified mass, damping, and
+stiffness matrix as shown in the following example.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>f: array</strong></p>
+<blockquote>
+<div><p>The frequency vector in Hz. Does not have to start at 0 Hz.</p>
+</div></blockquote>
+<p><strong>TF: array</strong></p>
+<blockquote>
+<div><p>The complex transfer function</p>
+</div></blockquote>
+<p><strong>Fmin: int</strong></p>
+<blockquote>
+<div><p>The minimum frequency to be used for curve fitting in the FRF</p>
+</div></blockquote>
+<p><strong>Fmax: int</strong></p>
+<blockquote>
+<div><p>The maximum frequency to be used for curve fitting in the FRF</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">z: double</p>
+<blockquote>
+<div><p>The damping ratio</p>
+</div></blockquote>
+<p>nf: double</p>
+<blockquote>
+<div><p>Natural frequency (Hz)</p>
+</div></blockquote>
+<p>u: array</p>
+<blockquote class="last">
+<div><p>The mode shape</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>FRF are columns comprised of the FRFs presuming single input, multiple
+output z and nf are the damping ratio and natural frequency (Hz) u is the
+mode shape. Only one peak may exist in the segment of the FRF passed to
+sdofcf. No zeros may exist within this segment. If so, curve fitting
+becomes unreliable.</p>
+<p>Author: Original Joseph C. Slater. Python version, Gabriel Loranger</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># First we need to load the sampled data which is in a .mat file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibration_toolbox</span> <span class="k">as</span> <span class="nn">vtb</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">scipy.io</span> <span class="k">as</span> <span class="nn">sio</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">sio</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">vtb</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/data/case2.mat&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#print(data)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Data is imported as arrays. Modify then to fit our function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TF</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Hf_chan_2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Freq_domain&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Now we are able to call the function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span><span class="p">,</span> <span class="n">nf</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">vtb</span><span class="o">.</span><span class="n">mdof_cf</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">TF</span><span class="p">,</span><span class="mi">500</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nf</span>
+<span class="go">192.59382330...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="identification.sdof_cf">
+<code class="descclassname">identification.</code><code class="descname">sdof_cf</code><span class="sig-paren">(</span><em>f</em>, <em>TF</em>, <em>Fmin=None</em>, <em>Fmax=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/identification.html#sdof_cf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#identification.sdof_cf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Curve fit to a single degree of freedom FRF.</p>
+<p>Only one peak may exist in the segment of the FRF passed to sdofcf. No
+zeros may exist within this segment. If so, curve fitting becomes
+unreliable.</p>
+<p>If Fmin and Fmax are not entered, the first and last elements of TF are
+used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>f: array</strong></p>
+<blockquote>
+<div><p>The frequency vector in Hz. Does not have to start at 0 Hz.</p>
+</div></blockquote>
+<p><strong>TF: array</strong></p>
+<blockquote>
+<div><p>The complex transfer function</p>
+</div></blockquote>
+<p><strong>Fmin: int</strong></p>
+<blockquote>
+<div><p>The minimum frequency to be used for curve fitting in the FRF</p>
+</div></blockquote>
+<p><strong>Fmax: int</strong></p>
+<blockquote>
+<div><p>The maximum frequency to be used for curve fitting in the FRF</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">z: double</p>
+<blockquote>
+<div><p>The damping ratio</p>
+</div></blockquote>
+<p>nf: double</p>
+<blockquote>
+<div><p>Natural frequency (Hz)</p>
+</div></blockquote>
+<p>a: double</p>
+<blockquote class="last">
+<div><p>The numerator of the identified transfer functions</p>
+<p>Plot of the FRF magnitude and phase.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Author: Original Joseph C. Slater. Python version, Gabriel Loranger</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># First we need to load the sampled data which is in a .mat file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibration_toolbox</span> <span class="k">as</span> <span class="nn">vtb</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">scipy.io</span> <span class="k">as</span> <span class="nn">sio</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">sio</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">vtb</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/data/case1.mat&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#print(data)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Data is imported as arrays. Modify then to fit our function.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TF</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Hf_chan_2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Freq_domain&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Now we are able to call the function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span><span class="p">,</span> <span class="n">nf</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">vtb</span><span class="o">.</span><span class="n">sdof_cf</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">TF</span><span class="p">,</span><span class="mi">500</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nf</span>
+<span class="go">212.092530551...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Vibration Testing</a></h1>
+
+
+
+<p class="blurb">Vibration Testing Analysis</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="signal.html">Signal Processing (<code class="docutils literal"><span class="pre">signals</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="system.html">System Manipulation (<code class="docutils literal"><span class="pre">system</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Modal Analysis and System Identification (<code class="docutils literal"><span class="pre">identification</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/reference/identification.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Joseph C. Slater.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../_sources/reference/identification.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
