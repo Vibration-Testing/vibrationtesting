@@ -24,7 +24,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Signal Processing (vibrationtesting.signal)" href="signal.html" />
+    <link rel="prev" title="Signal Processing (vibrationtesting.signals)" href="signal.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -42,15 +42,13 @@
             
   <div class="section" id="system-manipulation-vibrationtesting-system">
 <h1>System Manipulation (<code class="xref py py-mod docutils literal"><span class="pre">vibrationtesting.system</span></code>)<a class="headerlink" href="#system-manipulation-vibrationtesting-system" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="system-system-solvers-and-manipulators">
-<h2><a class="reference internal" href="#module-system" title="system"><code class="xref py py-mod docutils literal"><span class="pre">system</span></code></a> – System Solvers and Manipulators<a class="headerlink" href="#system-system-solvers-and-manipulators" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-system"></span><p>Created on 14 May 2015
 &#64;author: Joseph C. Slater</p>
 <dl class="function">
 <dt id="system.c2d">
 <code class="descclassname">system.</code><code class="descname">c2d</code><span class="sig-paren">(</span><em>A</em>, <em>B</em>, <em>C</em>, <em>D</em>, <em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#c2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.c2d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert continuous state system to discrete time
-Converts a set of continuous state space system matrices to their
+<dd><p>Convert continuous state system to discrete time</p>
+<p>Converts a set of continuous state space system matrices to their
 discrete counterpart.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -90,13 +88,14 @@ discrete counterpart.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">A2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>   <span class="mf">0.</span> <span class="p">,</span>  <span class="mf">0.</span>    <span class="p">,</span>  <span class="mf">1.</span>    <span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">A3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.4</span><span class="p">,</span>  <span class="mf">1.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0058</span><span class="p">,</span>  <span class="mf">0.0014</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">A4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.4</span><span class="p">,</span>  <span class="mf">0.0016</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0038</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">A3</span><span class="p">,</span> <span class="n">A4</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="go">[[ 0.      0.      1.      0.    ]</span>
-<span class="go"> [ 0.      0.      0.      1.    ]</span>
-<span class="go"> [-1.4     1.2    -0.0058  0.0014]</span>
-<span class="go"> [ 0.8    -1.4     0.0016 -0.0038]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>   <span class="mf">0.</span> <span class="p">,</span>  <span class="mf">1.</span>    <span class="p">,</span>  <span class="mf">0.</span>    <span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>   <span class="mf">0.</span> <span class="p">,</span>  <span class="mf">0.</span>    <span class="p">,</span>  <span class="mf">1.</span>    <span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="o">-</span><span class="mf">1.4</span><span class="p">,</span>  <span class="mf">1.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0058</span><span class="p">,</span>  <span class="mf">0.0014</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span> <span class="mf">0.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.4</span><span class="p">,</span>  <span class="mf">0.0016</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0038</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span> <span class="mf">0.</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span> <span class="mf">0.</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span> <span class="mf">1.</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0058</span><span class="p">,</span> <span class="mf">0.0014</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Ad</span><span class="p">,</span> <span class="n">Bd</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">c2d</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
@@ -117,8 +116,8 @@ discrete counterpart.</p>
 <dl class="function">
 <dt id="system.d2c">
 <code class="descclassname">system.</code><code class="descname">d2c</code><span class="sig-paren">(</span><em>Ad</em>, <em>Bd</em>, <em>C</em>, <em>D</em>, <em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#d2c"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.d2c" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns continuous A, B, C, D from discrete
-Converts a set of digital state space system matrices to their
+<dd><p>Returns continuous A, B, C, D from discrete</p>
+<p>Converts a set of digital state space system matrices to their
 continuous counterpart.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -157,17 +156,14 @@ continuous counterpart.</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">A1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.9999</span><span class="p">,</span><span class="mf">0.0001</span><span class="p">,</span><span class="mf">0.01</span><span class="p">,</span><span class="mf">0.</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">A2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span><span class="mf">0.9999</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.01</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">A3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.014</span><span class="p">,</span><span class="mf">0.012</span><span class="p">,</span><span class="mf">0.9999</span><span class="p">,</span><span class="mf">0.0001</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">A4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.008</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.014</span><span class="p">,</span><span class="mf">0.0001</span><span class="p">,</span><span class="mf">0.9999</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Ad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">A3</span><span class="p">,</span> <span class="n">A4</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Ad</span><span class="p">)</span>
-<span class="go">[[ 0.9999  0.0001  0.01    0.    ]</span>
-<span class="go"> [ 0.      0.9999  0.      0.01  ]</span>
-<span class="go"> [-0.014   0.012   0.9999  0.0001]</span>
-<span class="go"> [ 0.008  -0.014   0.0001  0.9999]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Bd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span>  <span class="p">],</span> <span class="p">[</span> <span class="mf">0.</span>  <span class="p">],</span> <span class="p">[</span> <span class="mf">0.</span>  <span class="p">],</span> <span class="p">[</span> <span class="mf">0.01</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Ad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.9999</span><span class="p">,</span><span class="mf">0.0001</span><span class="p">,</span><span class="mf">0.01</span><span class="p">,</span><span class="mf">0.</span><span class="p">],</span>
+<span class="gp">... </span>               <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span><span class="mf">0.9999</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.01</span><span class="p">],</span>
+<span class="gp">... </span>               <span class="p">[</span><span class="o">-</span><span class="mf">0.014</span><span class="p">,</span><span class="mf">0.012</span><span class="p">,</span><span class="mf">0.9999</span><span class="p">,</span><span class="mf">0.0001</span><span class="p">],</span>
+<span class="gp">... </span>               <span class="p">[</span> <span class="mf">0.008</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.014</span><span class="p">,</span><span class="mf">0.0001</span><span class="p">,</span><span class="mf">0.9999</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span>  <span class="p">],</span>
+<span class="gp">... </span>               <span class="p">[</span> <span class="mf">0.</span>  <span class="p">],</span>
+<span class="gp">... </span>               <span class="p">[</span> <span class="mf">0.</span>  <span class="p">],</span>
+<span class="gp">... </span>               <span class="p">[</span> <span class="mf">0.01</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0058</span><span class="p">,</span> <span class="mf">0.0014</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">d2c</span><span class="p">(</span><span class="n">Ad</span><span class="p">,</span> <span class="n">Bd</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
@@ -189,8 +185,8 @@ continuous counterpart.</p>
 <dl class="function">
 <dt id="system.so2ss">
 <code class="descclassname">system.</code><code class="descname">so2ss</code><span class="sig-paren">(</span><em>M</em>, <em>C</em>, <em>K</em>, <em>Bt</em>, <em>Cd</em>, <em>Cv</em>, <em>Ca</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#so2ss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.so2ss" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns A, B, C, D
-Given second order linear matrix equation of the form
+<dd><p>Convert second order system to state space</p>
+<p>Given second order linear matrix equation of the form
 <span class="math">\(M\ddot{x} + C \dot{x} + K x= \tilde{B} u\)</span>
 and
 <span class="math">\(y = C_d x + + C_v \dot{x} + C_a\ddot{x}\)</span>
@@ -219,9 +215,12 @@ and accelerometer matrices</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Bt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Cd</span> <span class="o">=</span> <span class="n">Cv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Ca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
@@ -247,8 +246,8 @@ and accelerometer matrices</p>
 <dl class="function">
 <dt id="system.ssfrf">
 <code class="descclassname">system.</code><code class="descname">ssfrf</code><span class="sig-paren">(</span><em>A</em>, <em>B</em>, <em>C</em>, <em>D</em>, <em>omega_low</em>, <em>omega_high</em>, <em>in_index</em>, <em>out_index</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#ssfrf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.ssfrf" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns
-obtains the computed FRF of a state space system between selected input
+<dd><p>FRF of state space system</p>
+<p>Obtains the computed FRF of a state space system between selected input
 and output over frequency range of interest.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -287,13 +286,14 @@ and output over frequency range of interest.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">A2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>   <span class="mf">0.</span> <span class="p">,</span>  <span class="mf">0.</span>    <span class="p">,</span>  <span class="mf">1.</span>    <span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">A3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.4</span><span class="p">,</span>  <span class="mf">1.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0058</span><span class="p">,</span>  <span class="mf">0.0014</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">A4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.4</span><span class="p">,</span>  <span class="mf">0.0016</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0038</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">A3</span><span class="p">,</span> <span class="n">A4</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="go">[[ 0.      0.      1.      0.    ]</span>
-<span class="go"> [ 0.      0.      0.      1.    ]</span>
-<span class="go"> [-1.4     1.2    -0.0058  0.0014]</span>
-<span class="go"> [ 0.8    -1.4     0.0016 -0.0038]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span> <span class="mf">1.</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>   <span class="mf">0.</span> <span class="p">,</span>  <span class="mf">1.</span>    <span class="p">,</span>  <span class="mf">0.</span>    <span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>   <span class="mf">0.</span> <span class="p">,</span>  <span class="mf">0.</span>    <span class="p">,</span>  <span class="mf">1.</span>    <span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="o">-</span><span class="mf">1.4</span><span class="p">,</span>  <span class="mf">1.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0058</span><span class="p">,</span>  <span class="mf">0.0014</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span> <span class="mf">0.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.4</span><span class="p">,</span>  <span class="mf">0.0016</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0038</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span> <span class="mf">0.</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span> <span class="mf">0.</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span> <span class="mf">1.</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0058</span><span class="p">,</span> <span class="mf">0.0014</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">omega</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">ssfrf</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -302,7 +302,54 @@ and output over frequency range of interest.</p>
 </div>
 </dd></dl>
 
+<dl class="function">
+<dt id="system.undamped_modes">
+<code class="descclassname">system.</code><code class="descname">undamped_modes</code><span class="sig-paren">(</span><em>M</em>, <em>K</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#undamped_modes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.undamped_modes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Undamped modes and natural frequencies from Mass and Stiffness matrix.</p>
+<p>Optimally find mass normalized mode shapes and natural frequencies
+of a system modelled by <span class="math">\(M\ddot{x}+Kx=0\)</span>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>M, K</strong> : float arrays</p>
+<blockquote>
+<div><p>Mass and stiffness matrices</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>omega</strong> : float array (1xN)</p>
+<blockquote>
+<div><p>Vector of natural frequencies (rad/sec)</p>
+</div></blockquote>
+<p><strong>Psi</strong> : float array (NxN)</p>
+<blockquote class="last">
+<div><p>Matrix of mass normalized mode shapes by column</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">omega</span><span class="p">,</span> <span class="n">Psi</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">undamped_modes</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">omega</span><span class="p">)</span>
+<span class="go">[ 0.445   1.247   1.8019]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Psi</span><span class="p">)</span>
+<span class="go">[[ 0.164  -0.3685 -0.2955]</span>
+<span class="go"> [ 0.2955 -0.164   0.3685]</span>
+<span class="go"> [ 0.3685  0.2955 -0.164 ]]</span>
+</pre></div>
 </div>
+</dd></dl>
+
 </div>
 
 
@@ -327,11 +374,8 @@ and output over frequency range of interest.</p>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="signal.html">Signal Processing (<code class="docutils literal"><span class="pre">vibrationtesting.signal</span></code>)</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">System Manipulation (<code class="docutils literal"><span class="pre">vibrationtesting.system</span></code>)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#system-system-solvers-and-manipulators"><code class="docutils literal"><span class="pre">system</span></code> – System Solvers and Manipulators</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="signal.html">Signal Processing (<code class="docutils literal"><span class="pre">vibrationtesting.signals</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">System Manipulation (<code class="docutils literal"><span class="pre">vibrationtesting.system</span></code>)</a></li>
 </ul>
 </li>
 </ul>

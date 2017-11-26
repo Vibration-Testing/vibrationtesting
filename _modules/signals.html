@@ -1,0 +1,1419 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>signals &#8212; Vibration Testing 0.1b03 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1b03',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for signals</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 14 May 2015</span>
+<span class="sd">@author: Joseph C. Slater</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Joseph C. Slater&quot;</span>
+
+<span class="n">__docformat__</span> <span class="o">=</span> <span class="s1">&#39;reStructuredText&#39;</span>
+
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">control</span> <span class="k">as</span> <span class="nn">ctrl</span>
+<span class="c1"># from numpy import ma</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="c1"># import scipy.signal as sig</span>
+<span class="kn">import</span> <span class="nn">scipy.fftpack</span> <span class="k">as</span> <span class="nn">fftpack</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="k">as</span> <span class="nn">la</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="c1"># rcParams = matplotlib.rcParams</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Notes:</span>
+<span class="sd">------</span>
+<span class="sd">Sept. 3, 2016</span>
+<span class="sd">Development of windows in scipy.signal has been rapid and</span>
+<span class="sd">determining what I should build into this module, or simply leverage</span>
+<span class="sd">from scipy.signal has been a moving target.</span>
+<span class="sd">It&#39;s now apparent that creating or returning a window is pointless. Further,</span>
+<span class="sd">Applying should be a relatively simple code obviating much of any need for the</span>
+<span class="sd">code here.</span>
+
+<span class="sd">The cross spectrum analysis formerly lacking is now available, periodogram</span>
+<span class="sd">is often the best option, however not with impulse excitations.</span>
+
+<span class="sd">FRF calculation is typically trivial, Hv being an expected gap long term</span>
+<span class="sd">MIMO FRF calculation is an open question. Pretty printing of FRFs is always</span>
+<span class="sd">a welcome tool.</span>
+
+<span class="sd">System ID is likely the remaining missing aspect at this time.</span>
+
+<span class="sd">In order to be consistent with the Control Systems Library, increasing time</span>
+<span class="sd">or increasing frequency steps positively with increased column number (second</span>
+<span class="sd">dimension). Rows (first dimension- 0 dimension)</span>
+<span class="sd">correspond to appropriate degress of freedom, output numbers, etc. The</span>
+<span class="sd">third dimension (2) indexes each data instance (experiment).</span>
+
+<span class="sd">http://python-control.readthedocs.io/en/latest/conventions.html#time-series-data</span>
+
+<span class="sd">Problem: This hasn&#39;t been fully implemented.</span>
+<span class="sd">I don&#39;t know which standard the package is following now- a bit of both!</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="window"><a class="viewcode-back" href="../reference/signal.html#signals.window">[docs]</a><span class="k">def</span> <span class="nf">window</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="s1">&#39;hanning&#39;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create leakage window</span>
+
+<span class="sd">    Create a  window of length :math:`x`, or a window sized to match</span>
+<span class="sd">    :math:`x` that :math:`x\\times w` is the windowed result.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x: integer, float array</span>
+<span class="sd">       | If integer- number of points in desired hanning windows.</span>
+<span class="sd">       | If array- array provides size of window returned.</span>
+<span class="sd">    windowname: string</span>
+<span class="sd">       One of: hanning, hamming, blackman, flatwin, boxwin</span>
+<span class="sd">    normalize: bool, optional(False)</span>
+<span class="sd">       Adjust power level (for use in ASD) to 1</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    w: float array</span>
+<span class="sd">       | window array of size x</span>
+<span class="sd">       | window array. Windowed array is then :math:`x\\times w`</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
+<span class="sd">    &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">    &gt;&gt;&gt; sample_freq = 1e3</span>
+<span class="sd">    &gt;&gt;&gt; tfinal = 5</span>
+<span class="sd">    &gt;&gt;&gt; fs = 100</span>
+<span class="sd">    &gt;&gt;&gt; A = 10</span>
+<span class="sd">    &gt;&gt;&gt; freq = 5</span>
+<span class="sd">    &gt;&gt;&gt; noise_power = 0.001 * sample_freq / 2</span>
+<span class="sd">    &gt;&gt;&gt; time = np.reshape(np.arange(0, tfinal, 1/sample_freq),(1,-1))</span>
+<span class="sd">    &gt;&gt;&gt; xsin = A*np.sin(2*np.pi*freq*time)</span>
+<span class="sd">    &gt;&gt;&gt; xcos = A*np.cos(2*np.pi*freq*time) # assembling individual records. vstack assembles channels</span>
+<span class="sd">    &gt;&gt;&gt; x=np.dstack((xsin,xcos)) # assembling individual records. vstack</span>
+<span class="sd">    &gt;&gt;&gt; xw=vt.hanning(x)*x</span>
+<span class="sd">    &gt;&gt;&gt; fig, (ax1, ax2) = plt.subplots(2,1)</span>
+<span class="sd">    &gt;&gt;&gt; ax1.plot(time.T,x[:,:,1].T)</span>
+<span class="sd">    [&lt;matplotlib.lines.Line2D object at ...&gt;]</span>
+<span class="sd">    &gt;&gt;&gt; ax1.set_ylim([-20, 20])</span>
+<span class="sd">    (-20, 20)</span>
+<span class="sd">    &gt;&gt;&gt; ax1.set_title(&#39;Original (raw) data.&#39;)</span>
+<span class="sd">    Text(0.5,1,&#39;Original (raw) data.&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ax1.set_ylabel(&#39;$x(t)$&#39;)</span>
+<span class="sd">    Text(0,0.5,&#39;$x(t)$&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ax2.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,&#39;--&#39;,time[0,:],-vt.hanning(x)[0,:]*A,&#39;--&#39;)</span>
+<span class="sd">    [&lt;matplotlib.lines.Line2D object at ...&gt;]</span>
+<span class="sd">    &gt;&gt;&gt; ax2.set_ylabel(&#39;Hanning windowed $x(t)$&#39;)</span>
+<span class="sd">    Text(0,0.5,&#39;Hanning windowed $x(t)$&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ax2.set_xlabel(&#39;time&#39;)</span>
+<span class="sd">    Text(0.5,0,&#39;time&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ax2.set_title(&#39;Effect of window. Note the scaling to conserve ASD amplitude&#39;)</span>
+<span class="sd">    Text(0.5,1,&#39;Effect of window. Note the scaling to conserve ASD amplitude&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; fig.tight_layout()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="sd">&#39;&#39;&#39;Create Hanning windowing array of dimension n by N by nr</span>
+<span class="sd">        where N is number of data points and n is the number of number of</span>
+<span class="sd">        inputs or outputs.</span>
+<span class="sd">        and nr is the number of records.&#39;&#39;&#39;</span>
+
+        <span class="n">swap</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># We have either a scalar or 1D array</span>
+            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;x is a scalar... and shouldn</span><span class="se">\&#39;</span><span class="s2">t have entered this </span><span class="se">\</span>
+<span class="s2">                      part of the loop.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+            <span class="n">f</span> <span class="o">=</span> <span class="n">window</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="n">windowname</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">swap</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;You shouldn</span><span class="se">\&#39;</span><span class="s1">t do that.&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The 1 dimension is the time (or frequency) </span><span class="se">\</span>
+<span class="s1">                       incrementing dimension.&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Swapping axes temporarily to be compliant with </span><span class="se">\</span>
+<span class="s1">                      expectations. I</span><span class="se">\&#39;</span><span class="s1">ll fix them in your result&#39;</span><span class="p">)</span>
+
+            <span class="n">N</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">window</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="n">windowname</span><span class="p">)</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">swap</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1"># f,_=np.meshgrid(f[0,:],np.arange(x.shape[0]))</span>
+            <span class="c1"># print(&#39;b&#39;)</span>
+
+            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">swap</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;You shouldn</span><span class="se">\&#39;</span><span class="s1">t do that.&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The 1 dimension is the time (or frequency) &#39;</span> <span class="o">+</span>
+                      <span class="s1">&#39;incrementing dimension.&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Swapping axes temporarily to be compliant with &#39;</span> <span class="o">+</span>
+                      <span class="s1">&#39;expectations.&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;I</span><span class="se">\&#39;</span><span class="s1">ll reluctantly return a transposed result.&#39;</span><span class="p">)</span>
+
+            <span class="n">f</span> <span class="o">=</span> <span class="n">window</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">windowname</span><span class="o">=</span><span class="n">windowname</span><span class="p">)</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">swap</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># print(x)</span>
+        <span class="c1"># Create hanning window of length x</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="c1"># print(N)</span>
+        <span class="k">if</span> <span class="n">windowname</span> <span class="ow">is</span> <span class="s1">&#39;hanning&#39;</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">windowname</span> <span class="ow">is</span> <span class="s1">&#39;hamming&#39;</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.54</span> <span class="o">-</span> <span class="mf">0.46</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span>\
+                <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">5000</span> <span class="o">/</span> <span class="mi">1987</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">windowname</span> <span class="ow">is</span> <span class="s1">&#39;blackman&#39;</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;blackman&#39;</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.42</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span><span class="p">))</span>
+                 <span class="o">+</span> <span class="o">.</span><span class="mi">08</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span><span class="p">)))</span>\
+                <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">5000</span> <span class="o">/</span> <span class="mi">1523</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">windowname</span> <span class="ow">is</span> <span class="s1">&#39;flatwin&#39;</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1.933</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>\
+                <span class="o">+</span> <span class="mf">1.286</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>\
+                <span class="o">-</span> <span class="mf">0.338</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">6</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>\
+                <span class="o">+</span> <span class="mf">0.032</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">windowname</span> <span class="ow">is</span> <span class="s1">&#39;boxwin&#39;</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;I don&#39;t recognize that window name. Sorry&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">normalize</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="n">la</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="hanning"><a class="viewcode-back" href="../reference/signal.html#signals.hanning">[docs]</a><span class="k">def</span> <span class="nf">hanning</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns hanning window</span>
+
+<span class="sd">    Create a hanning window of length :math:`x`, or a hanning window sized to</span>
+<span class="sd">    match :math:`x` that :math:`x\\times w` is the windowed result.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x: integer, float array</span>
+<span class="sd">       | If integer- number of points in desired hanning windows.</span>
+<span class="sd">       | If array- array provides size of window returned.</span>
+<span class="sd">    windowname: string</span>
+<span class="sd">       One of: hanning, hamming, blackman, flatwin, boxwin</span>
+<span class="sd">    normalize: bool, optional(False)</span>
+<span class="sd">       Adjust power level (for use in ASD) to 1</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    w: float array</span>
+<span class="sd">       | window array of size x</span>
+<span class="sd">       | window array. Windowed array is then :math:`x\\times w`</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
+<span class="sd">    &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">    &gt;&gt;&gt; sample_freq = 1e3</span>
+<span class="sd">    &gt;&gt;&gt; tfinal = 5</span>
+<span class="sd">    &gt;&gt;&gt; fs = 100</span>
+<span class="sd">    &gt;&gt;&gt; A = 10</span>
+<span class="sd">    &gt;&gt;&gt; freq = 5</span>
+<span class="sd">    &gt;&gt;&gt; noise_power = 0.001 * sample_freq / 2</span>
+<span class="sd">    &gt;&gt;&gt; time = np.reshape(np.arange(0, tfinal, 1/sample_freq),(1,-1))</span>
+<span class="sd">    &gt;&gt;&gt; xsin = A*np.sin(2*np.pi*freq*time)</span>
+<span class="sd">    &gt;&gt;&gt; xcos = A*np.cos(2*np.pi*freq*time)</span>
+<span class="sd">    &gt;&gt;&gt; x=np.dstack((xsin,xcos)) # assembling individual records. vstack</span>
+<span class="sd">    &gt;&gt;&gt; xw=vt.hanning(x)*x</span>
+<span class="sd">    &gt;&gt;&gt; fig, (ax1, ax2) = plt.subplots(2, 1)</span>
+<span class="sd">    &gt;&gt;&gt; ax1.plot(time.T,x[:,:,1].T)</span>
+<span class="sd">    [&lt;matplotlib.lines.Line2D object at ...&gt;]</span>
+<span class="sd">    &gt;&gt;&gt; ax1.set_ylim([-20, 20])</span>
+<span class="sd">    (-20, 20)</span>
+<span class="sd">    &gt;&gt;&gt; ax1.set_title(&#39;Unwindowed data, 2 records.&#39;)</span>
+<span class="sd">    Text(0.5,1,&#39;Unwindowed data, 2 records.&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ax1.set_ylabel(&#39;$x(t)$&#39;)</span>
+<span class="sd">    Text(0,0.5,&#39;$x(t)$&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ax2.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,&#39;--&#39;,time[0,:],-vt.hanning(x)[0,:]*A,&#39;--&#39;)</span>
+<span class="sd">    [&lt;matplotlib.lines.Line2D object at ...&gt;]</span>
+<span class="sd">    &gt;&gt;&gt; ax2.set_ylabel(&#39;Hanning windowed $x(t)$&#39;)</span>
+<span class="sd">    Text(0,0.5,&#39;Hanning windowed $x(t)$&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ax2.set_xlabel(&#39;time&#39;)</span>
+<span class="sd">    Text(0.5,0,&#39;time&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ax2.set_title(&#39;Effect of window. Note the scaling to conserve ASD amplitude&#39;)</span>
+<span class="sd">    Text(0.5,1,&#39;Effect of window. Note the scaling to conserve ASD amplitude&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; fig.tight_layout()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="sd">&#39;&#39;&#39;Create Hanning windowing array of dimension n by N by nr</span>
+<span class="sd">        where N is number of data points and n is the number of number of</span>
+<span class="sd">        inputs or outputs and nr is the number of records.&#39;&#39;&#39;</span>
+
+        <span class="n">swap</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># We have either a scalar or 1D array</span>
+            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;x is a scalar... and shouldn</span><span class="se">\&#39;</span><span class="s2">t have </span><span class="se">\</span>
+<span class="s2">                       entered this part of the loop.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">hanning</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="c1"># print(&#39;a&#39;)</span>
+            <span class="c1"># print(f.shape)</span>
+
+            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">swap</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Swapping axes temporarily to be compliant with </span><span class="se">\</span>
+<span class="s1">                      expectations. I</span><span class="se">\&#39;</span><span class="s1">ll fix them in your result&#39;</span><span class="p">)</span>
+
+            <span class="n">f</span> <span class="o">=</span> <span class="n">hanning</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">swap</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1"># f,_=np.meshgrid(f[0,:],np.arange(x.shape[0]))</span>
+            <span class="c1"># print(&#39;b&#39;)</span>
+            <span class="c1"># print(&#39;length = 2&#39;)</span>
+            <span class="c1"># print(x.shape)</span>
+            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">swap</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Swapping axes temporarily to be compliant with </span><span class="se">\</span>
+<span class="s1">                      expectations. I</span><span class="se">\&#39;</span><span class="s1">ll fix them in your result&#39;</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">hanning</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">swap</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># print(x)</span>
+        <span class="c1"># Create hanning window of length x</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="c1"># print(N)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">normalize</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="n">la</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="blackwin"><a class="viewcode-back" href="../reference/signal.html#signals.blackwin">[docs]</a><span class="k">def</span> <span class="nf">blackwin</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the n point Blackman window</span>
+
+<span class="sd">    Returns x as the Blackman windowing array x_window</span>
+<span class="sd">    The windowed signal is then x*x_window</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;blackwin is untested&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">blackwin</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mf">0.42</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="p">))</span> <span class="o">/</span>
+                        <span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">+</span> <span class="o">.</span><span class="mi">08</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="p">))</span> <span class="o">/</span>
+                        <span class="p">(</span><span class="n">n</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">5000</span> <span class="o">/</span> <span class="mi">1523</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="n">la</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="expwin"><a class="viewcode-back" href="../reference/signal.html#signals.expwin">[docs]</a><span class="k">def</span> <span class="nf">expwin</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ts</span><span class="o">=.</span><span class="mi">75</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the n point exponential window</span>
+
+<span class="sd">    Returns x as the expwin windowing array x_windowed</span>
+<span class="sd">    The windowed signal is then x*x_window</span>
+<span class="sd">    The optional second argument set the 5% &quot;settling time&quot; of the window.</span>
+<span class="sd">    Default is ts=0.75</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;expwin is untested&#39;</span><span class="p">)</span>
+    <span class="n">tc</span> <span class="o">=</span> <span class="o">-</span><span class="n">ts</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="o">.</span><span class="mi">05</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">expwin</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">v</span> <span class="o">/</span> <span class="n">tc</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="n">la</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="n">la</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="hammwin"><a class="viewcode-back" href="../reference/signal.html#signals.hammwin">[docs]</a><span class="k">def</span> <span class="nf">hammwin</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the n point hamming window</span>
+
+<span class="sd">    Returns x as the hamming windowingarray x_windowed</span>
+<span class="sd">    The windowed signal is then x*x_window</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;hammwin is untested&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">hammwin</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mf">0.54</span> <span class="o">-</span> <span class="mf">0.46</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">))</span> <span class="o">/</span>
+                                             <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">5000</span> <span class="o">/</span> <span class="mi">1987</span><span class="p">),</span>
+                       <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="n">la</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="flatwin"><a class="viewcode-back" href="../reference/signal.html#signals.flatwin">[docs]</a><span class="k">def</span> <span class="nf">flatwin</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the n point flat top window</span>
+
+<span class="sd">    x_windows=flatwin(x)</span>
+<span class="sd">    Returns x as the flat top windowing array x_windowed</span>
+<span class="sd">    The windowed signal is then x*x_window</span>
+<span class="sd">    McConnell, K. G., &quot;Vibration Testing: Theory and Practice,&quot; Wiley, 1995.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;flatwin is untested&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">flatwin</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1.933</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+                 <span class="o">+</span> <span class="mf">1.286</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+                 <span class="o">-</span> <span class="mf">0.338</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">6</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+                 <span class="o">+</span> <span class="mf">0.032</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))),</span>
+                <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="n">la</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="boxwin"><a class="viewcode-back" href="../reference/signal.html#signals.boxwin">[docs]</a><span class="k">def</span> <span class="nf">boxwin</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the n point box window (uniform)</span>
+
+<span class="sd">    Returns x as the boxwin windowing array x_windowed</span>
+<span class="sd">    The windowed signal is then x*x_window</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;boxwin is untested&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">boxwin</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="c1"># f=np.reshape((1.0-1.933*np.cos(2*np.pi*(np.arange(n))/(n-1))+1.286*np.cos(4*np.pi*(np.arange(n))/(n-1))-0.338*np.cos(6*np.pi*(np.arange(n))/(n-1))+0.032*np.cos(8*np.pi*(np.arange(n))/(n-1))),(1,-1))</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="n">la</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">f</span></div>
+
+
+<span class="k">def</span> <span class="nf">hannwin</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">hanning</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="asd"><a class="viewcode-back" href="../reference/signal.html#signals.asd">[docs]</a><span class="k">def</span> <span class="nf">asd</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="s2">&quot;hanning&quot;</span><span class="p">,</span> <span class="n">ave</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="kc">True</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;Return autospectrum (power spectrum) density of a signal x</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : float array</span>
+<span class="sd">        Data array (n x N x m) where n is the number of sensors, m the</span>
+<span class="sd">        number of experiments.</span>
+<span class="sd">    t : float array</span>
+<span class="sd">        Time array (1 x N)</span>
+<span class="sd">    windowname : string</span>
+<span class="sd">        Name of windowing function to use. See `window`.</span>
+<span class="sd">    ave : bool, optional(True)</span>
+<span class="sd">        Average result or not?</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    f : float array</span>
+<span class="sd">        Frequency vector (1 x N)</span>
+<span class="sd">    Pxx : float array</span>
+<span class="sd">          Autospectrum (n x N) or (n x N x m) if not averaged.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from scipy import signal</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
+<span class="sd">    &gt;&gt;&gt; import numpy.linalg as la</span>
+
+<span class="sd">    Generate a 5 second test signal, a 10 V sine wave at 50 Hz, corrupted by</span>
+<span class="sd">    0.001 V**2/Hz of white noise sampled at 1 kHz.</span>
+
+<span class="sd">    &gt;&gt;&gt; sample_freq = 1e3</span>
+<span class="sd">    &gt;&gt;&gt; tfinal = 5</span>
+<span class="sd">    &gt;&gt;&gt; sig_freq=50</span>
+<span class="sd">    &gt;&gt;&gt; A=10</span>
+<span class="sd">    &gt;&gt;&gt; noise_power = 0.0001 * sample_freq / 2</span>
+<span class="sd">    &gt;&gt;&gt; noise_power = A/1e12</span>
+<span class="sd">    &gt;&gt;&gt; time = np.arange(0,tfinal,1/sample_freq)</span>
+<span class="sd">    &gt;&gt;&gt; time = np.reshape(time, (1, -1))</span>
+<span class="sd">    &gt;&gt;&gt; x = A*np.sin(2*np.pi*sig_freq*time)</span>
+<span class="sd">    &gt;&gt;&gt; x = x + np.random.normal(scale=np.sqrt(noise_power), size=(1, time.shape[1]))</span>
+<span class="sd">    &gt;&gt;&gt; fig, (ax1, ax2) = plt.subplots(2,1)</span>
+<span class="sd">    &gt;&gt;&gt; ax1.plot(time[0,:],x[0,:])</span>
+<span class="sd">    [&lt;matplotlib.lines.Line2D object at ...&gt;]</span>
+<span class="sd">    &gt;&gt;&gt; ax1.set_title(&#39;Time history&#39;)</span>
+<span class="sd">    Text(0.5,1,&#39;Time history&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ax1.set_xlabel(&#39;Time (sec)&#39;)</span>
+<span class="sd">    Text(0.5,0,&#39;Time (sec)&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ax1.set_ylabel(&#39;$x(t)$&#39;)</span>
+<span class="sd">    Text(0,0.5,&#39;$x(t)$&#39;)</span>
+
+<span class="sd">    Compute and plot the autospectrum density.</span>
+
+<span class="sd">    &gt;&gt;&gt; freq_vec, Pxx = vt.asd(x, time, windowname=&quot;hanning&quot;, ave=bool(False))</span>
+<span class="sd">    &gt;&gt;&gt; ax2.plot(freq_vec, 20*np.log10(Pxx[0,:]))</span>
+<span class="sd">    [&lt;matplotlib.lines.Line2D object at ...&gt;]</span>
+<span class="sd">    &gt;&gt;&gt; ax2.set_ylim([-400, 100])</span>
+<span class="sd">    (-400, 100)</span>
+<span class="sd">    &gt;&gt;&gt; ax2.set_xlabel(&#39;frequency (Hz)&#39;)</span>
+<span class="sd">    Text(0.5,0,&#39;frequency (Hz)&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ax2.set_ylabel(&#39;PSD (V**2/Hz)&#39;)</span>
+<span class="sd">    Text(0,0.5,&#39;PSD (V**2/Hz)&#39;)</span>
+
+<span class="sd">    If we average the last half of the spectral density, to exclude the</span>
+<span class="sd">    peak, we can recover the noise power on the signal.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">Pxx</span> <span class="o">=</span> <span class="n">crsd</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="n">windowname</span><span class="p">,</span> <span class="n">ave</span><span class="o">=</span><span class="n">ave</span><span class="p">)</span>
+    <span class="n">Pxx</span> <span class="o">=</span> <span class="n">Pxx</span><span class="o">.</span><span class="n">real</span>
+    <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">Pxx</span></div>
+
+
+<div class="viewcode-block" id="crsd"><a class="viewcode-back" href="../reference/signal.html#signals.crsd">[docs]</a><span class="k">def</span> <span class="nf">crsd</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="s2">&quot;hanning&quot;</span><span class="p">,</span> <span class="n">ave</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="kc">True</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the cross spectrum (power spectrum) density between two signals.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x, y : arrays</span>
+<span class="sd">        Data array (n x N x m) where n is the number of sensors, m the</span>
+<span class="sd">        number of experiments.</span>
+<span class="sd">    t : array</span>
+<span class="sd">        Time array (1 x N)</span>
+<span class="sd">    windowname : string</span>
+<span class="sd">        Name of windowing function to use</span>
+<span class="sd">    ave : bool, optional</span>
+<span class="sd">        Average result or not?</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    f : array</span>
+<span class="sd">        Frequency vector (1 x N)</span>
+<span class="sd">    Pxy : array</span>
+<span class="sd">          Autospectrum (n x N) or (n x N x m) if not averaged.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from scipy import signal</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
+<span class="sd">    &gt;&gt;&gt; import numpy.linalg as la</span>
+
+<span class="sd">    Generate a 5 second test signal, a 10 V sine wave at 50 Hz, corrupted by</span>
+<span class="sd">    0.001 V**2/Hz of white noise sampled at 1 kHz.</span>
+
+<span class="sd">    &gt;&gt;&gt; sample_freq = 1e3</span>
+<span class="sd">    &gt;&gt;&gt; tfinal = 5</span>
+<span class="sd">    &gt;&gt;&gt; sig_freq=50</span>
+<span class="sd">    &gt;&gt;&gt; A=10</span>
+<span class="sd">    &gt;&gt;&gt; noise_power = 0.0001 * sample_freq / 2</span>
+<span class="sd">    &gt;&gt;&gt; noise_power = A/1e12</span>
+<span class="sd">    &gt;&gt;&gt; time = np.arange(0,tfinal,1/sample_freq)</span>
+<span class="sd">    &gt;&gt;&gt; time = np.reshape(time, (1, -1))</span>
+<span class="sd">    &gt;&gt;&gt; x = A*np.sin(2*np.pi*sig_freq*time)</span>
+<span class="sd">    &gt;&gt;&gt; x = x + np.random.normal(scale=np.sqrt(noise_power),</span>
+<span class="sd">    ...                          size=(1, time.shape[1]))</span>
+<span class="sd">    &gt;&gt;&gt; fig = plt.figure()</span>
+<span class="sd">    &gt;&gt;&gt; plt.subplot(2,1,1)</span>
+<span class="sd">    &lt;matplotlib...&gt;</span>
+<span class="sd">    &gt;&gt;&gt; plt.plot(time[0,:],x[0,:])</span>
+<span class="sd">    [&lt;matplotlib.lines.Line2D object at ...&gt;]</span>
+<span class="sd">    &gt;&gt;&gt; plt.title(&#39;Time history&#39;)</span>
+<span class="sd">    Text(0.5,1,&#39;Time history&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; plt.xlabel(&#39;Time (sec)&#39;)</span>
+<span class="sd">    Text(0.5,0,&#39;Time (sec)&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; plt.ylabel(&#39;$x(t)$&#39;)</span>
+<span class="sd">    Text(0,0.5,&#39;$x(t)$&#39;)</span>
+
+<span class="sd">    Compute and plot the autospectrum density.</span>
+<span class="sd">    &gt;&gt;&gt; freq_vec, Pxx = vt.asd(x, time, windowname=&quot;hanning&quot;, ave=bool(False))</span>
+<span class="sd">    &gt;&gt;&gt; plt.subplot(2,1,2)</span>
+<span class="sd">    &lt;matplotlib...&gt;</span>
+<span class="sd">    &gt;&gt;&gt; plt.plot(freq_vec, 20*np.log10(Pxx[0,:]))</span>
+<span class="sd">    [&lt;matplotlib.lines.Line2D object at ...&gt;]</span>
+<span class="sd">    &gt;&gt;&gt; plt.ylim([-400, 100])</span>
+<span class="sd">    (-400, 100)</span>
+<span class="sd">    &gt;&gt;&gt; plt.xlabel(&#39;frequency (Hz)&#39;)</span>
+<span class="sd">    Text(0.5,0,&#39;frequency (Hz)&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; plt.ylabel(&#39;PSD (V**2/Hz)&#39;)</span>
+<span class="sd">    Text(0,0.5,&#39;PSD (V**2/Hz)&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; fig.tight_layout()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># t_shape = t.shape</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">dt</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;You sent in bad data. Delta t is negative. </span><span class="se">\</span>
+<span class="s1">              Please check your inputs.&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># No clue what this does, and I wrote it. Comment your code, you fool!</span>
+    <span class="c1"># What this &quot;should&quot; do is assure that the data is longer in 0 axis than the others.</span>
+    <span class="c1"># if len(x.shape)==2:</span>
+    <span class="c1">#     # The issue fixed here is that the user put time along the 1 axis (instead of zero)</span>
+    <span class="c1">#     if (x.shape).index(max(x.shape))==0:</span>
+    <span class="c1">#         #x=x.reshape(max(x.shape),-1,1)</span>
+    <span class="c1">#         print(&#39;I think you put time along the 0 axis instead of the 1 axis. Not even attempting to fix this.&#39;)</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         # Here we are appending a 3rd dimension to simplify averaging command later. We could bypass at that point, and should.</span>
+    <span class="c1">#         x=x.reshape(max(x.shape),-1,1)</span>
+
+    <span class="c1"># if len(y.shape)==2:</span>
+    <span class="c1">#     if (y.shape).indey(may(y.shape))==0:</span>
+    <span class="c1">#         #y=y.reshape(may(y.shape),-1,1)</span>
+    <span class="c1">#         print(&#39;I think you put time along the 0 axis instead of the 1 axis. Not attempting to fix this.&#39;)</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         y=y.reshape(may(y.shape),-1,1)</span>
+    <span class="c1"># # Should use scipy.signal windows. I need to figure this out. Problem is: They don&#39;t scale the ASDs by the windowing &quot;weakening&quot;.</span>
+
+    <span class="k">if</span> <span class="n">windowname</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+        <span class="n">win</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># print(&#39;This doesn\&#39;t work yet&#39;)</span>
+        <span class="n">win</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">windowname</span> <span class="o">==</span> <span class="s2">&quot;hanning&quot;</span><span class="p">:</span>
+            <span class="c1"># print(&#39;shape of x&#39;)</span>
+            <span class="c1"># print(x.shape)</span>
+            <span class="n">win</span> <span class="o">=</span> <span class="n">window</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="s1">&#39;hanning&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">windowname</span> <span class="o">==</span> <span class="s2">&quot;blackwin&quot;</span><span class="p">:</span>
+            <span class="n">win</span> <span class="o">=</span> <span class="n">window</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="s1">&#39;blackwin&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">windowname</span> <span class="o">==</span> <span class="s2">&quot;boxwin&quot;</span><span class="p">:</span>
+            <span class="n">win</span> <span class="o">=</span> <span class="n">window</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="s1">&#39;boxwin&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">windowname</span> <span class="o">==</span> <span class="s2">&quot;expwin&quot;</span><span class="p">:</span>
+            <span class="n">win</span> <span class="o">=</span> <span class="n">window</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="s1">&#39;expwin&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">windowname</span> <span class="o">==</span> <span class="s2">&quot;hammwin&quot;</span><span class="p">:</span>
+            <span class="n">win</span> <span class="o">=</span> <span class="n">window</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="s1">&#39;hamming&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">windowname</span> <span class="o">==</span> <span class="s2">&quot;triwin&quot;</span><span class="p">:</span>
+            <span class="n">win</span> <span class="o">=</span> <span class="n">window</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="s1">&#39;triwin&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">windowname</span> <span class="o">==</span> <span class="s2">&quot;flatwin&quot;</span><span class="p">:</span>
+            <span class="n">win</span> <span class="o">=</span> <span class="n">window</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="s1">&#39;flatwin&#39;</span><span class="p">)</span>
+
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">*</span> <span class="n">win</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">win</span>
+        <span class="k">del</span> <span class="n">win</span>
+    <span class="c1"># print(y.shape)</span>
+    <span class="n">ffty</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span>
+    <span class="c1"># print(ffty.shape)</span>
+    <span class="c1"># print(x.shape)</span>
+    <span class="n">fftx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span>
+    <span class="c1"># print(fftx.shape)</span>
+    <span class="n">Pxy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">fftx</span><span class="p">)</span> <span class="o">*</span> <span class="n">ffty</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">dt</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">Pxy</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">Pxy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">ave</span><span class="p">:</span>
+        <span class="n">Pxy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">Pxy</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">nfreq</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dt</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nfreq</span><span class="p">,</span> <span class="n">Pxy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># /2./sp.pi</span>
+
+    <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">Pxy</span></div>
+
+
+<div class="viewcode-block" id="frfest"><a class="viewcode-back" href="../reference/signal.html#signals.frfest">[docs]</a><span class="k">def</span> <span class="nf">frfest</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="s2">&quot;hanning&quot;</span><span class="p">,</span> <span class="n">ave</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="n">Hv</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="kc">False</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;Returns freq, H1, H2, coh, Hv</span>
+
+<span class="sd">    Estimates the :math:`H(j\\omega)` Frequency Response Functions (FRFs)</span>
+<span class="sd">    between :math:`x` and :math:`f`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : float array</span>
+<span class="sd">        output or response of system</span>
+<span class="sd">    f : float array</span>
+<span class="sd">        input to system</span>
+<span class="sd">    dt : float</span>
+<span class="sd">        time step of samples</span>
+<span class="sd">    windowname : string - locked to Hanning</span>
+<span class="sd">        name of leakage window to use</span>
+<span class="sd">    ave : bool, optional(True)- currently locked</span>
+<span class="sd">        whether or not to average PSDs and ASDs or calculate raw FRFs</span>
+<span class="sd">    Hv : bool, optional(False)</span>
+<span class="sd">        calculate the :math:`H_v` frequency response function</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    freq : float array</span>
+<span class="sd">        frequency vector (1xN)</span>
+<span class="sd">    H1 :  float array</span>
+<span class="sd">        Frequency Response Function :math:`H_1` estimate, (nxN) or (nxNxm)</span>
+<span class="sd">    H2 :  float array</span>
+<span class="sd">        Frequency Response Function :math:`H_2` estimate, (nxN) or (nxNxm)</span>
+<span class="sd">    coh :  float array</span>
+<span class="sd">        Coherance Function :math:`\gamma^2` estimate, (nxN)</span>
+<span class="sd">    Hv : float array</span>
+<span class="sd">        Frequency Response Function :math:`H_v` estimate, (nxN) or (nxNxm)</span>
+
+<span class="sd">    Currently ``windowname`` and ``ave`` are locked to default values.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import control as ctrl</span>
+<span class="sd">    &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; sample_freq = 1e3</span>
+<span class="sd">    &gt;&gt;&gt; noise_power = 0.001 * sample_freq / 2</span>
+<span class="sd">    &gt;&gt;&gt; A = np.array([[0, 0, 1, 0],</span>
+<span class="sd">    ...               [0, 0, 0, 1],</span>
+<span class="sd">    ...               [-200, 100, -.2, .1],</span>
+<span class="sd">    ...               [100, -200, .1, -.2]])</span>
+<span class="sd">    &gt;&gt;&gt; B = np.array([[0], [0], [1], [0]])</span>
+<span class="sd">    &gt;&gt;&gt; C = np.array([[35, 0, 0, 0], [0, 35, 0, 0]])</span>
+<span class="sd">    &gt;&gt;&gt; D = np.array([[0], [0]])</span>
+<span class="sd">    &gt;&gt;&gt; sys = ctrl.ss(A, B, C, D)</span>
+<span class="sd">    &gt;&gt;&gt; tin = np.arange(0, 51.2, .1)</span>
+<span class="sd">    &gt;&gt;&gt; nr=.5   # 0 is all noise on input</span>
+<span class="sd">    &gt;&gt;&gt; for i in np.arange(5): #was 2*50</span>
+<span class="sd">    ...     u = np.random.normal(scale=np.sqrt(noise_power), size=tin.shape)</span>
+<span class="sd">    ...     #print(u)</span>
+<span class="sd">    ...     t, yout, xout = ctrl.forced_response(sys, tin, u,rtol=1e-12)#,transpose=True)</span>
+<span class="sd">    ...     if &#39;Yout&#39; in locals():</span>
+<span class="sd">    ...         Yout=np.dstack((Yout,yout+nr*np.random.normal(scale=.050*np.std(yout[0,:]), size=yout.shape)))</span>
+<span class="sd">    ...         Ucomb=np.dstack((Ucomb,u+(1-nr)*np.random.normal(scale=.05*np.std(u), size=u.shape)))</span>
+<span class="sd">    ...     else:</span>
+<span class="sd">    ...         Yout=yout+nr*np.random.normal(scale=.050*np.std(yout[0,:]), size=yout.shape) # 5% half the noise on output as on input</span>
+<span class="sd">    ...         Ucomb=u+(1-nr)*np.random.normal(scale=.05*np.std(u), size=u.shape)#(1, len(tin))) #10% noise signal on input</span>
+<span class="sd">    &gt;&gt;&gt; fig, ax = plt.subplots()</span>
+<span class="sd">    &gt;&gt;&gt; ax.plot(tin,Yout[0,:])</span>
+<span class="sd">    [&lt;matplotlib.lines.Line2...</span>
+<span class="sd">    &gt;&gt;&gt; Yout=Yout*np.std(Ucomb)/np.std(Yout)#40</span>
+<span class="sd">    &gt;&gt;&gt; ax.set_title(&#39;time response&#39;)</span>
+<span class="sd">    Text(0.5,1,&#39;time response&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; freq_vec, Pxx = vt.asd(Yout, tin, windowname=&quot;hanning&quot;, ave=bool(False))</span>
+<span class="sd">    &gt;&gt;&gt; fig, ax = plt.subplots()</span>
+<span class="sd">    &gt;&gt;&gt; ax.plot(freq_vec, 20*np.log10(Pxx[0,:]))</span>
+<span class="sd">    [&lt;matplotlib.lines.Line2D object at ...]</span>
+<span class="sd">    &gt;&gt;&gt; ax.set_title(&#39;Raw ASDs&#39;)</span>
+<span class="sd">    Text(0.5,1,&#39;Raw ASDs&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; freq_vec, Pxx = vt.asd(Yout, tin, windowname=&quot;hanning&quot;, ave=bool(True))</span>
+<span class="sd">    &gt;&gt;&gt; fig, ax = plt.subplots()</span>
+<span class="sd">    &gt;&gt;&gt; ax.plot(freq_vec, 20*np.log10(Pxx[0,:]))</span>
+<span class="sd">    [&lt;matplotlib.lines.Line2D object at ...]</span>
+<span class="sd">    &gt;&gt;&gt; ax.set_title(&#39;Averaged ASDs&#39;)</span>
+<span class="sd">    Text(0.5,1,&#39;Averaged ASDs&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; f, Txy1, Txy2, coh, Txyv = vt.frfest(Yout, Ucomb, t,Hv=bool(True))</span>
+<span class="sd">    &gt;&gt;&gt; #fig_amp,=plt.plot(f[0,:],20*np.log10(np.abs(Txy1[0,:])),legend=&#39;$H_1$&#39;,f[0,:],20*np.log10(np.abs(Txy2[0,:])),legend=&#39;$H_2$&#39;,f[0,:],20*np.log10(np.abs(Txyv[0,:])),legend=&#39;$H_v$&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; fig, ax = plt.subplots()</span>
+<span class="sd">    &gt;&gt;&gt; (line1, line2, line3) = ax.plot(f,20*np.log10(np.abs(Txy1[0,:])),f,20*np.log10(np.abs(Txy2[0,:])),f,20*np.log10(np.abs(Txyv[0,:])))</span>
+<span class="sd">    &gt;&gt;&gt; ax.set_title(&#39;FRF of &#39; + str(Yout.shape[2]) + &#39; averages.&#39;)</span>
+<span class="sd">    Text(0.5,1,...</span>
+<span class="sd">    &gt;&gt;&gt; ax.legend((line1,line2,line3),(&#39;$H_1$&#39;,&#39;$H_2$&#39;,&#39;$H_v$&#39;))</span>
+<span class="sd">    &lt;matplotlib.legend.Legend object ...&gt;</span>
+<span class="sd">    &gt;&gt;&gt; fig, ax = plt.subplots()</span>
+<span class="sd">    &gt;&gt;&gt; ax.plot(f,180.0/np.pi*np.unwrap(np.angle(Txy1[0,:])),f,180.0/np.pi*np.unwrap(np.angle(Txy2[0,:])),f,180.0/np.pi*np.unwrap(np.angle(Txyv[0,:])))</span>
+<span class="sd">    [&lt;matplotlib.lines.Line2D object at ...]</span>
+<span class="sd">    &gt;&gt;&gt; ax.set_title(&#39;FRF of &#39; + str(Yout.shape[2]) + &#39; averages.&#39;)</span>
+<span class="sd">    Text(0.5,1,...</span>
+<span class="sd">    &gt;&gt;&gt; fig, ax = plt.subplots()</span>
+<span class="sd">    &gt;&gt;&gt; ax.plot(f,coh[0,:])</span>
+<span class="sd">    [&lt;matplotlib.lines.Line2D object at...</span>
+<span class="sd">    &gt;&gt;&gt; vt.frfplot(f,Txy1,freq_max=3.5)</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    4/13/15: Converted to Python</span>
+<span class="sd">    .. note:: Not compatible with scipy.signal functions</span>
+<span class="sd">    .. seealso:: :func:`asd`, :func:`crsd`, :func:`frfplot`.</span>
+<span class="sd">    .. warning:: hanning window cannot be selected yet. Averaging cannot be</span>
+<span class="sd">    unslected yet.</span>
+<span class="sd">    .. todo:: Fix averaging, windowing, multiple input.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+    <span class="c1"># Note: Two different ways to ignore returned values shown</span>
+    <span class="n">Pff</span> <span class="o">=</span> <span class="n">asd</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dt</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># print(&#39;works until here?&#39;)</span>
+    <span class="c1"># print(x.shape)</span>
+    <span class="c1"># print(f.shape)</span>
+    <span class="n">freq</span><span class="p">,</span> <span class="n">Pxf</span> <span class="o">=</span> <span class="n">crsd</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">Pxx</span> <span class="o">=</span> <span class="n">asd</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+
+    <span class="c1"># Note Pfx=conj(Pxf) is applied in the H1 FRF estimation</span>
+    <span class="n">Txf1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">Pxf</span> <span class="o">/</span> <span class="n">Pff</span><span class="p">)</span>
+    <span class="n">Txf2</span> <span class="o">=</span> <span class="n">Pxx</span> <span class="o">/</span> <span class="n">Pxf</span>
+    <span class="c1"># Nulled to avoid output problems/simplify calls if unrequested</span>
+    <span class="n">Txfv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">Txf1</span><span class="p">)</span>
+
+    <span class="n">coh</span> <span class="o">=</span> <span class="p">(</span><span class="n">Pxf</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">Pxf</span><span class="p">))</span><span class="o">.</span><span class="n">real</span> <span class="o">/</span> <span class="n">Pxx</span> <span class="o">/</span> <span class="n">Pff</span>
+
+    <span class="k">if</span> <span class="n">Hv</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">Pxx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">frfm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[[</span><span class="n">Pff</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">Pxf</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">])],</span> <span class="p">[</span><span class="n">Pxf</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="n">Pxx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]]])</span>
+            <span class="c1"># print(&#39;index number &#39; + str(i))</span>
+            <span class="c1"># print(frfm)</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># np.sqrt(Pff[0,i]/Pxx[0,i])</span>
+            <span class="c1"># print(alpha)</span>
+            <span class="n">frfm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">Pff</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">Pxf</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">])],</span>
+                             <span class="p">[</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">Pxf</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="n">alpha</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">Pxx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]]])</span>
+            <span class="c1"># print(&#39;new frfm&#39;)</span>
+            <span class="c1"># print(frfm)</span>
+            <span class="n">lam</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">frfm</span><span class="p">)</span>
+            <span class="c1"># print(lam)</span>
+            <span class="c1"># print(vecs)</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">lam</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+            <span class="c1"># print(index)</span>
+            <span class="n">lam</span> <span class="o">=</span> <span class="n">lam</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="c1"># print(lam)</span>
+            <span class="n">vecs</span> <span class="o">=</span> <span class="n">vecs</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span>
+            <span class="c1"># print(vecs)</span>
+            <span class="c1"># print(np.array([Txf1[0,i], -(vecs[0,0]/vecs[1,0]), -(vecs[1,0]/vecs[1,1]), Txf2[0,i]]))</span>
+            <span class="n">Txfv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">vecs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">vecs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">alpha</span>  <span class="c1"># *np.sqrt(alpha)</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="o">-</span><span class="n">Pxx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">Pff</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">Pxx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">Pff</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">Pxf</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+            <span class="c1"># lambda1=((Pxx[0,i]+Pff[0,i])-np.sqrt((Pxx[0,i]+Pff[0,i])*2+4*((Pxx[0,i]*Pff[0,i]-abs(Pxf[0,i])**2))))/2</span>
+            <span class="n">lambda1</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">b</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">b</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">c</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">a</span>
+            <span class="c1"># Txfv[0,i]=np.conj(Pxf[0,i])/(Pff[0,i]-lambda1)*alpha</span>
+            <span class="c1"># print(Txfv[0,i])</span>
+            <span class="c1"># person = input(&#39;Next point: &#39;)</span>
+            <span class="c1"># print(np.dot(frfm, vecs[:, 0]) - lam[0] * vecs[:, 0])</span>
+            <span class="c1"># print(np.dot(frfm, vecs[:, 1]) - lam[1] * vecs[:, 1])</span>
+
+    <span class="k">return</span> <span class="n">freq</span><span class="p">,</span> <span class="n">Txf1</span><span class="p">,</span> <span class="n">Txf2</span><span class="p">,</span> <span class="n">coh</span><span class="p">,</span> <span class="n">Txfv</span>
+
+
+    <span class="sd">&#39;&#39;&#39;# def acorr(self, x, **kwargs):</span>
+<span class="sd">    # &quot;&quot;&quot;</span>
+<span class="sd">    # Plot the autocorrelation of `x`.</span>
+
+<span class="sd">    # Parameters</span>
+<span class="sd">    # ----------</span>
+
+<span class="sd">    # x : sequence of scalar</span>
+
+<span class="sd">    # hold : boolean, optional, default: True</span>
+
+<span class="sd">    # detrend : callable, optional, default: `mlab.detrend_none`</span>
+<span class="sd">    # x is detrended by the `detrend` callable. Default is no</span>
+<span class="sd">    # normalization.</span>
+
+<span class="sd">    # normed : boolean, optional, default: True</span>
+<span class="sd">    # if True, normalize the data by the autocorrelation at the 0-th</span>
+<span class="sd">    # lag.</span>
+
+<span class="sd">    # usevlines : boolean, optional, default: True</span>
+<span class="sd">    # if True, Axes.vlines is used to plot the vertical lines from the</span>
+<span class="sd">    # origin to the acorr. Otherwise, Axes.plot is used.</span>
+
+<span class="sd">    # maxlags : integer, optional, default: 10</span>
+<span class="sd">    # number of lags to show. If None, will return all 2 * len(x) - 1</span>
+<span class="sd">    # lags.</span>
+
+<span class="sd">    # Returns</span>
+<span class="sd">    # -------</span>
+<span class="sd">    # (lags, c, line, b) : where:</span>
+
+<span class="sd">    # - `lags` are a length 2`maxlags+1 lag vector.</span>
+<span class="sd">    # - `c` is the 2`maxlags+1 auto correlation vectorI</span>
+<span class="sd">    # - `line` is a `~matplotlib.lines.Line2D` instance returned by</span>
+<span class="sd">    # `plot`.</span>
+<span class="sd">    # - `b` is the x-axis.</span>
+
+<span class="sd">    # Other parameters</span>
+<span class="sd">    # -----------------</span>
+<span class="sd">    # linestyle : `~matplotlib.lines.Line2D` prop, optional, default: None</span>
+<span class="sd">    # Only used if usevlines is False.</span>
+
+<span class="sd">    # marker : string, optional, default: &#39;o&#39;</span>
+
+<span class="sd">    # Notes</span>
+<span class="sd">    # -----</span>
+<span class="sd">    # The cross correlation is performed with :func:`numpy.correlate` with</span>
+<span class="sd">    # `mode` = 2.</span>
+
+<span class="sd">    # Examples</span>
+<span class="sd">    # --------</span>
+
+<span class="sd">    # `~matplotlib.pyplot.xcorr` is top graph, and</span>
+<span class="sd">    # `~matplotlib.pyplot.acorr` is bottom graph.</span>
+
+<span class="sd">    # .. plot:: mpl_examples/pylab_examples/xcorr_demo.py</span>
+
+<span class="sd">    # &quot;&quot;&quot;</span>
+<span class="sd">    # return self.xcorr(x, x, **kwargs)</span>
+
+<span class="sd">    # @docstring.dedent_interpd</span>
+<span class="sd">    # def xcorr(self, x, y, normed=True, detrend=mlab.detrend_none,</span>
+<span class="sd">    # usevlines=True, maxlags=10, **kwargs):</span>
+<span class="sd">    # &quot;&quot;&quot;</span>
+<span class="sd">    # Plot the cross correlation between *x* and *y*.</span>
+
+<span class="sd">    # Parameters</span>
+<span class="sd">    # ----------</span>
+
+<span class="sd">    # x : sequence of scalars of length n</span>
+
+<span class="sd">    # y : sequence of scalars of length n</span>
+
+<span class="sd">    # hold : boolean, optional, default: True</span>
+
+<span class="sd">    # detrend : callable, optional, default: `mlab.detrend_none`</span>
+<span class="sd">    # x is detrended by the `detrend` callable. Default is no</span>
+<span class="sd">    # normalization.</span>
+
+<span class="sd">    # normed : boolean, optional, default: True</span>
+<span class="sd">    # if True, normalize the data by the autocorrelation at the 0-th</span>
+<span class="sd">    # lag.</span>
+
+<span class="sd">    # usevlines : boolean, optional, default: True</span>
+<span class="sd">    # if True, Axes.vlines is used to plot the vertical lines from the</span>
+<span class="sd">    # origin to the acorr. Otherwise, Axes.plot is used.</span>
+
+<span class="sd">    # maxlags : integer, optional, default: 10</span>
+<span class="sd">    # number of lags to show. If None, will return all 2 * len(x) - 1</span>
+<span class="sd">    # lags.</span>
+
+<span class="sd">    # Returns</span>
+<span class="sd">    # -------</span>
+<span class="sd">    # (lags, c, line, b) : where:</span>
+
+<span class="sd">    # - `lags` are a length 2`maxlags+1 lag vector.</span>
+<span class="sd">    # - `c` is the 2`maxlags+1 auto correlation vectorI</span>
+<span class="sd">    # - `line` is a `~matplotlib.lines.Line2D` instance returned by</span>
+<span class="sd">    # `plot`.</span>
+<span class="sd">    # - `b` is the x-axis (none, if plot is used).</span>
+
+<span class="sd">    # Other parameters</span>
+<span class="sd">    # -----------------</span>
+<span class="sd">    # linestyle : `~matplotlib.lines.Line2D` prop, optional, default: None</span>
+<span class="sd">    # Only used if usevlines is False.</span>
+
+<span class="sd">    # marker : string, optional, default: &#39;o&#39;</span>
+
+<span class="sd">    # Notes</span>
+<span class="sd">    # -----</span>
+<span class="sd">    # The cross correlation is performed with :func:`numpy.correlate` with</span>
+<span class="sd">    # `mode` = 2.</span>
+<span class="sd">    # &quot;&quot;&quot;</span>
+
+<span class="sd">    ##     Nx = len(x)</span>
+<span class="sd">    # if Nx != len(y):</span>
+<span class="sd">    ##         raise ValueError(&#39;x and y must be equal length&#39;)</span>
+
+<span class="sd">    ##     x = detrend(np.asarray(x))</span>
+<span class="sd">    ##     y = detrend(np.asarray(y))</span>
+
+<span class="sd">    ##     c = np.correlate(x, y, mode=2)</span>
+
+<span class="sd">    # if normed:</span>
+<span class="sd">    ##         c /= np.sqrt(np.dot(x, x) * np.dot(y, y))</span>
+
+<span class="sd">    # if maxlags is None:</span>
+<span class="sd">    ##         maxlags = Nx - 1</span>
+
+<span class="sd">    # if maxlags &gt;= Nx or maxlags &lt; 1:</span>
+<span class="sd">    # raise ValueError(&#39;maglags must be None or strictly &#39;</span>
+<span class="sd">    # &#39;positive &lt; %d&#39; % Nx)</span>
+
+<span class="sd">    ##     lags = np.arange(-maxlags, maxlags + 1)</span>
+<span class="sd">    ##     c = c[Nx - 1 - maxlags:Nx + maxlags]</span>
+
+<span class="sd">    # if usevlines:</span>
+<span class="sd">    ##         a = self.vlines(lags, [0], c, **kwargs)</span>
+<span class="sd">    ##         b = self.axhline(**kwargs)</span>
+<span class="sd">    # else:</span>
+
+<span class="sd">    ##         kwargs.setdefault(&#39;marker&#39;, &#39;o&#39;)</span>
+<span class="sd">    ##         kwargs.setdefault(&#39;linestyle&#39;, &#39;None&#39;)</span>
+<span class="sd">    ##         a, = self.plot(lags, c, **kwargs)</span>
+<span class="sd">    ##         b = None</span>
+<span class="sd">    # return lags, c, a, b&#39;&#39;&#39;</span></div>
+
+
+<div class="viewcode-block" id="frfplot"><a class="viewcode-back" href="../reference/signal.html#signals.frfplot">[docs]</a><span class="k">def</span> <span class="nf">frfplot</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">freq_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">freq_max</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">FLAG</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Frequency Response function pretty plotting.</span>
+
+<span class="sd">    Plots frequency response functions in a variety of formats</span>
+
+<span class="sd">        - parameters using ``:param &lt;name&gt;: &lt;description&gt;``</span>
+<span class="sd">        - type of parameters ``:type &lt;name&gt;: &lt;description&gt;``</span>
+<span class="sd">        - returns using ``:returns: &lt;description&gt;``</span>
+<span class="sd">        - examples (doctest)</span>
+<span class="sd">        - seealso using ``.. seealso:: text``</span>
+<span class="sd">        - notes using ``.. note:: text``</span>
+<span class="sd">        - warning using ``.. warning:: text``</span>
+<span class="sd">        - todo ``.. todo:: text``</span>
+
+
+<span class="sd">    :param freq: frequency data (Hz) of shape (1,n_points)</span>
+<span class="sd">    :param H: Frequency Response Functions, shape (n,n_points)</span>
+<span class="sd">    :param freq_min: lowest frequency to plot</span>
+<span class="sd">    :param freq_min: highest frequency to plot</span>
+<span class="sd">    :param FLAG: type of plot</span>
+<span class="sd">    :type freq: float array</span>
+<span class="sd">    :type H: float array</span>
+<span class="sd">    :type freq_min: float</span>
+<span class="sd">    :type freq_max: float</span>
+<span class="sd">    :type FLAG: integer</span>
+<span class="sd">    :returns:</span>
+
+<span class="sd">    =======  =============================================================</span>
+<span class="sd">    FLAG     Plot Type</span>
+<span class="sd">    -------  -------------------------------------------------------------</span>
+<span class="sd">    1 (def)  Magnitude and Phase versus F</span>
+<span class="sd">    2        Magnitude and Phase versus log10(F)</span>
+<span class="sd">    3        Bodelog  (Magnitude and Phase versus log10(w))</span>
+<span class="sd">    4        Real and Imaginary</span>
+<span class="sd">    5        Nyquist  (Real versus Imaginary)</span>
+<span class="sd">    6        Magnitude versus F</span>
+<span class="sd">    7        Phase versus F</span>
+<span class="sd">    8        Real versus F</span>
+<span class="sd">    9        Imaginary versus F</span>
+<span class="sd">    10       Magnitude versus log10(F)</span>
+<span class="sd">    11       Phase versus log10(F)</span>
+<span class="sd">    12       Real versus log10(F)</span>
+<span class="sd">    13       Imaginary versus log10(F)</span>
+<span class="sd">    14       Magnitude versus log10(w)</span>
+<span class="sd">    15       Phase versus log10(w)</span>
+<span class="sd">    =======  =============================================================</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; f=np.linspace(0,100,10000).reshape(-1,1);</span>
+<span class="sd">    &gt;&gt;&gt; w=f*2*np.pi;</span>
+<span class="sd">    &gt;&gt;&gt; k=1e5;m=1;c=1;</span>
+<span class="sd">    &gt;&gt;&gt; tf=1./(m*(w*1j)**2+c*1j*w+k)</span>
+<span class="sd">    &gt;&gt;&gt; vt.frfplot(f,tf)</span>
+<span class="sd">    &gt;&gt;&gt; vt.frfplot(f,tf,5)</span>
+
+<span class="sd">    Copyright J. Slater, Dec 17, 1994</span>
+<span class="sd">    Updated April 27, 1995</span>
+<span class="sd">    Ported to Python, July 1, 2015</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">freq</span> <span class="o">=</span> <span class="n">freq</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">lenF</span> <span class="o">=</span> <span class="n">freq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="ow">is</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="c1">#    if lenF==1;</span>
+    <span class="c1">#    F=(0:length(Xfer)-1)&#39;*F;</span>
+    <span class="c1">#    end</span>
+    <span class="k">if</span> <span class="n">freq_max</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">freq_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+        <span class="c1"># print(str(freq_max))</span>
+
+    <span class="k">if</span> <span class="n">freq_min</span> <span class="o">&gt;</span> <span class="n">freq_max</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;freq_min must be less than freq_max.&#39;</span><span class="p">)</span>
+
+    <span class="c1"># print(str(np.amin(freq)))</span>
+    <span class="n">inlow</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lenF</span> <span class="o">*</span> <span class="p">(</span><span class="n">freq_min</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+                        <span class="p">)</span> <span class="o">//</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">freq</span><span class="p">)))</span>
+
+    <span class="n">inhigh</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lenF</span> <span class="o">*</span> <span class="p">(</span><span class="n">freq_max</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+                         <span class="p">)</span> <span class="o">//</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">freq</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># if inlow&lt;1,inlow=1;end</span>
+    <span class="c1"># if inhigh&gt;lenF,inhigh=lenF;end</span>
+    <span class="sd">&#39;&#39;&#39;print(&#39;freq shape: {}&#39;.format(freq.shape))</span>
+<span class="sd">    print(&#39;H shape: {}&#39;.format(H.shape))</span>
+<span class="sd">    print(&#39;Index of low frequency: {}&#39;.format(inlow))</span>
+<span class="sd">    print(&#39;Index of high frequency: {}&#39;.format(inhigh))&#39;&#39;&#39;</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">H</span><span class="p">[:,</span> <span class="n">inlow</span><span class="p">:</span><span class="n">inhigh</span><span class="p">]</span>
+    <span class="c1"># print(H.shape)</span>
+    <span class="n">freq</span> <span class="o">=</span> <span class="n">freq</span><span class="p">[:,</span> <span class="n">inlow</span><span class="p">:</span><span class="n">inhigh</span><span class="p">]</span>
+    <span class="n">mag</span> <span class="o">=</span> <span class="mi">20</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
+    <span class="c1"># print(mag)</span>
+    <span class="c1"># print(mag.shape)</span>
+    <span class="n">minmag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">mag</span><span class="p">)</span>
+    <span class="n">maxmag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">mag</span><span class="p">)</span>
+    <span class="n">phase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unwrap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">H</span><span class="p">))</span> <span class="o">*</span> <span class="mi">180</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="c1">#    phmin_max=[min(phase)//45)*45 ceil(max(max(phase))/45)*45];</span>
+    <span class="n">phmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span> <span class="o">//</span> <span class="mi">45</span> <span class="o">*</span> <span class="mf">45.0</span>
+    <span class="n">phmax</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span> <span class="o">//</span> <span class="mi">45</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">45</span>
+    <span class="n">minreal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
+    <span class="n">maxreal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
+    <span class="n">minimag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
+    <span class="n">maximag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">FLAG</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">mag</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Frequency (Hz)&#39;</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Mag (dB)&#39;</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xmax</span><span class="o">=</span><span class="n">freq_max</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="n">freq_min</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ymax</span><span class="o">=</span><span class="n">maxmag</span><span class="p">,</span> <span class="n">ymin</span><span class="o">=</span><span class="n">minmag</span><span class="p">)</span>
+
+        <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">phase</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Frequency (Hz)&#39;</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Phase (deg)&#39;</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xmax</span><span class="o">=</span><span class="n">freq_max</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="n">freq_min</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ymax</span><span class="o">=</span><span class="n">phmax</span><span class="p">,</span> <span class="n">ymin</span><span class="o">=</span><span class="n">phmin</span><span class="p">)</span>
+
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">phmin</span><span class="p">,</span> <span class="p">(</span><span class="n">phmax</span> <span class="o">+</span> <span class="mi">45</span><span class="p">),</span> <span class="mi">45</span><span class="p">))</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sorry, that option isn&#39;t supported yet&quot;</span><span class="p">)</span>
+
+    <span class="sd">&#39;&#39;&#39;# elif FLAG==2:</span>
+<span class="sd">    # subplot(2,1,1)</span>
+<span class="sd">    # semilogx(F,mag)</span>
+<span class="sd">    #   xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">    #   ylabel(&#39;Mag (dB)&#39;)</span>
+<span class="sd">    # grid on</span>
+<span class="sd">    # %  Fmin,Fmax,min(mag),max(mag)</span>
+<span class="sd">    # axis([Fmin Fmax minmag maxmag])</span>
+
+<span class="sd">    # subplot(2,1,2)</span>
+<span class="sd">    # semilogx(F,phase)</span>
+<span class="sd">    # xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">    # ylabel(&#39;Phase (deg)&#39;)</span>
+<span class="sd">    # grid on</span>
+<span class="sd">    # axis([Fmin Fmax  phmin_max(1) phmin_max(2)])</span>
+<span class="sd">    # gridmin_max=round(phmin_max/90)*90;</span>
+<span class="sd">    # set(gca,&#39;YTick&#39;,gridmin_max(1):90:gridmin_max(2))</span>
+
+<span class="sd">    # elif FLAG==3:</span>
+<span class="sd">    # subplot(2,1,1)</span>
+<span class="sd">    # mag=20*log10(abs(Xfer));</span>
+<span class="sd">    # semilogx(F*2*pi,mag)</span>
+<span class="sd">    # xlabel(&#39;Frequency (Rad/s)&#39;)</span>
+<span class="sd">      ## ylabel(&#39;Mag (dB)&#39;)</span>
+<span class="sd">      # grid on</span>
+<span class="sd">      # axis([Wmin Wmax minmag maxmag])</span>
+<span class="sd">      # zoom on</span>
+<span class="sd">      # subplot(2,1,2)</span>
+<span class="sd">      # semilogx(F*2*pi,phase)</span>
+<span class="sd">      ## xlabel(&#39;Frequency (Rad/s)&#39;)</span>
+<span class="sd">      ## ylabel(&#39;Phase (deg)&#39;)</span>
+<span class="sd">      # grid on</span>
+<span class="sd">      # axis([Wmin Wmax  phmin_max(1) phmin_max(2)])</span>
+<span class="sd">      # gridmin_max=round(phmin_max/90)*90;</span>
+<span class="sd">      # set(gca,&#39;YTick&#39;,gridmin_max(1):90:gridmin_max(2))</span>
+
+<span class="sd">     # elseif FLAG==4</span>
+<span class="sd">     # subplot(2,1,1)</span>
+<span class="sd">     # plot(F,real(Xfer))</span>
+<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     # ylabel(&#39;Real&#39;)</span>
+<span class="sd">     # grid on</span>
+<span class="sd">     # axis([Fmin Fmax minreal maxreal])</span>
+<span class="sd">     # zoom on</span>
+<span class="sd">     # subplot(2,1,2)</span>
+<span class="sd">     # plot(F,imag(Xfer))</span>
+<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     # ylabel(&#39;Imaginary&#39;)</span>
+<span class="sd">     # grid on</span>
+<span class="sd">     # axis([Fmin Fmax minimag maximag])</span>
+<span class="sd">     # zoom on</span>
+<span class="sd">     # elseif FLAG==5</span>
+<span class="sd">     # subplot(1,1,1)</span>
+<span class="sd">     # imax=round(length(F)*Fmax/max(F));</span>
+<span class="sd">     # imin=round(length(F)*Fmin/max(F))+1;</span>
+<span class="sd">     # plot(real(Xfer(imin:imax)),imag(Xfer(imin:imax)))</span>
+<span class="sd">     # xlabel(&#39;Real&#39;)</span>
+<span class="sd">     # ylabel(&#39;Imaginary&#39;)</span>
+<span class="sd">     # grid on</span>
+<span class="sd">     # zoom on</span>
+<span class="sd">     # elseif FLAG==6</span>
+<span class="sd">     # subplot(1,1,1)</span>
+<span class="sd">     # mag=20*log10(abs(Xfer));</span>
+<span class="sd">     # plot(F,mag)</span>
+<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     ##  ylabel(&#39;Mag (dB)&#39;)</span>
+<span class="sd">     # grid on</span>
+<span class="sd">     # axis([Fmin Fmax minmag maxmag])</span>
+<span class="sd">     # zoom on</span>
+<span class="sd">     # elseif FLAG==7</span>
+<span class="sd">     # subplot(1,1,1)</span>
+<span class="sd">     # plot(F,phase)</span>
+<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     ##  ylabel(&#39;Phase (deg)&#39;)</span>
+<span class="sd">     # grid on</span>
+<span class="sd">     # phmin_max=[floor(min(phase)/45)*45 ceil(max(phase)/45)*45];</span>
+<span class="sd">     # axis([Fmin Fmax  phmin_max(1) phmin_max(2)])</span>
+<span class="sd">     # gridmin_max=round(phmin_max/90)*90;</span>
+<span class="sd">     # set(gca,&#39;YTick&#39;,gridmin_max(1):90:gridmin_max(2))</span>
+<span class="sd">     # zoom on</span>
+<span class="sd">     # elseif FLAG==8</span>
+<span class="sd">     # subplot(1,1,1)</span>
+<span class="sd">     # plot(F,real(Xfer))</span>
+<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     # ylabel(&#39;Real&#39;)</span>
+<span class="sd">     # grid on</span>
+<span class="sd">     # axis([Fmin Fmax minreal maxreal])</span>
+<span class="sd">     # zoom on</span>
+<span class="sd">     # elseif FLAG==9</span>
+<span class="sd">     # subplot(1,1,1)</span>
+<span class="sd">     # plot(F,imag(Xfer))</span>
+<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     # ylabel(&#39;Imaginary&#39;)</span>
+<span class="sd">     # grid on</span>
+<span class="sd">     # axis([Fmin Fmax minimag maximag])</span>
+<span class="sd">     # zoom on</span>
+<span class="sd">     # elseif FLAG==10</span>
+<span class="sd">     # subplot(1,1,1)</span>
+<span class="sd">     # mag=20*log10(abs(Xfer));</span>
+<span class="sd">     # semilogx(F,mag)</span>
+<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     ##  ylabel(&#39;Mag (dB)&#39;)</span>
+<span class="sd">     # grid on</span>
+<span class="sd">     # axis([Fmin Fmax minmag maxmag])</span>
+<span class="sd">     # zoom on</span>
+<span class="sd">     # elseif FLAG==11</span>
+<span class="sd">     # subplot(1,1,1)</span>
+<span class="sd">     # semilogx(F,phase)</span>
+<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     ##  ylabel(&#39;Phase (deg)&#39;)</span>
+<span class="sd">     # grid on</span>
+<span class="sd">     # phmin_max=[floor(min(phase)/45)*45 ceil(max(phase)/45)*45];</span>
+<span class="sd">     # axis([Fmin Fmax  phmin_max(1) phmin_max(2)])</span>
+<span class="sd">     # gridmin_max=round(phmin_max/90)*90;</span>
+<span class="sd">     # set(gca,&#39;YTick&#39;,gridmin_max(1):90:gridmin_max(2))</span>
+<span class="sd">     # zoom on</span>
+<span class="sd">     # elseif FLAG==12</span>
+<span class="sd">     # subplot(1,1,1)</span>
+<span class="sd">     # semilogx(F,real(Xfer))</span>
+<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     # ylabel(&#39;Real&#39;)</span>
+<span class="sd">     # grid on</span>
+<span class="sd">     # axis([Fmin Fmax minreal maxreal])</span>
+<span class="sd">     # zoom on</span>
+<span class="sd">     # elseif FLAG==13</span>
+<span class="sd">     # subplot(1,1,1)</span>
+<span class="sd">     # semilogx(F,imag(Xfer))</span>
+<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     # ylabel(&#39;Imaginary&#39;)</span>
+<span class="sd">     # grid on</span>
+<span class="sd">     # axis([Fmin Fmax minimag maximag])</span>
+<span class="sd">     # zoom on</span>
+<span class="sd">     # elseif FLAG==14</span>
+<span class="sd">     # subplot(1,1,1)</span>
+<span class="sd">     # mag=20*log10(abs(Xfer));</span>
+<span class="sd">     # semilogx(F*2*pi,mag)</span>
+<span class="sd">     ##  xlabel(&#39;Frequency (Rad/s)&#39;)</span>
+<span class="sd">     ##  ylabel(&#39;Mag (dB)&#39;)</span>
+<span class="sd">     # grid on</span>
+<span class="sd">     # axis([Wmin Wmax minmag maxmag])</span>
+<span class="sd">     # zoom on</span>
+<span class="sd">     # elseif FLAG==15</span>
+<span class="sd">     # subplot(1,1,1)</span>
+<span class="sd">     # semilogx(F*2*pi,phase)</span>
+<span class="sd">     ##  xlabel(&#39;Frequency (Rad/s)&#39;)</span>
+<span class="sd">     ##  ylabel(&#39;Phase (deg)&#39;)</span>
+<span class="sd">     # grid on</span>
+<span class="sd">     # axis([Wmin Wmax  phmin_max(1) phmin_max(2)])</span>
+<span class="sd">     # gridmin_max=round(phmin_max/90)*90;</span>
+<span class="sd">     # set(gca,&#39;YTick&#39;,gridmin_max(1):90:gridmin_max(2))</span>
+<span class="sd">     # zoom on</span>
+<span class="sd">     # else</span>
+<span class="sd">     # subplot(2,1,1)</span>
+<span class="sd">     # mag=20*log10(abs(Xfer));</span>
+<span class="sd">     # plot(F,mag)</span>
+<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     ##  ylabel(&#39;Mag (dB)&#39;)</span>
+<span class="sd">     # grid on</span>
+<span class="sd">     # axis([Fmin Fmax minmag maxmag])</span>
+<span class="sd">     # zoom on</span>
+<span class="sd">     # subplot(2,1,2)</span>
+<span class="sd">     # plot(F,phase)</span>
+<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     ##  ylabel(&#39;Phase (deg)&#39;)</span>
+<span class="sd">     # grid on</span>
+<span class="sd">     # phmin_max=[floor(min(phase)/45)*45 ceil(max(phase)/45)*45];</span>
+<span class="sd">     # axis([Fmin Fmax phmin_max(1) phmin_max(2)])</span>
+<span class="sd">     # gridmin_max=round(phmin_max/90)*90;</span>
+<span class="sd">     # set(gca,&#39;YTick&#39;,gridmin_max(1):90:gridmin_max(2))</span>
+<span class="sd">     # zoom on</span>
+<span class="sd">     &#39;&#39;&#39;</span></div>
+
+
+<div class="viewcode-block" id="xcorr"><a class="viewcode-back" href="../reference/signal.html#signals.xcorr">[docs]</a><span class="k">def</span> <span class="nf">xcorr</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">zeropad</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Sorry, no docs or tests yet&#39;&#39;&#39;</span>
+    <span class="n">tau</span> <span class="o">=</span> <span class="n">t</span>
+    <span class="c1"># sx = len(x)</span>
+    <span class="c1"># sy = len(y)</span>
+    <span class="k">if</span> <span class="n">zeropad</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">Xn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">Yn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Xn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">Yn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+
+    <span class="n">xcor</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fftpack</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">Xn</span> <span class="o">*</span> <span class="n">Yn</span><span class="p">)))</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">tau</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">xcor</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+                      <span class="nb">len</span><span class="p">(</span><span class="n">xcor</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">xcor</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">tau</span><span class="p">,</span> <span class="n">xcor</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Vibration Testing</a></h1>
+
+
+
+<p class="blurb">Vibration Testing Analysis</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Joseph C. Slater.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

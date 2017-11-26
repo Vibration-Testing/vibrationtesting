@@ -5,7 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Signal Processing (vibrationtesting.signal) &#8212; Vibration Testing 0.1b03 documentation</title>
+    <title>Signal Processing (vibrationtesting.signals) &#8212; Vibration Testing 0.1b03 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -41,29 +41,445 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="signal-processing-vibrationtesting-signal">
-<h1>Signal Processing (<code class="xref py py-mod docutils literal"><span class="pre">vibrationtesting.signal</span></code>)<a class="headerlink" href="#signal-processing-vibrationtesting-signal" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="signal-signal-processing-for-vibration-testing">
-<h2><a class="reference internal" href="#module-signal" title="signal"><code class="xref py py-mod docutils literal"><span class="pre">signal</span></code></a> – Signal Processing for Vibration Testing<a class="headerlink" href="#signal-signal-processing-for-vibration-testing" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-signal"></span><dl class="class">
-<dt id="signal.Handlers">
-<em class="property">class </em><code class="descclassname">signal.</code><code class="descname">Handlers</code><a class="headerlink" href="#signal.Handlers" title="Permalink to this definition">¶</a></dt>
-<dd><p>An enumeration.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="signal.Sigmasks">
-<em class="property">class </em><code class="descclassname">signal.</code><code class="descname">Sigmasks</code><a class="headerlink" href="#signal.Sigmasks" title="Permalink to this definition">¶</a></dt>
-<dd><p>An enumeration.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="signal.Signals">
-<em class="property">class </em><code class="descclassname">signal.</code><code class="descname">Signals</code><a class="headerlink" href="#signal.Signals" title="Permalink to this definition">¶</a></dt>
-<dd><p>An enumeration.</p>
-</dd></dl>
-
+  <div class="section" id="signal-processing-vibrationtesting-signals">
+<h1>Signal Processing (<code class="xref py py-mod docutils literal"><span class="pre">vibrationtesting.signals</span></code>)<a class="headerlink" href="#signal-processing-vibrationtesting-signals" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-signals"></span><p>Created on 14 May 2015
+&#64;author: Joseph C. Slater</p>
+<dl class="function">
+<dt id="signals.asd">
+<code class="descclassname">signals.</code><code class="descname">asd</code><span class="sig-paren">(</span><em>x</em>, <em>t</em>, <em>windowname='hanning'</em>, <em>ave=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#asd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.asd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return autospectrum (power spectrum) density of a signal x</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>x</strong> : float array</p>
+<blockquote>
+<div><p>Data array (n x N x m) where n is the number of sensors, m the
+number of experiments.</p>
+</div></blockquote>
+<p><strong>t</strong> : float array</p>
+<blockquote>
+<div><p>Time array (1 x N)</p>
+</div></blockquote>
+<p><strong>windowname</strong> : string</p>
+<blockquote>
+<div><p>Name of windowing function to use. See <cite>window</cite>.</p>
+</div></blockquote>
+<p><strong>ave</strong> : bool, optional(True)</p>
+<blockquote>
+<div><p>Average result or not?</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>f</strong> : float array</p>
+<blockquote>
+<div><p>Frequency vector (1 x N)</p>
+</div></blockquote>
+<p><strong>Pxx</strong> : float array</p>
+<blockquote class="last">
+<div><p>Autospectrum (n x N) or (n x N x m) if not averaged.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>(<a class="reference external" href="../reference/signal-1.py">Source code</a>, <a class="reference external" href="../reference/signal-1.png">png</a>, <a class="reference external" href="../reference/signal-1.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-1.pdf">pdf</a>)</p>
+<div class="figure">
+<img alt="../_images/signal-1.png" src="../_images/signal-1.png" />
 </div>
+</dd></dl>
+
+<dl class="function">
+<dt id="signals.blackwin">
+<code class="descclassname">signals.</code><code class="descname">blackwin</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#blackwin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.blackwin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the n point Blackman window</p>
+<p>Returns x as the Blackman windowing array x_window
+The windowed signal is then x*x_window</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="signals.boxwin">
+<code class="descclassname">signals.</code><code class="descname">boxwin</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#boxwin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.boxwin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the n point box window (uniform)</p>
+<p>Returns x as the boxwin windowing array x_windowed
+The windowed signal is then x*x_window</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="signals.crsd">
+<code class="descclassname">signals.</code><code class="descname">crsd</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>t</em>, <em>windowname='hanning'</em>, <em>ave=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#crsd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.crsd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the cross spectrum (power spectrum) density between two signals.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>x, y</strong> : arrays</p>
+<blockquote>
+<div><p>Data array (n x N x m) where n is the number of sensors, m the
+number of experiments.</p>
+</div></blockquote>
+<p><strong>t</strong> : array</p>
+<blockquote>
+<div><p>Time array (1 x N)</p>
+</div></blockquote>
+<p><strong>windowname</strong> : string</p>
+<blockquote>
+<div><p>Name of windowing function to use</p>
+</div></blockquote>
+<p><strong>ave</strong> : bool, optional</p>
+<blockquote>
+<div><p>Average result or not?</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>f</strong> : array</p>
+<blockquote>
+<div><p>Frequency vector (1 x N)</p>
+</div></blockquote>
+<p><strong>Pxy</strong> : array</p>
+<blockquote class="last">
+<div><p>Autospectrum (n x N) or (n x N x m) if not averaged.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>(<a class="reference external" href="../reference/signal-2.py">Source code</a>, <a class="reference external" href="../reference/signal-2.png">png</a>, <a class="reference external" href="../reference/signal-2.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-2.pdf">pdf</a>)</p>
+<div class="figure">
+<img alt="../_images/signal-2.png" src="../_images/signal-2.png" />
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="signals.expwin">
+<code class="descclassname">signals.</code><code class="descname">expwin</code><span class="sig-paren">(</span><em>x</em>, <em>ts=0.75</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#expwin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.expwin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the n point exponential window</p>
+<p>Returns x as the expwin windowing array x_windowed
+The windowed signal is then x*x_window
+The optional second argument set the 5% “settling time” of the window.
+Default is ts=0.75</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="signals.flatwin">
+<code class="descclassname">signals.</code><code class="descname">flatwin</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#flatwin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.flatwin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the n point flat top window</p>
+<p>x_windows=flatwin(x)
+Returns x as the flat top windowing array x_windowed
+The windowed signal is then x*x_window
+McConnell, K. G., “Vibration Testing: Theory and Practice,” Wiley, 1995.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="signals.frfest">
+<code class="descclassname">signals.</code><code class="descname">frfest</code><span class="sig-paren">(</span><em>x</em>, <em>f</em>, <em>dt</em>, <em>windowname='hanning'</em>, <em>ave=True</em>, <em>Hv=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#frfest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.frfest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns freq, H1, H2, coh, Hv</p>
+<p>Estimates the <span class="math">\(H(j\omega)\)</span> Frequency Response Functions (FRFs)
+between <span class="math">\(x\)</span> and <span class="math">\(f\)</span>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>x</strong> : float array</p>
+<blockquote>
+<div><p>output or response of system</p>
+</div></blockquote>
+<p><strong>f</strong> : float array</p>
+<blockquote>
+<div><p>input to system</p>
+</div></blockquote>
+<p><strong>dt</strong> : float</p>
+<blockquote>
+<div><p>time step of samples</p>
+</div></blockquote>
+<p><strong>windowname</strong> : string - locked to Hanning</p>
+<blockquote>
+<div><p>name of leakage window to use</p>
+</div></blockquote>
+<p><strong>ave</strong> : bool, optional(True)- currently locked</p>
+<blockquote>
+<div><p>whether or not to average PSDs and ASDs or calculate raw FRFs</p>
+</div></blockquote>
+<p><strong>Hv</strong> : bool, optional(False)</p>
+<blockquote>
+<div><p>calculate the <span class="math">\(H_v\)</span> frequency response function</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>freq</strong> : float array</p>
+<blockquote>
+<div><p>frequency vector (1xN)</p>
+</div></blockquote>
+<p><strong>H1</strong> :  float array</p>
+<blockquote>
+<div><p>Frequency Response Function <span class="math">\(H_1\)</span> estimate, (nxN) or (nxNxm)</p>
+</div></blockquote>
+<p><strong>H2</strong> :  float array</p>
+<blockquote>
+<div><p>Frequency Response Function <span class="math">\(H_2\)</span> estimate, (nxN) or (nxNxm)</p>
+</div></blockquote>
+<p><strong>coh</strong> :  float array</p>
+<blockquote>
+<div><p>Coherance Function <span class="math">\(\gamma^2\)</span> estimate, (nxN)</p>
+</div></blockquote>
+<p><strong>Hv</strong> : float array</p>
+<blockquote>
+<div><p>Frequency Response Function <span class="math">\(H_v\)</span> estimate, (nxN) or (nxNxm)</p>
+</div></blockquote>
+<p class="last">Currently <code class="docutils literal"><span class="pre">windowname</span></code> and <code class="docutils literal"><span class="pre">ave</span></code> are locked to default values.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>4/13/15: Converted to Python
+.. note:: Not compatible with scipy.signal functions
+.. seealso:: <a class="reference internal" href="#signals.asd" title="signals.asd"><code class="xref py py-func docutils literal"><span class="pre">asd()</span></code></a>, <a class="reference internal" href="#signals.crsd" title="signals.crsd"><code class="xref py py-func docutils literal"><span class="pre">crsd()</span></code></a>, <a class="reference internal" href="#signals.frfplot" title="signals.frfplot"><code class="xref py py-func docutils literal"><span class="pre">frfplot()</span></code></a>.
+.. warning:: hanning window cannot be selected yet. Averaging cannot be
+unslected yet.
+.. todo:: Fix averaging, windowing, multiple input.</p>
+<p class="rubric">Examples</p>
+<p>(<a class="reference external" href="../reference/signal-3.py">Source code</a>)</p>
+<div class="figure" id="id1">
+<img alt="../_images/signal-3_00.png" src="../_images/signal-3_00.png" />
+<p class="caption"><span class="caption-text">(<a class="reference external" href="../reference/signal-3_00.png">png</a>, <a class="reference external" href="../reference/signal-3_00.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-3_00.pdf">pdf</a>)</span></p>
+</div>
+<div class="figure" id="id2">
+<img alt="../_images/signal-3_01.png" src="../_images/signal-3_01.png" />
+<p class="caption"><span class="caption-text">(<a class="reference external" href="../reference/signal-3_01.png">png</a>, <a class="reference external" href="../reference/signal-3_01.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-3_01.pdf">pdf</a>)</span></p>
+</div>
+<div class="figure" id="id3">
+<img alt="../_images/signal-3_02.png" src="../_images/signal-3_02.png" />
+<p class="caption"><span class="caption-text">(<a class="reference external" href="../reference/signal-3_02.png">png</a>, <a class="reference external" href="../reference/signal-3_02.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-3_02.pdf">pdf</a>)</span></p>
+</div>
+<div class="figure" id="id4">
+<img alt="../_images/signal-3_03.png" src="../_images/signal-3_03.png" />
+<p class="caption"><span class="caption-text">(<a class="reference external" href="../reference/signal-3_03.png">png</a>, <a class="reference external" href="../reference/signal-3_03.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-3_03.pdf">pdf</a>)</span></p>
+</div>
+<div class="figure" id="id5">
+<img alt="../_images/signal-3_04.png" src="../_images/signal-3_04.png" />
+<p class="caption"><span class="caption-text">(<a class="reference external" href="../reference/signal-3_04.png">png</a>, <a class="reference external" href="../reference/signal-3_04.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-3_04.pdf">pdf</a>)</span></p>
+</div>
+<div class="figure" id="id6">
+<img alt="../_images/signal-3_05.png" src="../_images/signal-3_05.png" />
+<p class="caption"><span class="caption-text">(<a class="reference external" href="../reference/signal-3_05.png">png</a>, <a class="reference external" href="../reference/signal-3_05.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-3_05.pdf">pdf</a>)</span></p>
+</div>
+<div class="figure" id="id7">
+<img alt="../_images/signal-3_06.png" src="../_images/signal-3_06.png" />
+<p class="caption"><span class="caption-text">(<a class="reference external" href="../reference/signal-3_06.png">png</a>, <a class="reference external" href="../reference/signal-3_06.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-3_06.pdf">pdf</a>)</span></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="signals.frfplot">
+<code class="descclassname">signals.</code><code class="descname">frfplot</code><span class="sig-paren">(</span><em>freq</em>, <em>H</em>, <em>freq_min=0</em>, <em>freq_max=0</em>, <em>FLAG=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#frfplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.frfplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Frequency Response function pretty plotting.</p>
+<p>Plots frequency response functions in a variety of formats</p>
+<blockquote>
+<div><ul class="simple">
+<li>parameters using <code class="docutils literal"><span class="pre">:param</span> <span class="pre">&lt;name&gt;:</span> <span class="pre">&lt;description&gt;</span></code></li>
+<li>type of parameters <code class="docutils literal"><span class="pre">:type</span> <span class="pre">&lt;name&gt;:</span> <span class="pre">&lt;description&gt;</span></code></li>
+<li>returns using <code class="docutils literal"><span class="pre">:returns:</span> <span class="pre">&lt;description&gt;</span></code></li>
+<li>examples (doctest)</li>
+<li>seealso using <code class="docutils literal"><span class="pre">..</span> <span class="pre">seealso::</span> <span class="pre">text</span></code></li>
+<li>notes using <code class="docutils literal"><span class="pre">..</span> <span class="pre">note::</span> <span class="pre">text</span></code></li>
+<li>warning using <code class="docutils literal"><span class="pre">..</span> <span class="pre">warning::</span> <span class="pre">text</span></code></li>
+<li>todo <code class="docutils literal"><span class="pre">..</span> <span class="pre">todo::</span> <span class="pre">text</span></code></li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>freq</strong> (<em>float array</em>) – frequency data (Hz) of shape (1,n_points)</li>
+<li><strong>H</strong> (<em>float array</em>) – Frequency Response Functions, shape (n,n_points)</li>
+<li><strong>freq_min</strong> (<em>float</em>) – lowest frequency to plot</li>
+<li><strong>freq_min</strong> – highest frequency to plot</li>
+<li><strong>FLAG</strong> (<em>integer</em>) – type of plot</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>FLAG</td>
+<td>Plot Type</td>
+</tr>
+<tr class="row-even"><td>1 (def)</td>
+<td>Magnitude and Phase versus F</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>Magnitude and Phase versus log10(F)</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td>Bodelog  (Magnitude and Phase versus log10(w))</td>
+</tr>
+<tr class="row-odd"><td>4</td>
+<td>Real and Imaginary</td>
+</tr>
+<tr class="row-even"><td>5</td>
+<td>Nyquist  (Real versus Imaginary)</td>
+</tr>
+<tr class="row-odd"><td>6</td>
+<td>Magnitude versus F</td>
+</tr>
+<tr class="row-even"><td>7</td>
+<td>Phase versus F</td>
+</tr>
+<tr class="row-odd"><td>8</td>
+<td>Real versus F</td>
+</tr>
+<tr class="row-even"><td>9</td>
+<td>Imaginary versus F</td>
+</tr>
+<tr class="row-odd"><td>10</td>
+<td>Magnitude versus log10(F)</td>
+</tr>
+<tr class="row-even"><td>11</td>
+<td>Phase versus log10(F)</td>
+</tr>
+<tr class="row-odd"><td>12</td>
+<td>Real versus log10(F)</td>
+</tr>
+<tr class="row-even"><td>13</td>
+<td>Imaginary versus log10(F)</td>
+</tr>
+<tr class="row-odd"><td>14</td>
+<td>Magnitude versus log10(w)</td>
+</tr>
+<tr class="row-even"><td>15</td>
+<td>Phase versus log10(w)</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>(<a class="reference external" href="../reference/signal-4.py">Source code</a>)</p>
+<div class="figure" id="id8">
+<img alt="../_images/signal-4_00.png" src="../_images/signal-4_00.png" />
+<p class="caption"><span class="caption-text">(<a class="reference external" href="../reference/signal-4_00.png">png</a>, <a class="reference external" href="../reference/signal-4_00.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-4_00.pdf">pdf</a>)</span></p>
+</div>
+<div class="figure" id="id9">
+<img alt="../_images/signal-4_01.png" src="../_images/signal-4_01.png" />
+<p class="caption"><span class="caption-text">(<a class="reference external" href="../reference/signal-4_01.png">png</a>, <a class="reference external" href="../reference/signal-4_01.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-4_01.pdf">pdf</a>)</span></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="signals.hammwin">
+<code class="descclassname">signals.</code><code class="descname">hammwin</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#hammwin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.hammwin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the n point hamming window</p>
+<p>Returns x as the hamming windowingarray x_windowed
+The windowed signal is then x*x_window</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="signals.hanning">
+<code class="descclassname">signals.</code><code class="descname">hanning</code><span class="sig-paren">(</span><em>x</em>, <em>normalize=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#hanning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.hanning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns hanning window</p>
+<p>Create a hanning window of length <span class="math">\(x\)</span>, or a hanning window sized to
+match <span class="math">\(x\)</span> that <span class="math">\(x\times w\)</span> is the windowed result.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>x: integer, float array</strong></p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">If integer- number of points in desired hanning windows.</div>
+<div class="line">If array- array provides size of window returned.</div>
+</div>
+</div></blockquote>
+<p><strong>windowname: string</strong></p>
+<blockquote>
+<div><p>One of: hanning, hamming, blackman, flatwin, boxwin</p>
+</div></blockquote>
+<p><strong>normalize: bool, optional(False)</strong></p>
+<blockquote>
+<div><p>Adjust power level (for use in ASD) to 1</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">w: float array</p>
+<blockquote class="last">
+<div><div class="line-block">
+<div class="line">window array of size x</div>
+<div class="line">window array. Windowed array is then <span class="math">\(x\times w\)</span></div>
+</div>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>(<a class="reference external" href="../reference/signal-5.py">Source code</a>, <a class="reference external" href="../reference/signal-5.png">png</a>, <a class="reference external" href="../reference/signal-5.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-5.pdf">pdf</a>)</p>
+<div class="figure">
+<img alt="../_images/signal-5.png" src="../_images/signal-5.png" />
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="signals.window">
+<code class="descclassname">signals.</code><code class="descname">window</code><span class="sig-paren">(</span><em>x</em>, <em>windowname='hanning'</em>, <em>normalize=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.window" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create leakage window</p>
+<p>Create a  window of length <span class="math">\(x\)</span>, or a window sized to match
+<span class="math">\(x\)</span> that <span class="math">\(x\times w\)</span> is the windowed result.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>x: integer, float array</strong></p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">If integer- number of points in desired hanning windows.</div>
+<div class="line">If array- array provides size of window returned.</div>
+</div>
+</div></blockquote>
+<p><strong>windowname: string</strong></p>
+<blockquote>
+<div><p>One of: hanning, hamming, blackman, flatwin, boxwin</p>
+</div></blockquote>
+<p><strong>normalize: bool, optional(False)</strong></p>
+<blockquote>
+<div><p>Adjust power level (for use in ASD) to 1</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">w: float array</p>
+<blockquote class="last">
+<div><div class="line-block">
+<div class="line">window array of size x</div>
+<div class="line">window array. Windowed array is then <span class="math">\(x\times w\)</span></div>
+</div>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>(<a class="reference external" href="../reference/signal-6.py">Source code</a>, <a class="reference external" href="../reference/signal-6.png">png</a>, <a class="reference external" href="../reference/signal-6.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-6.pdf">pdf</a>)</p>
+<div class="figure">
+<img alt="../_images/signal-6.png" src="../_images/signal-6.png" />
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="signals.xcorr">
+<code class="descclassname">signals.</code><code class="descname">xcorr</code><span class="sig-paren">(</span><em>t</em>, <em>x</em>, <em>y</em>, <em>zeropad=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#xcorr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.xcorr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sorry, no docs or tests yet</p>
+</dd></dl>
+
 </div>
 
 
@@ -88,10 +504,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Signal Processing (<code class="docutils literal"><span class="pre">vibrationtesting.signal</span></code>)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#signal-signal-processing-for-vibration-testing"><code class="docutils literal"><span class="pre">signal</span></code> – Signal Processing for Vibration Testing</a></li>
-</ul>
-</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Signal Processing (<code class="docutils literal"><span class="pre">vibrationtesting.signals</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="system.html">System Manipulation (<code class="docutils literal"><span class="pre">vibrationtesting.system</span></code>)</a></li>
 </ul>
 </li>

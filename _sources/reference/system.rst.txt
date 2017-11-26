@@ -1,5 +1,5 @@
 System Manipulation (:mod:`vibrationtesting.system`)
-------------------------------------------------------------------
+----------------------------------------------------
 
 .. sectionauthor:: Joseph C. Slater
 
@@ -11,13 +11,13 @@ System Manipulation (:mod:`vibrationtesting.system`)
 
 .. .. literalinclude:: examples/4-1
 
-:mod:`system` -- System Solvers and Manipulators
-________________________________________________
+.. :mod:`system` -- System Solvers and Manipulators
+.. ________________________________________________
 
-.. .. module:: mdof
+.. .. module:: system
    :synopsis: Multiple Degree of Freedom Systems
 
-.. .. py:module:: systemidentification
+.. .. py:module:: system
 
 .. automodule:: system
    :members:
