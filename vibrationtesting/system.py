@@ -244,7 +244,7 @@ def so2ss(M, C, K, Bt, Cd, Cv, Ca):
 
     A = np.vstack((np.hstack((np.zeros_like(M), np.eye(M.shape[0]))),
                    np.hstack((-la.solve(M, K), -la.solve(M, C)))))
-    B = np.vstack((np.zeros((Bt.shape[0], 1)), Bt))
+    B = np.vstack((np.zeros_like(Bt), Bt))
     C_ss = np.hstack((Cd - Ca@la.solve(M, K), Cv - Ca@la.solve(M, C)))
     D = Ca@la.solve(M, Bt)
 
@@ -270,7 +270,8 @@ def damp(A):
         if (abs(np.imag(pole)) < abs(np.real(pole))):
             print('      {:.3f}                    {:.3f}       \
                   {:.3f}         {:.3f}'.format(float(np.real(pole)),
-                                                float(abs(pole)), float(d0), float(f0)))
+                                                float(abs(pole)), float(d0),
+                                                float(f0)))
 
         else:
             print('      {:.3f}        {:+.3f}      {:.3f}       \
