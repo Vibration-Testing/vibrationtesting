@@ -36,17 +36,14 @@ def d2c(Ad, Bd, C, D, dt):
     Examples
     --------
     >>> import vibrationtesting as vt
-    >>> A1 = np.array([[ 0.9999,0.0001,0.01,0.]])
-    >>> A2 = np.array([[ 0.,0.9999,0.,0.01]])
-    >>> A3 = np.array([[-0.014,0.012,0.9999,0.0001]])
-    >>> A4 = np.array([[ 0.008, -0.014,0.0001,0.9999]])
-    >>> Ad = np.concatenate((A1, A2, A3, A4))
-    >>> print(Ad)
-    [[ 0.9999  0.0001  0.01    0.    ]
-     [ 0.      0.9999  0.      0.01  ]
-     [-0.014   0.012   0.9999  0.0001]
-     [ 0.008  -0.014   0.0001  0.9999]]
-    >>> Bd = np.array([[ 0.  ], [ 0.  ], [ 0.  ], [ 0.01]])
+    >>> Ad = np.array([[ 0.9999,0.0001,0.01,0.],
+    ...                [ 0.,0.9999,0.,0.01],
+    ...                [-0.014,0.012,0.9999,0.0001],
+    ...                [ 0.008, -0.014,0.0001,0.9999]])
+    >>> Bd = np.array([[ 0.  ],
+    ...                [ 0.  ],
+    ...                [ 0.  ],
+    ...                [ 0.01]])
     >>> C = np.array([[-1.4, 1.2, -0.0058, 0.0014]])
     >>> D = np.array([[-0.2]])
     >>> A, B, *_ = vt.d2c(Ad, Bd, C, D, 0.01)
@@ -102,13 +99,14 @@ def c2d(A, B, C, D, dt):
     >>> A2 = np.array([[ 0.,   0. ,  0.    ,  1.    ]])
     >>> A3 = np.array([[-1.4,  1.2, -0.0058,  0.0014]])
     >>> A4 = np.array([[ 0.8, -1.4,  0.0016, -0.0038]])
-    >>> A = np.concatenate((A1, A2, A3, A4))
-    >>> print(A)
-    [[ 0.      0.      1.      0.    ]
-     [ 0.      0.      0.      1.    ]
-     [-1.4     1.2    -0.0058  0.0014]
-     [ 0.8    -1.4     0.0016 -0.0038]]
-    >>> B = np.array([[ 0.], [ 0.], [ 0.], [ 1.]])
+    >>> A = np.array([[ 0.,   0. ,  1.    ,  0.    ],
+    ...               [ 0.,   0. ,  0.    ,  1.    ],
+    ...               [-1.4,  1.2, -0.0058,  0.0014],
+    ...               [ 0.8, -1.4,  0.0016, -0.0038]])
+    >>> B = np.array([[ 0.],
+    ...               [ 0.],
+    ...               [ 0.],
+    ...               [ 1.]])
     >>> C = np.array([[-1.4, 1.2, -0.0058, 0.0014]])
     >>> D = np.array([[-0.2]])
     >>> Ad, Bd, *_ = vt.c2d(A, B, C, D, 0.01)
@@ -164,13 +162,14 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
     >>> A2 = np.array([[ 0.,   0. ,  0.    ,  1.    ]])
     >>> A3 = np.array([[-1.4,  1.2, -0.0058,  0.0014]])
     >>> A4 = np.array([[ 0.8, -1.4,  0.0016, -0.0038]])
-    >>> A = np.concatenate((A1, A2, A3, A4))
-    >>> print(A)
-    [[ 0.      0.      1.      0.    ]
-     [ 0.      0.      0.      1.    ]
-     [-1.4     1.2    -0.0058  0.0014]
-     [ 0.8    -1.4     0.0016 -0.0038]]
-    >>> B = np.array([[ 0.], [ 0.], [ 0.], [ 1.]])
+    >>> A = np.array([[ 0.,   0. ,  1.    ,  0.    ],
+    ...               [ 0.,   0. ,  0.    ,  1.    ],
+    ...               [-1.4,  1.2, -0.0058,  0.0014],
+    ...               [ 0.8, -1.4,  0.0016, -0.0038]])
+    >>> B = np.array([[ 0.],
+    ...               [ 0.],
+    ...               [ 0.],
+    ...               [ 1.]])
     >>> C = np.array([[-1.4, 1.2, -0.0058, 0.0014]])
     >>> D = np.array([[-0.2]])
     >>> omega, H = vt.ssfrf(A, B, C, D, 0, 3.5, 1, 1)
@@ -213,9 +212,12 @@ def so2ss(M, C, K, Bt, Cd, Cv, Ca):
     --------
     >>> import numpy as np
     >>> import vibrationtesting as vt
-    >>> M = np.array([[2, 1], [1, 3]])
-    >>> K = np.array([[2, -1], [-1, 3]])
-    >>> C = np.array([[0.01, 0.001], [0.001, 0.01]])
+    >>> M = np.array([[2, 1],
+    ...               [1, 3]])
+    >>> K = np.array([[2, -1],
+    ...               [-1, 3]])
+    >>> C = np.array([[0.01, 0.001],
+    ...               [0.001, 0.01]])
     >>> Bt = np.array([[0], [1]])
     >>> Cd = Cv = np.zeros((1,2))
     >>> Ca = np.array([[1, 0]])
@@ -271,3 +273,54 @@ def damp(A):
                   {:.3f}         {:.3f}'.format(float(np.real(pole)),
                   float(np.imag(pole)), float(abs(pole)), float(d0),
                   float(f0)))
+
+def undamped_modes(M,K):
+    '''Undamped modes and natural frequencies from Mass and Stiffness matrix.
+
+    Parameters
+    ----------
+    M, K : float arrays
+        Mass and stiffness matrices
+
+    Returns
+    -------
+    omega : float array (1xN)
+        Vector of natural frequencies (rad/sec)
+    Psi : float array (NxN)
+        Matrix of mass normalized mode shapes by column
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import vibrationtesting as vt
+    >>> M = np.array([[4, 0, 0],
+    ...               [0, 4, 0],
+    ...               [0, 0, 4]])
+    >>> K = np.array([[8, -4, 0],
+    ...               [-4, 8, -4],
+    ...               [0, -4, 4]])
+    >>> omega, Psi = vt.undamped_modes(M, K)
+    >>> print(omega)
+    [ 0.445   1.247   1.8019]
+    >>> print(Psi)
+    [[ 0.164  -0.3685 -0.2955]
+     [ 0.2955 -0.164   0.3685]
+     [ 0.3685  0.2955 -0.164 ]]
+    '''
+    lam, psi_flipped = la.eigh(M, K)
+
+    omega = np.real(np.sqrt(1/lam[-1::-1]))
+
+    Psi = np.fliplr(psi_flipped)
+
+    norms = np.diag(1/np.sqrt(np.diag(Psi.T@M@Psi)))
+
+    Psi = Psi @ norms
+
+    return omega, Psi
+
+
+
+
+
+
