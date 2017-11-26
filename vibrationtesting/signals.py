@@ -1000,35 +1000,27 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
     # return lags, c, a, b'''
 
 
-def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
+def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1, legend = []):
     """Frequency Response function pretty plotting.
 
     Plots frequency response functions in a variety of formats
 
-        - parameters using ``:param <name>: <description>``
-        - type of parameters ``:type <name>: <description>``
-        - returns using ``:returns: <description>``
-        - examples (doctest)
-        - seealso using ``.. seealso:: text``
-        - notes using ``.. note:: text``
-        - warning using ``.. warning:: text``
-        - todo ``.. todo:: text``
-
-
-    :param freq: frequency data (Hz) of shape (1,n_points)
-    :param H: Frequency Response Functions, shape (n,n_points)
-    :param freq_min: lowest frequency to plot
-    :param freq_min: highest frequency to plot
-    :param FLAG: type of plot
-    :type freq: float array
-    :type H: float array
-    :type freq_min: float
-    :type freq_max: float
-    :type FLAG: integer
-    :returns:
-
+    Parameters
+    ----------
+    freq : float array
+        Frequency vector (rad/sec), (1xN)
+    H : float array
+        Frequency response functions (nxN)
+    freq_min : float, optional
+        Low frequency for plot (default 0)
+    freq_min : float, optional
+        High frequency for plot (default max frequency)
+    legend : string array
+        Array of string for use in legend.
+    type : int, optional
+        Plot type form from:
     =======  =============================================================
-    FLAG     Plot Type
+    type     Plot Type
     -------  -------------------------------------------------------------
     1 (def)  Magnitude and Phase versus F
     2        Magnitude and Phase versus log10(F)
@@ -1047,6 +1039,9 @@ def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
     15       Phase versus log10(w)
     =======  =============================================================
 
+    Returns
+    -------
+
     Examples
     --------
     >>> import matplotlib.pyplot as plt
@@ -1059,10 +1054,16 @@ def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1):
     >>> vt.frfplot(f,tf)
     >>> vt.frfplot(f,tf,5)
 
+    Notes
+    -----
+    .. seealso:: `frfest`
+
     Copyright J. Slater, Dec 17, 1994
     Updated April 27, 1995
     Ported to Python, July 1, 2015
     """
+
+    FLAG = type  # Plot type, should libe renamed throughout.
     freq = freq.reshape(1, -1)
     lenF = freq.shape[1]
     if len(H.shape) is 1:
