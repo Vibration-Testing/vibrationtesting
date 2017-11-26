@@ -26,7 +26,7 @@ Window functions
 from __future__ import division, print_function, absolute_import
 
 __title__ = 'vibrationtesting'
-__version__ = '0.1b03'
+__version__ = '0.1b04'
 __author__ = u'Joseph C. Slater'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2002-2017 Joseph C. Slater'
