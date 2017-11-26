@@ -997,29 +997,11 @@ def frfplot(freq, H, freq_min=0, freq_max=0, type=1, legend=[]):
     legend : string array
         Array of string for use in legend.
     type : int, optional
-        Plot type form from:
-    =======  =============================================================
-    type     Plot Type
-    -------  -------------------------------------------------------------
-    1 (def)  Magnitude and Phase versus F
-    2        Magnitude and Phase versus log10(F)
-    3        Bodelog  (Magnitude and Phase versus log10(w))
-    4        Real and Imaginary
-    5        Nyquist  (Real versus Imaginary)
-    6        Magnitude versus F
-    7        Phase versus F
-    8        Real versus F
-    9        Imaginary versus F
-    10       Magnitude versus log10(F)
-    11       Phase versus log10(F)
-    12       Real versus log10(F)
-    13       Imaginary versus log10(F)
-    14       Magnitude versus log10(w)
-    15       Phase versus log10(w)
-    =======  =============================================================
+        Plot type. See notes.
 
     Returns
     -------
+
 
     Examples
     --------
@@ -1031,10 +1013,45 @@ def frfplot(freq, H, freq_min=0, freq_max=0, type=1, legend=[]):
     >>> k=1e5;m=1;c=1;
     >>> frf1=1./(m*(w*1j)**2+c*1j*w+k)
     >>> frf2=1./(m*(w*1j)**2+c*1j*w+k*3)
-    >>> vt.frfplot(f,np.hstack((frf1,frf2)), legend = ['FRF 1','FRF 2'])  # doctest: +SKIP
+    >>> vt.frfplot(f,np.hstack((frf1,frf2)), legend = ['FRF 1','FRF 2'])
+    ...                                      # doctest: +SKIP
 
     Notes
     -----
+    +---------+------------------------------------------------+
+    |  type   |  Plot style                                    |
+    +=========+================================================+
+    | 1 (def) |  Magnitude and Phase versus F                  |
+    +---------+------------------------------------------------+
+    | 2       |  Magnitude and Phase versus log10(F)           |
+    +---------+------------------------------------------------+
+    | 3       |  Bodelog (Magnitude and Phase versus log10(w)) |
+    +---------+------------------------------------------------+
+    | 4       |  Real and Imaginary                            |
+    +---------+------------------------------------------------+
+    | 5       |  Nyquist (Imaginary versus Real)               |
+    +---------+------------------------------------------------+
+    | 6       |  Magnitude versus F                            |
+    +---------+------------------------------------------------+
+    | 7       |  Phase versus F                                |
+    +---------+------------------------------------------------+
+    | 8       |  Real versus F                                 |
+    +---------+------------------------------------------------+
+    | 9       |  Imaginary versus F                            |
+    +---------+------------------------------------------------+
+    | 10      |  Magnitude versus log10(F)                     |
+    +---------+------------------------------------------------+
+    | 11      |  Phase versus log10(F)                         |
+    +---------+------------------------------------------------+
+    | 12      |  Real versus log10(F)                          |
+    +---------+------------------------------------------------+
+    | 13      |  Imaginary versus log10(F)                     |
+    +---------+------------------------------------------------+
+    | 14      |  Magnitude versus log10(w)                     |
+    +---------+------------------------------------------------+
+    | 15      |  Phase versus log10(w)                         |
+    +---------+------------------------------------------------+
+
     .. seealso:: `frfest`
 
     Copyright J. Slater, Dec 17, 1994
