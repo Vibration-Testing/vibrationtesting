@@ -43,8 +43,6 @@ from .system import *
 
 #  Signal processing (:mod:`vibrationtesting.signal`)
 
-
-
 # print options were change inside modules to produce better
 # outputs at examples. Here we set the print options to the
 # default values after importing the modules to avoid changing
