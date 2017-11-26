@@ -1,6 +1,5 @@
 """
 ==================================================
-Signal processing (:mod:`vibrationtesting.signal`)
 ==================================================
 
 
@@ -42,6 +41,7 @@ if 'pytest' in sys.argv[0]:
 from .signal import *
 from .system import *
 
+#  Signal processing (:mod:`vibrationtesting.signal`)
 
 
 
@@ -49,7 +49,3 @@ from .system import *
 # outputs at examples. Here we set the print options to the
 # default values after importing the modules to avoid changing
 # np default print options when importing the module.
-
-np.set_printoptions(edgeitems=3, infstr='inf', linewidth=75,
-                    nanstr='nan', precision=8, suppress=False,
-                    threshold=1000, formatter=None)
