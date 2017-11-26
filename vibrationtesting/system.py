@@ -176,7 +176,7 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
     >>> C = np.array([[-1.4, 1.2, -0.0058, 0.0014]])
     >>> D = np.array([[-0.2]])
     >>> omega, H = vt.ssfrf(A, B, C, D, 0, 3.5, 1, 1)
-    >>> vt.frfplot(omega, H)
+    >>> vt.frfplot(omega, H) # doctest: +SKIP
 
     """
     # A, B, C, D = ctrl.ssdata(sys)
