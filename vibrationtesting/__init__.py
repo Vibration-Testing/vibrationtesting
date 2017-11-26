@@ -40,6 +40,7 @@ if 'pytest' in sys.argv[0]:
 
 from .signals import *
 from .system import *
+from .identification import *
 
 #  Signal processing (:mod:`vibrationtesting.signal`)
 
