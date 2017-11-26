@@ -730,52 +730,31 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
     >>> D = np.array([[0], [0]])
     >>> sys = ctrl.ss(A, B, C, D)
     >>> tin = np.arange(0, 51.2, .1)
-    >>> nr=.5   # 0 is all noise on input
-    >>> for i in np.arange(5): #was 2*50
+    >>> nr = .5   # 0 is all noise on input
+    >>> for i in np.arange(520):
     ...     u = np.random.normal(scale=np.sqrt(noise_power), size=tin.shape)
     ...     #print(u)
-    ...     t, yout, xout = ctrl.forced_response(sys, tin, u,rtol=1e-12)#,transpose=True)
+    ...     t, yout, xout = ctrl.forced_response(sys, tin, u,rtol=1e-12)
     ...     if 'Yout' in locals():
-    ...         Yout=np.dstack((Yout,yout+nr*np.random.normal(scale=.050*np.std(yout[0,:]), size=yout.shape)))
-    ...         Ucomb=np.dstack((Ucomb,u+(1-nr)*np.random.normal(scale=.05*np.std(u), size=u.shape)))
+    ...         Yout=np.dstack((Yout,yout
+    ...                 +nr*np.random.normal(scale=.050*np.std(yout[0,:]),
+    ...                  size=yout.shape)))
+    ...         Ucomb=np.dstack((Ucomb,u+(1-nr)
+    ...                 *np.random.normal(scale=.05*np.std(u),
+    ...                  size=u.shape)))
     ...     else:
-    ...         Yout=yout+nr*np.random.normal(scale=.050*np.std(yout[0,:]), size=yout.shape) # 5% half the noise on output as on input
-    ...         Ucomb=u+(1-nr)*np.random.normal(scale=.05*np.std(u), size=u.shape)#(1, len(tin))) #10% noise signal on input
-    >>> fig, ax = plt.subplots()
-    >>> ax.plot(tin,Yout[0,:])
-    [<matplotlib.lines.Line2...
-    >>> Yout=Yout*np.std(Ucomb)/np.std(Yout)#40
-    >>> ax.set_title('time response')
-    Text(0.5,1,'time response')
-    >>> freq_vec, Pxx = vt.asd(Yout, tin, windowname="hanning", ave=bool(False))
-    >>> fig, ax = plt.subplots()
-    >>> ax.plot(freq_vec, 20*np.log10(Pxx[0,:]))
-    [<matplotlib.lines.Line2D object at ...]
-    >>> ax.set_title('Raw ASDs')
-    Text(0.5,1,'Raw ASDs')
-    >>> freq_vec, Pxx = vt.asd(Yout, tin, windowname="hanning", ave=bool(True))
-    >>> fig, ax = plt.subplots()
-    >>> ax.plot(freq_vec, 20*np.log10(Pxx[0,:]))
-    [<matplotlib.lines.Line2D object at ...]
-    >>> ax.set_title('Averaged ASDs')
-    Text(0.5,1,'Averaged ASDs')
-    >>> f, Txy1, Txy2, coh, Txyv = vt.frfest(Yout, Ucomb, t,Hv=bool(True))
-    >>> #fig_amp,=plt.plot(f[0,:],20*np.log10(np.abs(Txy1[0,:])),legend='$H_1$',f[0,:],20*np.log10(np.abs(Txy2[0,:])),legend='$H_2$',f[0,:],20*np.log10(np.abs(Txyv[0,:])),legend='$H_v$')
-    >>> fig, ax = plt.subplots()
-    >>> (line1, line2, line3) = ax.plot(f,20*np.log10(np.abs(Txy1[0,:])),f,20*np.log10(np.abs(Txy2[0,:])),f,20*np.log10(np.abs(Txyv[0,:])))
-    >>> ax.set_title('FRF of ' + str(Yout.shape[2]) + ' averages.')
-    Text(0.5,1,...
-    >>> ax.legend((line1,line2,line3),('$H_1$','$H_2$','$H_v$'))
-    <matplotlib.legend.Legend object ...>
-    >>> fig, ax = plt.subplots()
-    >>> ax.plot(f,180.0/np.pi*np.unwrap(np.angle(Txy1[0,:])),f,180.0/np.pi*np.unwrap(np.angle(Txy2[0,:])),f,180.0/np.pi*np.unwrap(np.angle(Txyv[0,:])))
-    [<matplotlib.lines.Line2D object at ...]
-    >>> ax.set_title('FRF of ' + str(Yout.shape[2]) + ' averages.')
-    Text(0.5,1,...
-    >>> fig, ax = plt.subplots()
-    >>> ax.plot(f,coh[0,:])
-    [<matplotlib.lines.Line2D object at...
-    >>> vt.frfplot(f,Txy1,freq_max=3.5)
+    ...         Yout=yout+nr*np.random.normal(scale=.05*np.std(yout[0,:]),
+    ...                   size=yout.shape)
+    ...                   # noise on output is 5% scale of input
+    ...         Ucomb=u+(1-nr)*np.random.normal(scale=.05*np.std(u),
+    ...                   size=u.shape)#(1, len(tin)))
+    ...                   # 5% noise signal on input
+    >>> f, Hxy1, Hxy2, coh, Hxyv = vt.frfest(Yout, Ucomb, t, Hv=bool(True))
+    >>> vt.frfplot(f,Hxy2,freq_max=3.5, legend=['$H_{11}$', '$H_{12}$'])
+    ...               # doctest: +SKIP
+    >>> vt.frfplot(f, np.vstack((Hxy1[0,:], Hxy2[0,:], Hxyv[0,:])),
+    ...               legend=['$H_{11-1}$','$H_{11-2}$','$H_{11-v}$'])
+    ...               # doctest: +SKIP
 
     Notes
     -----
@@ -1050,9 +1029,9 @@ def frfplot(freq, H, freq_min=0, freq_max=0, type=1, legend=[]):
     >>> f=np.linspace(0,100,10000).reshape(-1,1);
     >>> w=f*2*np.pi;
     >>> k=1e5;m=1;c=1;
-    >>> tf=1./(m*(w*1j)**2+c*1j*w+k)
-    >>> vt.frfplot(f,tf)
-    >>> vt.frfplot(f,tf,5)
+    >>> frf1=1./(m*(w*1j)**2+c*1j*w+k)
+    >>> frf2=1./(m*(w*1j)**2+c*1j*w+k*3)
+    >>> vt.frfplot(f,np.hstack((frf1,frf2)), legend = ['FRF 1','FRF 2'])  # doctest: +SKIP
 
     Notes
     -----
@@ -1126,11 +1105,16 @@ def frfplot(freq, H, freq_min=0, freq_max=0, type=1, legend=[]):
         ax2.grid()
         ax2.set_xlim(xmax=freq_max, xmin=freq_min)
         ax2.set_ylim(ymax=phmax, ymin=phmin)
-
         ax2.set_yticks(np.arange(phmin, (phmax + 45), 45))
         fig.tight_layout()
+
+        if len(legend) > 0:
+            plt.legend(legend)
+
+
     else:
         print("Sorry, that option isn't supported yet")
+        return
 
     '''# elif FLAG==2:
     # subplot(2,1,1)
