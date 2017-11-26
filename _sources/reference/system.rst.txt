@@ -1,4 +1,4 @@
-System Manipulation (:mod:`vibrationtesting.system`)
+System Manipulation (:mod:`system`)
 ----------------------------------------------------
 
 .. sectionauthor:: Joseph C. Slater

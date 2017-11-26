@@ -5,7 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Signal Processing (vibrationtesting.signals) &#8212; Vibration Testing 0.1b04 documentation</title>
+    <title>Signal Processing (signals) &#8212; Vibration Testing 0.1b04 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="System Manipulation (vibrationtesting.system)" href="system.html" />
+    <link rel="next" title="System Manipulation (system)" href="system.html" />
     <link rel="prev" title="Reference" href="index.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -41,9 +41,9 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="signal-processing-vibrationtesting-signals">
-<h1>Signal Processing (<code class="xref py py-mod docutils literal"><span class="pre">vibrationtesting.signals</span></code>)<a class="headerlink" href="#signal-processing-vibrationtesting-signals" title="Permalink to this headline">¶</a></h1>
-<span class="target" id="module-signals"></span><p>Created on 14 May 2015
+  <div class="section" id="module-signals">
+<span id="signal-processing-signals"></span><h1>Signal Processing (<a class="reference internal" href="#module-signals" title="signals"><code class="xref py py-mod docutils literal"><span class="pre">signals</span></code></a>)<a class="headerlink" href="#module-signals" title="Permalink to this headline">¶</a></h1>
+<p>Created on 14 May 2015
 &#64;author: Joseph C. Slater</p>
 <dl class="function">
 <dt id="signals.asd">
@@ -283,33 +283,72 @@ unslected yet.
 <div><p>Array of string for use in legend.</p>
 </div></blockquote>
 <p><strong>type</strong> : int, optional</p>
-<blockquote>
-<div><p>Plot type form from:</p>
+<blockquote class="last">
+<div><p>Plot type. See notes.</p>
 </div></blockquote>
-<p><strong>=======  =============================================================</strong></p>
-<p><strong>type     Plot Type</strong></p>
-<p><strong>——-  ————————————————————-</strong></p>
-<p><strong>1 (def)  Magnitude and Phase versus F</strong></p>
-<p><strong>2        Magnitude and Phase versus log10(F)</strong></p>
-<p><strong>3        Bodelog  (Magnitude and Phase versus log10(w))</strong></p>
-<p><strong>4        Real and Imaginary</strong></p>
-<p><strong>5        Nyquist  (Real versus Imaginary)</strong></p>
-<p><strong>6        Magnitude versus F</strong></p>
-<p><strong>7        Phase versus F</strong></p>
-<p><strong>8        Real versus F</strong></p>
-<p><strong>9        Imaginary versus F</strong></p>
-<p><strong>10       Magnitude versus log10(F)</strong></p>
-<p><strong>11       Phase versus log10(F)</strong></p>
-<p><strong>12       Real versus log10(F)</strong></p>
-<p><strong>13       Imaginary versus log10(F)</strong></p>
-<p><strong>14       Magnitude versus log10(w)</strong></p>
-<p><strong>15       Phase versus log10(w)</strong></p>
-<p class="last"><strong>=======  =============================================================</strong></p>
 </td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="84%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">type</th>
+<th class="head">Plot style</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1 (def)</td>
+<td>Magnitude and Phase versus F</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>Magnitude and Phase versus log10(F)</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td>Bodelog (Magnitude and Phase versus log10(w))</td>
+</tr>
+<tr class="row-odd"><td>4</td>
+<td>Real and Imaginary</td>
+</tr>
+<tr class="row-even"><td>5</td>
+<td>Nyquist (Imaginary versus Real)</td>
+</tr>
+<tr class="row-odd"><td>6</td>
+<td>Magnitude versus F</td>
+</tr>
+<tr class="row-even"><td>7</td>
+<td>Phase versus F</td>
+</tr>
+<tr class="row-odd"><td>8</td>
+<td>Real versus F</td>
+</tr>
+<tr class="row-even"><td>9</td>
+<td>Imaginary versus F</td>
+</tr>
+<tr class="row-odd"><td>10</td>
+<td>Magnitude versus log10(F)</td>
+</tr>
+<tr class="row-even"><td>11</td>
+<td>Phase versus log10(F)</td>
+</tr>
+<tr class="row-odd"><td>12</td>
+<td>Real versus log10(F)</td>
+</tr>
+<tr class="row-even"><td>13</td>
+<td>Imaginary versus log10(F)</td>
+</tr>
+<tr class="row-odd"><td>14</td>
+<td>Magnitude versus log10(w)</td>
+</tr>
+<tr class="row-even"><td>15</td>
+<td>Phase versus log10(w)</td>
+</tr>
+</tbody>
+</table>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><cite>frfest</cite></p>
@@ -452,8 +491,8 @@ match <span class="math">\(x\)</span> that <span class="math">\(x\times w\)</spa
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Signal Processing (<code class="docutils literal"><span class="pre">vibrationtesting.signals</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="system.html">System Manipulation (<code class="docutils literal"><span class="pre">vibrationtesting.system</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Signal Processing (<code class="docutils literal"><span class="pre">signals</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="system.html">System Manipulation (<code class="docutils literal"><span class="pre">system</span></code>)</a></li>
 </ul>
 </li>
 </ul>

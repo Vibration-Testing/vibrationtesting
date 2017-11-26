@@ -1039,29 +1039,7 @@
 <span class="sd">    legend : string array</span>
 <span class="sd">        Array of string for use in legend.</span>
 <span class="sd">    type : int, optional</span>
-<span class="sd">        Plot type form from:</span>
-<span class="sd">    =======  =============================================================</span>
-<span class="sd">    type     Plot Type</span>
-<span class="sd">    -------  -------------------------------------------------------------</span>
-<span class="sd">    1 (def)  Magnitude and Phase versus F</span>
-<span class="sd">    2        Magnitude and Phase versus log10(F)</span>
-<span class="sd">    3        Bodelog  (Magnitude and Phase versus log10(w))</span>
-<span class="sd">    4        Real and Imaginary</span>
-<span class="sd">    5        Nyquist  (Real versus Imaginary)</span>
-<span class="sd">    6        Magnitude versus F</span>
-<span class="sd">    7        Phase versus F</span>
-<span class="sd">    8        Real versus F</span>
-<span class="sd">    9        Imaginary versus F</span>
-<span class="sd">    10       Magnitude versus log10(F)</span>
-<span class="sd">    11       Phase versus log10(F)</span>
-<span class="sd">    12       Real versus log10(F)</span>
-<span class="sd">    13       Imaginary versus log10(F)</span>
-<span class="sd">    14       Magnitude versus log10(w)</span>
-<span class="sd">    15       Phase versus log10(w)</span>
-<span class="sd">    =======  =============================================================</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
+<span class="sd">        Plot type. See notes.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -1073,10 +1051,45 @@
 <span class="sd">    &gt;&gt;&gt; k=1e5;m=1;c=1;</span>
 <span class="sd">    &gt;&gt;&gt; frf1=1./(m*(w*1j)**2+c*1j*w+k)</span>
 <span class="sd">    &gt;&gt;&gt; frf2=1./(m*(w*1j)**2+c*1j*w+k*3)</span>
-<span class="sd">    &gt;&gt;&gt; vt.frfplot(f,np.hstack((frf1,frf2)), legend = [&#39;FRF 1&#39;,&#39;FRF 2&#39;])  # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; vt.frfplot(f,np.hstack((frf1,frf2)), legend = [&#39;FRF 1&#39;,&#39;FRF 2&#39;])</span>
+<span class="sd">    ...                                      # doctest: +SKIP</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
+<span class="sd">    +---------+------------------------------------------------+</span>
+<span class="sd">    |  type   |  Plot style                                    |</span>
+<span class="sd">    +=========+================================================+</span>
+<span class="sd">    | 1 (def) |  Magnitude and Phase versus F                  |</span>
+<span class="sd">    +---------+------------------------------------------------+</span>
+<span class="sd">    | 2       |  Magnitude and Phase versus log10(F)           |</span>
+<span class="sd">    +---------+------------------------------------------------+</span>
+<span class="sd">    | 3       |  Bodelog (Magnitude and Phase versus log10(w)) |</span>
+<span class="sd">    +---------+------------------------------------------------+</span>
+<span class="sd">    | 4       |  Real and Imaginary                            |</span>
+<span class="sd">    +---------+------------------------------------------------+</span>
+<span class="sd">    | 5       |  Nyquist (Imaginary versus Real)               |</span>
+<span class="sd">    +---------+------------------------------------------------+</span>
+<span class="sd">    | 6       |  Magnitude versus F                            |</span>
+<span class="sd">    +---------+------------------------------------------------+</span>
+<span class="sd">    | 7       |  Phase versus F                                |</span>
+<span class="sd">    +---------+------------------------------------------------+</span>
+<span class="sd">    | 8       |  Real versus F                                 |</span>
+<span class="sd">    +---------+------------------------------------------------+</span>
+<span class="sd">    | 9       |  Imaginary versus F                            |</span>
+<span class="sd">    +---------+------------------------------------------------+</span>
+<span class="sd">    | 10      |  Magnitude versus log10(F)                     |</span>
+<span class="sd">    +---------+------------------------------------------------+</span>
+<span class="sd">    | 11      |  Phase versus log10(F)                         |</span>
+<span class="sd">    +---------+------------------------------------------------+</span>
+<span class="sd">    | 12      |  Real versus log10(F)                          |</span>
+<span class="sd">    +---------+------------------------------------------------+</span>
+<span class="sd">    | 13      |  Imaginary versus log10(F)                     |</span>
+<span class="sd">    +---------+------------------------------------------------+</span>
+<span class="sd">    | 14      |  Magnitude versus log10(w)                     |</span>
+<span class="sd">    +---------+------------------------------------------------+</span>
+<span class="sd">    | 15      |  Phase versus log10(w)                         |</span>
+<span class="sd">    +---------+------------------------------------------------+</span>
+
 <span class="sd">    .. seealso:: `frfest`</span>
 
 <span class="sd">    Copyright J. Slater, Dec 17, 1994</span>
