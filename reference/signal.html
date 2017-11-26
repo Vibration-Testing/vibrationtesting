@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Signal Processing (vibrationtesting.signals) &#8212; Vibration Testing 0.1b03 documentation</title>
+    <title>Signal Processing (vibrationtesting.signals) &#8212; Vibration Testing 0.1b04 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1b03',
+        VERSION:     '0.1b04',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -251,128 +251,76 @@ unslected yet.
 <img alt="../_images/signal-3_01.png" src="../_images/signal-3_01.png" />
 <p class="caption"><span class="caption-text">(<a class="reference external" href="../reference/signal-3_01.png">png</a>, <a class="reference external" href="../reference/signal-3_01.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-3_01.pdf">pdf</a>)</span></p>
 </div>
-<div class="figure" id="id3">
-<img alt="../_images/signal-3_02.png" src="../_images/signal-3_02.png" />
-<p class="caption"><span class="caption-text">(<a class="reference external" href="../reference/signal-3_02.png">png</a>, <a class="reference external" href="../reference/signal-3_02.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-3_02.pdf">pdf</a>)</span></p>
-</div>
-<div class="figure" id="id4">
-<img alt="../_images/signal-3_03.png" src="../_images/signal-3_03.png" />
-<p class="caption"><span class="caption-text">(<a class="reference external" href="../reference/signal-3_03.png">png</a>, <a class="reference external" href="../reference/signal-3_03.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-3_03.pdf">pdf</a>)</span></p>
-</div>
-<div class="figure" id="id5">
-<img alt="../_images/signal-3_04.png" src="../_images/signal-3_04.png" />
-<p class="caption"><span class="caption-text">(<a class="reference external" href="../reference/signal-3_04.png">png</a>, <a class="reference external" href="../reference/signal-3_04.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-3_04.pdf">pdf</a>)</span></p>
-</div>
-<div class="figure" id="id6">
-<img alt="../_images/signal-3_05.png" src="../_images/signal-3_05.png" />
-<p class="caption"><span class="caption-text">(<a class="reference external" href="../reference/signal-3_05.png">png</a>, <a class="reference external" href="../reference/signal-3_05.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-3_05.pdf">pdf</a>)</span></p>
-</div>
-<div class="figure" id="id7">
-<img alt="../_images/signal-3_06.png" src="../_images/signal-3_06.png" />
-<p class="caption"><span class="caption-text">(<a class="reference external" href="../reference/signal-3_06.png">png</a>, <a class="reference external" href="../reference/signal-3_06.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-3_06.pdf">pdf</a>)</span></p>
-</div>
 </dd></dl>
 
 <dl class="function">
 <dt id="signals.frfplot">
-<code class="descclassname">signals.</code><code class="descname">frfplot</code><span class="sig-paren">(</span><em>freq</em>, <em>H</em>, <em>freq_min=0</em>, <em>freq_max=0</em>, <em>FLAG=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#frfplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.frfplot" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">signals.</code><code class="descname">frfplot</code><span class="sig-paren">(</span><em>freq</em>, <em>H</em>, <em>freq_min=0</em>, <em>freq_max=0</em>, <em>type=1</em>, <em>legend=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#frfplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.frfplot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Frequency Response function pretty plotting.</p>
 <p>Plots frequency response functions in a variety of formats</p>
-<blockquote>
-<div><ul class="simple">
-<li>parameters using <code class="docutils literal"><span class="pre">:param</span> <span class="pre">&lt;name&gt;:</span> <span class="pre">&lt;description&gt;</span></code></li>
-<li>type of parameters <code class="docutils literal"><span class="pre">:type</span> <span class="pre">&lt;name&gt;:</span> <span class="pre">&lt;description&gt;</span></code></li>
-<li>returns using <code class="docutils literal"><span class="pre">:returns:</span> <span class="pre">&lt;description&gt;</span></code></li>
-<li>examples (doctest)</li>
-<li>seealso using <code class="docutils literal"><span class="pre">..</span> <span class="pre">seealso::</span> <span class="pre">text</span></code></li>
-<li>notes using <code class="docutils literal"><span class="pre">..</span> <span class="pre">note::</span> <span class="pre">text</span></code></li>
-<li>warning using <code class="docutils literal"><span class="pre">..</span> <span class="pre">warning::</span> <span class="pre">text</span></code></li>
-<li>todo <code class="docutils literal"><span class="pre">..</span> <span class="pre">todo::</span> <span class="pre">text</span></code></li>
-</ul>
-</div></blockquote>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>freq</strong> (<em>float array</em>) – frequency data (Hz) of shape (1,n_points)</li>
-<li><strong>H</strong> (<em>float array</em>) – Frequency Response Functions, shape (n,n_points)</li>
-<li><strong>freq_min</strong> (<em>float</em>) – lowest frequency to plot</li>
-<li><strong>freq_min</strong> – highest frequency to plot</li>
-<li><strong>FLAG</strong> (<em>integer</em>) – type of plot</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>freq</strong> : float array</p>
+<blockquote>
+<div><p>Frequency vector (rad/sec), (1xN)</p>
+</div></blockquote>
+<p><strong>H</strong> : float array</p>
+<blockquote>
+<div><p>Frequency response functions (nxN)</p>
+</div></blockquote>
+<p><strong>freq_min</strong> : float, optional</p>
+<blockquote>
+<div><p>Low frequency for plot (default 0)</p>
+</div></blockquote>
+<p><strong>freq_min</strong> : float, optional</p>
+<blockquote>
+<div><p>High frequency for plot (default max frequency)</p>
+</div></blockquote>
+<p><strong>legend</strong> : string array</p>
+<blockquote>
+<div><p>Array of string for use in legend.</p>
+</div></blockquote>
+<p><strong>type</strong> : int, optional</p>
+<blockquote>
+<div><p>Plot type form from:</p>
+</div></blockquote>
+<p><strong>=======  =============================================================</strong></p>
+<p><strong>type     Plot Type</strong></p>
+<p><strong>——-  ————————————————————-</strong></p>
+<p><strong>1 (def)  Magnitude and Phase versus F</strong></p>
+<p><strong>2        Magnitude and Phase versus log10(F)</strong></p>
+<p><strong>3        Bodelog  (Magnitude and Phase versus log10(w))</strong></p>
+<p><strong>4        Real and Imaginary</strong></p>
+<p><strong>5        Nyquist  (Real versus Imaginary)</strong></p>
+<p><strong>6        Magnitude versus F</strong></p>
+<p><strong>7        Phase versus F</strong></p>
+<p><strong>8        Real versus F</strong></p>
+<p><strong>9        Imaginary versus F</strong></p>
+<p><strong>10       Magnitude versus log10(F)</strong></p>
+<p><strong>11       Phase versus log10(F)</strong></p>
+<p><strong>12       Real versus log10(F)</strong></p>
+<p><strong>13       Imaginary versus log10(F)</strong></p>
+<p><strong>14       Magnitude versus log10(w)</strong></p>
+<p><strong>15       Phase versus log10(w)</strong></p>
+<p class="last"><strong>=======  =============================================================</strong></p>
 </td>
 </tr>
 </tbody>
 </table>
-<table border="1" class="docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td>FLAG</td>
-<td>Plot Type</td>
-</tr>
-<tr class="row-even"><td>1 (def)</td>
-<td>Magnitude and Phase versus F</td>
-</tr>
-<tr class="row-odd"><td>2</td>
-<td>Magnitude and Phase versus log10(F)</td>
-</tr>
-<tr class="row-even"><td>3</td>
-<td>Bodelog  (Magnitude and Phase versus log10(w))</td>
-</tr>
-<tr class="row-odd"><td>4</td>
-<td>Real and Imaginary</td>
-</tr>
-<tr class="row-even"><td>5</td>
-<td>Nyquist  (Real versus Imaginary)</td>
-</tr>
-<tr class="row-odd"><td>6</td>
-<td>Magnitude versus F</td>
-</tr>
-<tr class="row-even"><td>7</td>
-<td>Phase versus F</td>
-</tr>
-<tr class="row-odd"><td>8</td>
-<td>Real versus F</td>
-</tr>
-<tr class="row-even"><td>9</td>
-<td>Imaginary versus F</td>
-</tr>
-<tr class="row-odd"><td>10</td>
-<td>Magnitude versus log10(F)</td>
-</tr>
-<tr class="row-even"><td>11</td>
-<td>Phase versus log10(F)</td>
-</tr>
-<tr class="row-odd"><td>12</td>
-<td>Real versus log10(F)</td>
-</tr>
-<tr class="row-even"><td>13</td>
-<td>Imaginary versus log10(F)</td>
-</tr>
-<tr class="row-odd"><td>14</td>
-<td>Magnitude versus log10(w)</td>
-</tr>
-<tr class="row-even"><td>15</td>
-<td>Phase versus log10(w)</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Examples</p>
-<p>(<a class="reference external" href="../reference/signal-4.py">Source code</a>)</p>
-<div class="figure" id="id8">
-<img alt="../_images/signal-4_00.png" src="../_images/signal-4_00.png" />
-<p class="caption"><span class="caption-text">(<a class="reference external" href="../reference/signal-4_00.png">png</a>, <a class="reference external" href="../reference/signal-4_00.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-4_00.pdf">pdf</a>)</span></p>
+<p class="rubric">Notes</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><cite>frfest</cite></p>
 </div>
-<div class="figure" id="id9">
-<img alt="../_images/signal-4_01.png" src="../_images/signal-4_01.png" />
-<p class="caption"><span class="caption-text">(<a class="reference external" href="../reference/signal-4_01.png">png</a>, <a class="reference external" href="../reference/signal-4_01.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-4_01.pdf">pdf</a>)</span></p>
+<p>Copyright J. Slater, Dec 17, 1994
+Updated April 27, 1995
+Ported to Python, July 1, 2015</p>
+<p class="rubric">Examples</p>
+<p>(<a class="reference external" href="../reference/signal-4.py">Source code</a>, <a class="reference external" href="../reference/signal-4.png">png</a>, <a class="reference external" href="../reference/signal-4.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-4.pdf">pdf</a>)</p>
+<div class="figure">
+<img alt="../_images/signal-4.png" src="../_images/signal-4.png" />
 </div>
 </dd></dl>
 

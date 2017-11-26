@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>System Manipulation (vibrationtesting.system) &#8212; Vibration Testing 0.1b03 documentation</title>
+    <title>System Manipulation (vibrationtesting.system) &#8212; Vibration Testing 0.1b04 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1b03',
+        VERSION:     '0.1b04',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -183,6 +183,64 @@ continuous counterpart.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="system.serep">
+<code class="descclassname">system.</code><code class="descname">serep</code><span class="sig-paren">(</span><em>M</em>, <em>K</em>, <em>master</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#serep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.serep" title="Permalink to this definition">¶</a></dt>
+<dd><p>System Equivalent Reduction reduced model</p>
+<p>Reduce size of second order system of equations by SEREP processs while
+returning expansion matrix</p>
+<p>Equation of the form:
+<span class="math">\(M \ddot{x} + K x = 0\)</span>
+is reduced to the form
+<span class="math">\(M_r \ddot{x}_m + Kr x_m = 0\)</span>
+where <span class="math">\(x = T x_m\)</span>, <span class="math">\(M_r= T^T M T\)</span>, <span class="math">\(K_r= T^T K T\)</span></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>M, K</strong> : float arrays</p>
+<blockquote>
+<div><p>Mass and Stiffness matrices</p>
+</div></blockquote>
+<p><strong>master</strong> : float array or list</p>
+<blockquote>
+<div><p>List of retained degrees of freedom</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>Mred, Kred, T</strong> : float arrays</p>
+<blockquote>
+<div><p>Reduced Mass matric, reduced stiffness matrix, Transformation matrix</p>
+</div></blockquote>
+<p><strong>truncated_dofs</strong> : int list</p>
+<blockquote class="last">
+<div><p>List of truncated degrees of freedom</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Reduced coordinate system forces can be obtained by
+<cite>Fr = T.T &#64; F</cite></p>
+<p>Reduced damping matrix can be obtained using <cite>Cr = T.T*&#64; C &#64; T</cite>.</p>
+<p>If mode shapes are obtained for the reduced system, full system mode shapes
+are <cite>phi = T &#64; phi_r</cite></p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">retained</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Mred</span><span class="p">,</span> <span class="n">Kred</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">truncated_dofs</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">serep</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">retained</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
 <dt id="system.so2ss">
 <code class="descclassname">system.</code><code class="descname">so2ss</code><span class="sig-paren">(</span><em>M</em>, <em>C</em>, <em>K</em>, <em>Bt</em>, <em>Cd</em>, <em>Cv</em>, <em>Ca</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#so2ss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.so2ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert second order system to state space</p>
@@ -297,7 +355,7 @@ and output over frequency range of interest.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0058</span><span class="p">,</span> <span class="mf">0.0014</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">omega</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">ssfrf</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">vt</span><span class="o">.</span><span class="n">frfplot</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vt</span><span class="o">.</span><span class="n">frfplot</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span> 
 </pre></div>
 </div>
 </dd></dl>

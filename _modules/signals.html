@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>signals &#8212; Vibration Testing 0.1b03 documentation</title>
+    <title>signals &#8212; Vibration Testing 0.1b04 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1b03',
+        VERSION:     '0.1b04',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -772,52 +772,31 @@
 <span class="sd">    &gt;&gt;&gt; D = np.array([[0], [0]])</span>
 <span class="sd">    &gt;&gt;&gt; sys = ctrl.ss(A, B, C, D)</span>
 <span class="sd">    &gt;&gt;&gt; tin = np.arange(0, 51.2, .1)</span>
-<span class="sd">    &gt;&gt;&gt; nr=.5   # 0 is all noise on input</span>
-<span class="sd">    &gt;&gt;&gt; for i in np.arange(5): #was 2*50</span>
+<span class="sd">    &gt;&gt;&gt; nr = .5   # 0 is all noise on input</span>
+<span class="sd">    &gt;&gt;&gt; for i in np.arange(520):</span>
 <span class="sd">    ...     u = np.random.normal(scale=np.sqrt(noise_power), size=tin.shape)</span>
 <span class="sd">    ...     #print(u)</span>
-<span class="sd">    ...     t, yout, xout = ctrl.forced_response(sys, tin, u,rtol=1e-12)#,transpose=True)</span>
+<span class="sd">    ...     t, yout, xout = ctrl.forced_response(sys, tin, u,rtol=1e-12)</span>
 <span class="sd">    ...     if &#39;Yout&#39; in locals():</span>
-<span class="sd">    ...         Yout=np.dstack((Yout,yout+nr*np.random.normal(scale=.050*np.std(yout[0,:]), size=yout.shape)))</span>
-<span class="sd">    ...         Ucomb=np.dstack((Ucomb,u+(1-nr)*np.random.normal(scale=.05*np.std(u), size=u.shape)))</span>
+<span class="sd">    ...         Yout=np.dstack((Yout,yout</span>
+<span class="sd">    ...                 +nr*np.random.normal(scale=.050*np.std(yout[0,:]),</span>
+<span class="sd">    ...                  size=yout.shape)))</span>
+<span class="sd">    ...         Ucomb=np.dstack((Ucomb,u+(1-nr)</span>
+<span class="sd">    ...                 *np.random.normal(scale=.05*np.std(u),</span>
+<span class="sd">    ...                  size=u.shape)))</span>
 <span class="sd">    ...     else:</span>
-<span class="sd">    ...         Yout=yout+nr*np.random.normal(scale=.050*np.std(yout[0,:]), size=yout.shape) # 5% half the noise on output as on input</span>
-<span class="sd">    ...         Ucomb=u+(1-nr)*np.random.normal(scale=.05*np.std(u), size=u.shape)#(1, len(tin))) #10% noise signal on input</span>
-<span class="sd">    &gt;&gt;&gt; fig, ax = plt.subplots()</span>
-<span class="sd">    &gt;&gt;&gt; ax.plot(tin,Yout[0,:])</span>
-<span class="sd">    [&lt;matplotlib.lines.Line2...</span>
-<span class="sd">    &gt;&gt;&gt; Yout=Yout*np.std(Ucomb)/np.std(Yout)#40</span>
-<span class="sd">    &gt;&gt;&gt; ax.set_title(&#39;time response&#39;)</span>
-<span class="sd">    Text(0.5,1,&#39;time response&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; freq_vec, Pxx = vt.asd(Yout, tin, windowname=&quot;hanning&quot;, ave=bool(False))</span>
-<span class="sd">    &gt;&gt;&gt; fig, ax = plt.subplots()</span>
-<span class="sd">    &gt;&gt;&gt; ax.plot(freq_vec, 20*np.log10(Pxx[0,:]))</span>
-<span class="sd">    [&lt;matplotlib.lines.Line2D object at ...]</span>
-<span class="sd">    &gt;&gt;&gt; ax.set_title(&#39;Raw ASDs&#39;)</span>
-<span class="sd">    Text(0.5,1,&#39;Raw ASDs&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; freq_vec, Pxx = vt.asd(Yout, tin, windowname=&quot;hanning&quot;, ave=bool(True))</span>
-<span class="sd">    &gt;&gt;&gt; fig, ax = plt.subplots()</span>
-<span class="sd">    &gt;&gt;&gt; ax.plot(freq_vec, 20*np.log10(Pxx[0,:]))</span>
-<span class="sd">    [&lt;matplotlib.lines.Line2D object at ...]</span>
-<span class="sd">    &gt;&gt;&gt; ax.set_title(&#39;Averaged ASDs&#39;)</span>
-<span class="sd">    Text(0.5,1,&#39;Averaged ASDs&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; f, Txy1, Txy2, coh, Txyv = vt.frfest(Yout, Ucomb, t,Hv=bool(True))</span>
-<span class="sd">    &gt;&gt;&gt; #fig_amp,=plt.plot(f[0,:],20*np.log10(np.abs(Txy1[0,:])),legend=&#39;$H_1$&#39;,f[0,:],20*np.log10(np.abs(Txy2[0,:])),legend=&#39;$H_2$&#39;,f[0,:],20*np.log10(np.abs(Txyv[0,:])),legend=&#39;$H_v$&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; fig, ax = plt.subplots()</span>
-<span class="sd">    &gt;&gt;&gt; (line1, line2, line3) = ax.plot(f,20*np.log10(np.abs(Txy1[0,:])),f,20*np.log10(np.abs(Txy2[0,:])),f,20*np.log10(np.abs(Txyv[0,:])))</span>
-<span class="sd">    &gt;&gt;&gt; ax.set_title(&#39;FRF of &#39; + str(Yout.shape[2]) + &#39; averages.&#39;)</span>
-<span class="sd">    Text(0.5,1,...</span>
-<span class="sd">    &gt;&gt;&gt; ax.legend((line1,line2,line3),(&#39;$H_1$&#39;,&#39;$H_2$&#39;,&#39;$H_v$&#39;))</span>
-<span class="sd">    &lt;matplotlib.legend.Legend object ...&gt;</span>
-<span class="sd">    &gt;&gt;&gt; fig, ax = plt.subplots()</span>
-<span class="sd">    &gt;&gt;&gt; ax.plot(f,180.0/np.pi*np.unwrap(np.angle(Txy1[0,:])),f,180.0/np.pi*np.unwrap(np.angle(Txy2[0,:])),f,180.0/np.pi*np.unwrap(np.angle(Txyv[0,:])))</span>
-<span class="sd">    [&lt;matplotlib.lines.Line2D object at ...]</span>
-<span class="sd">    &gt;&gt;&gt; ax.set_title(&#39;FRF of &#39; + str(Yout.shape[2]) + &#39; averages.&#39;)</span>
-<span class="sd">    Text(0.5,1,...</span>
-<span class="sd">    &gt;&gt;&gt; fig, ax = plt.subplots()</span>
-<span class="sd">    &gt;&gt;&gt; ax.plot(f,coh[0,:])</span>
-<span class="sd">    [&lt;matplotlib.lines.Line2D object at...</span>
-<span class="sd">    &gt;&gt;&gt; vt.frfplot(f,Txy1,freq_max=3.5)</span>
+<span class="sd">    ...         Yout=yout+nr*np.random.normal(scale=.05*np.std(yout[0,:]),</span>
+<span class="sd">    ...                   size=yout.shape)</span>
+<span class="sd">    ...                   # noise on output is 5% scale of input</span>
+<span class="sd">    ...         Ucomb=u+(1-nr)*np.random.normal(scale=.05*np.std(u),</span>
+<span class="sd">    ...                   size=u.shape)#(1, len(tin)))</span>
+<span class="sd">    ...                   # 5% noise signal on input</span>
+<span class="sd">    &gt;&gt;&gt; f, Hxy1, Hxy2, coh, Hxyv = vt.frfest(Yout, Ucomb, t, Hv=bool(True))</span>
+<span class="sd">    &gt;&gt;&gt; vt.frfplot(f,Hxy2,freq_max=3.5, legend=[&#39;$H_{11}$&#39;, &#39;$H_{12}$&#39;])</span>
+<span class="sd">    ...               # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; vt.frfplot(f, np.vstack((Hxy1[0,:], Hxy2[0,:], Hxyv[0,:])),</span>
+<span class="sd">    ...               legend=[&#39;$H_{11-1}$&#39;,&#39;$H_{11-2}$&#39;,&#39;$H_{11-v}$&#39;])</span>
+<span class="sd">    ...               # doctest: +SKIP</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1042,35 +1021,27 @@
 <span class="sd">    # return lags, c, a, b&#39;&#39;&#39;</span></div>
 
 
-<div class="viewcode-block" id="frfplot"><a class="viewcode-back" href="../reference/signal.html#signals.frfplot">[docs]</a><span class="k">def</span> <span class="nf">frfplot</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">freq_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">freq_max</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">FLAG</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="frfplot"><a class="viewcode-back" href="../reference/signal.html#signals.frfplot">[docs]</a><span class="k">def</span> <span class="nf">frfplot</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">freq_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">freq_max</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="p">[]):</span>
     <span class="sd">&quot;&quot;&quot;Frequency Response function pretty plotting.</span>
 
 <span class="sd">    Plots frequency response functions in a variety of formats</span>
 
-<span class="sd">        - parameters using ``:param &lt;name&gt;: &lt;description&gt;``</span>
-<span class="sd">        - type of parameters ``:type &lt;name&gt;: &lt;description&gt;``</span>
-<span class="sd">        - returns using ``:returns: &lt;description&gt;``</span>
-<span class="sd">        - examples (doctest)</span>
-<span class="sd">        - seealso using ``.. seealso:: text``</span>
-<span class="sd">        - notes using ``.. note:: text``</span>
-<span class="sd">        - warning using ``.. warning:: text``</span>
-<span class="sd">        - todo ``.. todo:: text``</span>
-
-
-<span class="sd">    :param freq: frequency data (Hz) of shape (1,n_points)</span>
-<span class="sd">    :param H: Frequency Response Functions, shape (n,n_points)</span>
-<span class="sd">    :param freq_min: lowest frequency to plot</span>
-<span class="sd">    :param freq_min: highest frequency to plot</span>
-<span class="sd">    :param FLAG: type of plot</span>
-<span class="sd">    :type freq: float array</span>
-<span class="sd">    :type H: float array</span>
-<span class="sd">    :type freq_min: float</span>
-<span class="sd">    :type freq_max: float</span>
-<span class="sd">    :type FLAG: integer</span>
-<span class="sd">    :returns:</span>
-
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    freq : float array</span>
+<span class="sd">        Frequency vector (rad/sec), (1xN)</span>
+<span class="sd">    H : float array</span>
+<span class="sd">        Frequency response functions (nxN)</span>
+<span class="sd">    freq_min : float, optional</span>
+<span class="sd">        Low frequency for plot (default 0)</span>
+<span class="sd">    freq_min : float, optional</span>
+<span class="sd">        High frequency for plot (default max frequency)</span>
+<span class="sd">    legend : string array</span>
+<span class="sd">        Array of string for use in legend.</span>
+<span class="sd">    type : int, optional</span>
+<span class="sd">        Plot type form from:</span>
 <span class="sd">    =======  =============================================================</span>
-<span class="sd">    FLAG     Plot Type</span>
+<span class="sd">    type     Plot Type</span>
 <span class="sd">    -------  -------------------------------------------------------------</span>
 <span class="sd">    1 (def)  Magnitude and Phase versus F</span>
 <span class="sd">    2        Magnitude and Phase versus log10(F)</span>
@@ -1089,6 +1060,9 @@
 <span class="sd">    15       Phase versus log10(w)</span>
 <span class="sd">    =======  =============================================================</span>
 
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
@@ -1097,14 +1071,20 @@
 <span class="sd">    &gt;&gt;&gt; f=np.linspace(0,100,10000).reshape(-1,1);</span>
 <span class="sd">    &gt;&gt;&gt; w=f*2*np.pi;</span>
 <span class="sd">    &gt;&gt;&gt; k=1e5;m=1;c=1;</span>
-<span class="sd">    &gt;&gt;&gt; tf=1./(m*(w*1j)**2+c*1j*w+k)</span>
-<span class="sd">    &gt;&gt;&gt; vt.frfplot(f,tf)</span>
-<span class="sd">    &gt;&gt;&gt; vt.frfplot(f,tf,5)</span>
+<span class="sd">    &gt;&gt;&gt; frf1=1./(m*(w*1j)**2+c*1j*w+k)</span>
+<span class="sd">    &gt;&gt;&gt; frf2=1./(m*(w*1j)**2+c*1j*w+k*3)</span>
+<span class="sd">    &gt;&gt;&gt; vt.frfplot(f,np.hstack((frf1,frf2)), legend = [&#39;FRF 1&#39;,&#39;FRF 2&#39;])  # doctest: +SKIP</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    .. seealso:: `frfest`</span>
 
 <span class="sd">    Copyright J. Slater, Dec 17, 1994</span>
 <span class="sd">    Updated April 27, 1995</span>
 <span class="sd">    Ported to Python, July 1, 2015</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">FLAG</span> <span class="o">=</span> <span class="nb">type</span>  <span class="c1"># Plot type, should libe renamed throughout.</span>
     <span class="n">freq</span> <span class="o">=</span> <span class="n">freq</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">lenF</span> <span class="o">=</span> <span class="n">freq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="ow">is</span> <span class="mi">1</span><span class="p">:</span>
@@ -1151,7 +1131,8 @@
     <span class="n">maxreal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
     <span class="n">minimag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
     <span class="n">maximag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">FLAG</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+
+    <span class="k">if</span> <span class="n">FLAG</span> <span class="ow">is</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">mag</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
         <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Frequency (Hz)&#39;</span><span class="p">)</span>
@@ -1166,11 +1147,16 @@
         <span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
         <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xmax</span><span class="o">=</span><span class="n">freq_max</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="n">freq_min</span><span class="p">)</span>
         <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ymax</span><span class="o">=</span><span class="n">phmax</span><span class="p">,</span> <span class="n">ymin</span><span class="o">=</span><span class="n">phmin</span><span class="p">)</span>
-
         <span class="n">ax2</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">phmin</span><span class="p">,</span> <span class="p">(</span><span class="n">phmax</span> <span class="o">+</span> <span class="mi">45</span><span class="p">),</span> <span class="mi">45</span><span class="p">))</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">legend</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">legend</span><span class="p">)</span>
+
+
     <span class="k">else</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sorry, that option isn&#39;t supported yet&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
 
     <span class="sd">&#39;&#39;&#39;# elif FLAG==2:</span>
 <span class="sd">    # subplot(2,1,1)</span>
