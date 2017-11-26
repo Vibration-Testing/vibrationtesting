@@ -18,6 +18,7 @@ import scipy.linalg as la
 
 def d2c(Ad, Bd, C, D, dt):
     """Returns continuous A, B, C, D from discrete
+
     Converts a set of digital state space system matrices to their
     continuous counterpart.
 
@@ -68,7 +69,7 @@ def d2c(Ad, Bd, C, D, dt):
     sb = Bd.shape[1]
     AAd = np.vstack((np.hstack((Ad,                  Bd)),
                      np.hstack((np.zeros((sb, sa)),  np.eye(sb)))))
-    AA = la.logm(AAd)/dt
+    AA = la.logm(AAd) / dt
     A = AA[0:sa, 0:sa]
     B = AA[0:sa, sa:]
     return A, B, C, D
@@ -76,6 +77,7 @@ def d2c(Ad, Bd, C, D, dt):
 
 def c2d(A, B, C, D, dt):
     """Convert continuous state system to discrete time
+
     Converts a set of continuous state space system matrices to their
     discrete counterpart.
 
@@ -134,8 +136,9 @@ def c2d(A, B, C, D, dt):
 
 
 def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
-    """returns
-    obtains the computed FRF of a state space system between selected input
+    """FRF of state space system
+
+    Obtains the computed FRF of a state space system between selected input
     and output over frequency range of interest.
 
     Parameters
@@ -182,13 +185,14 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
     H = omega * 1j
     i = 0
     for i, w in enumerate(omega):
-        H[i] = (C@la.solve(w * 1j * np.eye(sa) - A, B) + D)[out_index-1,
-                                                            in_index-1]
+        H[i] = (C@la.solve(w * 1j * np.eye(sa) - A, B) + D)[out_index - 1,
+                                                            in_index - 1]
     return omega.reshape(1, -1), H.reshape(1, -1)
 
 
 def so2ss(M, C, K, Bt, Cd, Cv, Ca):
-    """returns A, B, C, D
+    """Convert second order system to state space
+
     Given second order linear matrix equation of the form
     :math:`M\\ddot{x} + C \\dot{x} + K x= \\tilde{B} u`
     and
@@ -266,16 +270,21 @@ def damp(A):
         if (abs(np.imag(pole)) < abs(np.real(pole))):
             print('      {:.3f}                    {:.3f}       \
                   {:.3f}         {:.3f}'.format(float(np.real(pole)),
-                  float(abs(pole)), float(d0), float(f0)))
+                                                float(abs(pole)), float(d0), float(f0)))
 
         else:
             print('      {:.3f}        {:+.3f}      {:.3f}       \
                   {:.3f}         {:.3f}'.format(float(np.real(pole)),
-                  float(np.imag(pole)), float(abs(pole)), float(d0),
-                  float(f0)))
+                                                float(np.imag(pole)), float(
+                                                    abs(pole)), float(d0),
+                                                float(f0)))
 
-def undamped_modes(M,K):
+
+def undamped_modes(M, K):
     '''Undamped modes and natural frequencies from Mass and Stiffness matrix.
+
+    Optimally find mass normalized mode shapes and natural frequencies
+    of a system modelled by :math:`M\ddot{x}+Kx=0`.
 
     Parameters
     ----------
@@ -309,18 +318,12 @@ def undamped_modes(M,K):
     '''
     lam, psi_flipped = la.eigh(M, K)
 
-    omega = np.real(np.sqrt(1/lam[-1::-1]))
+    omega = np.real(np.sqrt(1 / lam[-1::-1]))
 
     Psi = np.fliplr(psi_flipped)
 
-    norms = np.diag(1/np.sqrt(np.diag(Psi.T@M@Psi)))
+    norms = np.diag(1 / np.sqrt(np.diag(Psi.T@M@Psi)))
 
     Psi = Psi @ norms
 
     return omega, Psi
-
-
-
-
-
-
