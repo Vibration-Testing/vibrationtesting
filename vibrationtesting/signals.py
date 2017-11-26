@@ -1000,7 +1000,7 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
     # return lags, c, a, b'''
 
 
-def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1, legend = []):
+def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1, legend=[]):
     """Frequency Response function pretty plotting.
 
     Plots frequency response functions in a variety of formats
