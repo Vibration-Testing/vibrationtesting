@@ -1000,7 +1000,7 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
     # return lags, c, a, b'''
 
 
-def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1, legend=[]):
+def frfplot(freq, H, freq_min=0, freq_max=0, type=1, legend=[]):
     """Frequency Response function pretty plotting.
 
     Plots frequency response functions in a variety of formats
@@ -1110,7 +1110,8 @@ def frfplot(freq, H, freq_min=0, freq_max=0, FLAG=1, legend=[]):
     maxreal = np.amax(np.real(H))
     minimag = np.amin(np.imag(H))
     maximag = np.amax(np.imag(H))
-    if FLAG == 1:
+
+    if FLAG is 1:
         fig, (ax1, ax2) = plt.subplots(2, 1)
         ax1.plot(freq.T, mag.T)
         ax1.set_xlabel('Frequency (Hz)')
