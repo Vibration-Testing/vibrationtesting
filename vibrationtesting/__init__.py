@@ -38,7 +38,7 @@ if 'pytest' in sys.argv[0]:
     print('Setting backend to agg to run tests')
     mpl.use('agg')
 
-from .signal import *
+from .signals import *
 from .system import *
 
 #  Signal processing (:mod:`vibrationtesting.signal`)

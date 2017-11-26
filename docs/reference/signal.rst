@@ -1,9 +1,9 @@
-Signal Processing (:mod:`vibrationtesting.signal`)
-------------------------------------------------------------------
+Signal Processing (:mod:`vibrationtesting.signals`)
+---------------------------------------------------
 
 .. sectionauthor:: Joseph C. Slater
 
-.. currentmodule:: vibrationtesting.signal
+.. currentmodule:: vibrationtesting.signals
 
 .. The :mod:`vibration_toolbox.mdof`
 
@@ -11,13 +11,13 @@ Signal Processing (:mod:`vibrationtesting.signal`)
 
 .. .. literalinclude:: examples/4-1
 
-:mod:`signal` -- Signal Processing for Vibration Testing
-________________________________________________________
+.. :mod:`signals` -- Signal Processing for Vibration Testing
+.. _________________________________________________________
 
-.. .. module:: mdof
+.. .. module:: signal
    :synopsis: Multiple Degree of Freedom Systems
 
-.. .. py:module:: signal
+.. .. py:module:: signals
 
-.. automodule:: signal
+.. automodule:: signals
    :members:
