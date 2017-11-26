@@ -1,32 +1,11 @@
 """
-==================================================
-==================================================
 
-
-Window functions
-================
-
-.. autosummary::
-   :toctree: generated/
-
-   barthann          -- Bartlett-Hann window
-   bartlett          -- Bartlett window
-   blackman          -- Blackman window
-   boxcar            -- Boxcar window
-   chebwin           -- Dolph-Chebyshev window
-   flattop           -- Flat top window
-   gaussian          -- Gaussian window
-   general_gaussian  -- Generalized Gaussian window
-   hamming           -- Hamming window
-   hann              -- Hann window
-   parzen            -- Parzen window
-   triang            -- Triangular window
 
 """
 from __future__ import division, print_function, absolute_import
 
 __title__ = 'vibrationtesting'
-__version__ = '0.1b04'
+__version__ = '0.1'
 __author__ = u'Joseph C. Slater'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2002-2017 Joseph C. Slater'
