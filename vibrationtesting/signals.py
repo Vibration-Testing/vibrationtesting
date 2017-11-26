@@ -999,10 +999,6 @@ def frfplot(freq, H, freq_min=0, freq_max=0, type=1, legend=[]):
     type : int, optional
         Plot type. See notes.
 
-    Returns
-    -------
-
-
     Examples
     --------
     >>> import matplotlib.pyplot as plt

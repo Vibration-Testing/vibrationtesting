@@ -1,4 +1,4 @@
-Signal Processing (:mod:`vibrationtesting.signals`)
+Signal Processing (:mod:`signals`)
 ---------------------------------------------------
 
 .. sectionauthor:: Joseph C. Slater
