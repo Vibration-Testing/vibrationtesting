@@ -327,3 +327,102 @@ def undamped_modes(M, K):
     Psi = Psi @ norms
 
     return omega, Psi
+
+
+def serep(M, K, master):
+    '''System Equivalent Reduction reduced model
+
+    Reduce size of second order system of equations by SEREP processs while
+    returning expansion matrix
+
+    Equation of the form:
+    :math:`M \ddot{x} + K x = 0`
+    is reduced to the form
+    :math:`M_r \ddot{x}_m + Kr x_m = 0`
+    where :math:`x = T x_m`, :math:`M_r= T^T M T`, :math:`K_r= T^T K T`
+
+    Parameters
+    ----------
+    M, K : float arrays
+        Mass and Stiffness matrices
+    master : float array or list
+        List of retained degrees of freedom
+
+    Returns
+    -------
+    Mred, Kred, T : float arrays
+        Reduced Mass matric, reduced stiffness matrix, Transformation matrix
+    truncated_dofs : int list
+        List of truncated degrees of freedom
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import vibrationtesting as vt
+    >>> M = np.array([[4, 0, 0],
+    ...               [0, 4, 0],
+    ...               [0, 0, 4]])
+    >>> K = np.array([[8, -4, 0],
+    ...               [-4, 8, -4],
+    ...               [0, -4, 4]])
+    >>> retained = np.array([[1, 2]])
+    >>> Mred, Kred, T, truncated_dofs = vt.serep(M, K, retained)
+
+    Notes
+    -----
+    Reduced coordinate system forces can be obtained by
+    `Fr = T.T @ F`
+
+    Reduced damping matrix can be obtained using `Cr = T.T*@ C @ T`.
+
+    If mode shapes are obtained for the reduced system, full system mode shapes
+    are `phi = T @ phi_r`
+    '''
+
+    nm = int(max(master.shape))  # length(master);
+    master = master.reshape(-1)-1  # retained dofs
+
+    ndof = int(M.shape[0])  # length(M);
+    # From $$$$$$ to $$$$$$ is the actual eigensolution.
+#    OPTS.issym=1;
+#    OPTS.isreal=1;
+#    %To increase accuracy: (Agnes)
+#    OPTS.tol=eps/10;
+#    [minvals,minvallocs]=sort(diag(K)./diag(M));
+#
+#    shift=minvals(min(7,length(minvals)));
+#    [phi,d]=eigs((K+K')/2+shift*(M+M')/2,(M+M')/2,min([ size(K,1) ...
+#		    max([floor(sqrt(size(K,1))) 100])]),0,OPTS);
+#    d=d-shift;
+    # $$$$$$
+
+    omega, Psi = undamped_modes(M, K)
+#    nm
+#    [S,index]=sort(diag(d));
+#    %index
+#    %size(phi)
+    # phi=phi(:,index); resorting mode shapes
+
+    # phitr=phi(nm+1:ndof,1:nm);
+    Psi_tr = Psi[nm:, :nm]  # Truncated modes
+    # phirr=phi(1:nm,1:nm);
+    Psi_rr = Psi[:nm, :nm]  # retained modes
+
+    # slave=(1:ndof)';
+    '''
+    slave(master)=zeros(nm,1);
+    slave=sort(slave);
+    slave=slave(nm+1:ndof);
+    '''
+
+    truncated_dofs = list(set(np.arange(ndof))-set(master))
+
+    T = np.zeros((ndof, nm))
+    T[master, :nm] = np.eye(nm)
+    T[truncated_dofs, :nm] = la.solve(Psi_rr.T, Psi_tr.T).T  # phitr/phirr
+    # Mred=T'*M*T;
+    Mred = T.T @ M @T
+    # Kred=T'*K*T;
+    Kred = T.T @ K @T
+
+    return Mred, Kred, T, np.array(truncated_dofs)+1
