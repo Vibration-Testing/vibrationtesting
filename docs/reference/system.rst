@@ -17,7 +17,5 @@ System Manipulation (:mod:`system`)
 .. .. module:: system
    :synopsis: Multiple Degree of Freedom Systems
 
-.. .. py:module:: system
-
 .. automodule:: system
    :members:
