@@ -163,7 +163,7 @@ html_theme_options = {
     'description': 'Vibration Testing Analysis',
     'github_button': 'True',
     'github_user': 'vibrationtesting',
-#    'analytics_id': 'UA-62100376-4',
+    'analytics_id': 'UA-62100376-6',
 }
 
 
