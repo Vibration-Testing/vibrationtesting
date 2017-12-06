@@ -212,6 +212,7 @@ def mdof_cf(f, TF, Fmin=None, Fmax=None):
     --------
     >>> # First we need to load the sampled data which is in a .mat file
     >>> import vibration_toolbox as vtb
+    ...
     >>> import scipy.io as sio
     >>> data = sio.loadmat(vtb.__path__[0] + '/data/case2.mat')
     >>> #print(data)
