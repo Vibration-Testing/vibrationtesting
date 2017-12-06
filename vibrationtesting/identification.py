@@ -8,7 +8,7 @@ __docformat__ = 'reStructuredText'
 
 import numpy as np
 import scipy.linalg as la
-import vibration_toolbox as vtb
+import matplotlib.pyplot as plt
 
 
 def sdof_cf(f, TF, Fmin=None, Fmax=None):
@@ -283,8 +283,6 @@ def mdof_cf(f, TF, Fmin=None, Fmax=None):
     rs = np.roots(np.array([1,
                             b[1],
                             b[0]]))
-
-    # irs = np.argsort(np.abs(np.imag(rs))) # necessary?
 
     omega = np.abs(rs[1])
     z = -1 * np.real(rs[1]) / np.abs(rs[1])

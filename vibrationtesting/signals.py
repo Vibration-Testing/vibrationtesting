@@ -6,7 +6,6 @@ __license__ = "Joseph C. Slater"
 
 __docformat__ = 'reStructuredText'
 
-
 import math
 import warnings
 
@@ -416,11 +415,11 @@ def flatwin(x):
 
         n = x
         f = np.reshape(
-                (1.0 - 1.933 * np.cos(2 * np.pi * (np.arange(n)) / (n - 1))
-                 + 1.286 * np.cos(4 * np.pi * (np.arange(n)) / (n - 1))
+            (1.0 - 1.933 * np.cos(2 * np.pi * (np.arange(n)) / (n - 1))
+             + 1.286 * np.cos(4 * np.pi * (np.arange(n)) / (n - 1))
                  - 0.338 * np.cos(6 * np.pi * (np.arange(n)) / (n - 1))
-                 + 0.032 * np.cos(8 * np.pi * (np.arange(n)) / (n - 1))),
-                (1, -1))
+             + 0.032 * np.cos(8 * np.pi * (np.arange(n)) / (n - 1))),
+            (1, -1))
         f = f / la.norm(f) * np.sqrt(n)
 
     return f
@@ -830,7 +829,6 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
 
     return freq, Txf1, Txf2, coh, Txfv
 
-
     '''# def acorr(self, x, **kwargs):
     # """
     # Plot the autocorrelation of `x`.
@@ -1123,7 +1121,6 @@ def frfplot(freq, H, freq_min=0, freq_max=0, type=1, legend=[]):
 
         if len(legend) > 0:
             plt.legend(legend)
-
 
     else:
         print("Sorry, that option isn't supported yet")
