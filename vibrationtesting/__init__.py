@@ -12,10 +12,12 @@ __copyright__ = 'Copyright 2002-2017 Joseph C. Slater'
 
 import sys
 import matplotlib as mpl
+import numpy as np
 
 if 'pytest' in sys.argv[0]:
-    print('Setting backend to agg to run tests')
-    mpl.use('agg')
+    # print('Setting backend to agg to run tests')
+    _ = mpl.use('agg');
+    np.set_printoptions(precision=4, suppress=True)
 
 from .signals import *
 from .system import *

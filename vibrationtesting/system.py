@@ -14,7 +14,7 @@ import numpy as np
 # import control as ctrl
 import scipy.signal as sig
 import scipy.linalg as la
-
+#np.set_printoptions(precision=4, suppress=True)
 
 def d2c(Ad, Bd, C, D, dt):
     """Returns continuous A, B, C, D from discrete
@@ -96,6 +96,7 @@ def c2d(A, B, C, D, dt):
     Examples
     --------
     >>> import numpy as np
+    >>> np.set_printoptions(precision=4, suppress=True)
     >>> import vibrationtesting as vt
     >>> A1 = np.array([[ 0.,   0. ,  1.    ,  0.    ]])
     >>> A2 = np.array([[ 0.,   0. ,  0.    ,  1.    ]])
@@ -159,7 +160,6 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
 
     Examples
     --------
-    >>> import numpy as np
     >>> import vibrationtesting as vt
     >>> A1 = np.array([[ 0.,   0. ,  1.    ,  0.    ]])
     >>> A2 = np.array([[ 0.,   0. ,  0.    ,  1.    ]])
@@ -214,7 +214,6 @@ def so2ss(M, C, K, Bt, Cd, Cv, Ca):
 
     Examples
     --------
-    >>> import numpy as np
     >>> import vibrationtesting as vt
     >>> M = np.array([[2, 1],
     ...               [1, 3]])
@@ -301,7 +300,6 @@ def undamped_modes(M, K):
 
     Examples
     --------
-    >>> import numpy as np
     >>> import vibrationtesting as vt
     >>> M = np.array([[4, 0, 0],
     ...               [0, 4, 0],
@@ -358,7 +356,6 @@ def serep(M, K, master):
 
     Examples
     --------
-    >>> import numpy as np
     >>> import vibrationtesting as vt
     >>> M = np.array([[4, 0, 0],
     ...               [0, 4, 0],

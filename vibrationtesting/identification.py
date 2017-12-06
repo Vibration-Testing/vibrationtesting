@@ -207,7 +207,6 @@ def mdof_cf(f, TF, Fmin=None, Fmax=None):
 
     Author: Original Joseph C. Slater. Python version, Gabriel Loranger
 
-
     Examples
     --------
     >>> # First we need to load the sampled data which is in a .mat file

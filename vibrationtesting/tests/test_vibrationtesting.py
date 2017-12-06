@@ -1,4 +1,5 @@
 import numpy as np
+np.set_printoptions(precision=4, suppress=True)
 import vibrationtesting as vt
 import numpy.testing as nt
 
@@ -26,3 +27,5 @@ def test_serep():
                         [-12.98791841,  10.21983253]])
     nt.assert_array_almost_equal(Mred, Mr_soln)
     nt.assert_array_almost_equal(Kred, Kr_soln)
+
+#test_serep()
