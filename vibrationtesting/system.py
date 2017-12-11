@@ -196,7 +196,7 @@ def so2ss(M, C, K, Bt, Cd, Cv, Ca):
     Given second order linear matrix equation of the form
     :math:`M\\ddot{x} + C \\dot{x} + K x= \\tilde{B} u`
     and
-    :math:`y = C_d x + + C_v \\dot{x} + C_a\\ddot{x}`
+    :math:`y = C_d x + C_v \\dot{x} + C_a\\ddot{x}`
     returns the state space form equations
     :math:`\\dot{z} = A z + B u`,
     :math:`y = C z + D u`
