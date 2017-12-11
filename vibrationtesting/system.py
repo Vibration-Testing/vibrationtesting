@@ -243,7 +243,7 @@ def so2ss(M, C, K, Bt, Cd, Cv, Ca):
 
     A = np.vstack((np.hstack((np.zeros_like(M), np.eye(M.shape[0]))),
                    np.hstack((-la.solve(M, K), -la.solve(M, C)))))
-    B = np.vstack((np.zeros_like(Bt), Bt))
+    B = np.vstack((np.zeros_like(Bt), la.solve(M,Bt)))
     C_ss = np.hstack((Cd - Ca@la.solve(M, K), Cv - Ca@la.solve(M, C)))
     D = Ca@la.solve(M, Bt)
 
