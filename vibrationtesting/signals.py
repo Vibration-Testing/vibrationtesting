@@ -6,27 +6,27 @@ __license__ = "Joseph C. Slater"
 
 __docformat__ = 'reStructuredText'
 
-
 import math
 import warnings
 
 import numpy as np
 import control as ctrl
-from numpy import ma
+# from numpy import ma
 import scipy as sp
-import scipy.signal as sig
+# import scipy.signal as sig
 import scipy.fftpack as fftpack
 import scipy.linalg as la
 import matplotlib
 import matplotlib.pyplot as plt
-rcParams = matplotlib.rcParams
+# rcParams = matplotlib.rcParams
 
 
-"""Notes:
+"""
+Notes:
 ------
 Sept. 3, 2016
 Development of windows in scipy.signal has been rapid and
-determining what I should build into this toolbox, or simply leverage
+determining what I should build into this module, or simply leverage
 from scipy.signal has been a moving target.
 It's now apparent that creating or returning a window is pointless. Further,
 Applying should be a relatively simple code obviating much of any need for the
@@ -50,34 +50,34 @@ third dimension (2) indexes each data instance (experiment).
 http://python-control.readthedocs.io/en/latest/conventions.html#time-series-data
 
 Problem: This hasn't been fully implemented.
-I don't know which standard the package is following now!
-In order to be consistent with scipy and matlab, increasing time or frequency indices
-increases in the 0th dimension (0,1,2). The first dimension is the index.
-The second dimension is the realization number (for multiple runs/simulations/datasets).
+I don't know which standard the package is following now- a bit of both!
 """
 
 
 def window(x, windowname='hanning', normalize=False):
-    """returns w
-    Create a  window of length :math:`x`, or a hanning window sized to match :math:`x`
-    such that x*w is the windowed result.
+    """Create leakage window
+
+    Create a  window of length :math:`x`, or a window sized to match
+    :math:`x` that :math:`x\\times w` is the windowed result.
 
     Parameters
     ----------
-
-    x:                 1) Integer. Number of points in desired hanning windows.
-                       2) Array to which window needs to be applied.
-    windowname:        One of: hanning, hamming, blackman, flatwin, boxwin
-    normalize (False): Adjust power level (for use in ASD) to 1
+    x: integer, float array
+       | If integer- number of points in desired hanning windows.
+       | If array- array provides size of window returned.
+    windowname: string
+       One of: hanning, hamming, blackman, flatwin, boxwin
+    normalize: bool, optional(False)
+       Adjust power level (for use in ASD) to 1
 
     Returns
     -------
+    w: float array
+       | window array of size x
+       | window array. Windowed array is then :math:`x\\times w`
 
-    w: 1) hanning window array of size x
-       2) windowing array. Windowed array is then x*w
-
-    :Example:
-
+    Examples
+    --------
     >>> import numpy as np
     >>> import vibrationtesting as vt
     >>> import matplotlib.pyplot as plt
@@ -92,56 +92,55 @@ def window(x, windowname='hanning', normalize=False):
     >>> xcos = A*np.cos(2*np.pi*freq*time) # assembling individual records. vstack assembles channels
     >>> x=np.dstack((xsin,xcos)) # assembling individual records. vstack
     >>> xw=vt.hanning(x)*x
-    >>> plt.subplot(2, 1, 1)
-    <matplotlib.axes._subplots.AxesSubplot object at ...>
-    >>> plt.plot(time.T,x.T)
+    >>> fig, (ax1, ax2) = plt.subplots(2,1)
+    >>> ax1.plot(time.T,x[:,:,1].T)
     [<matplotlib.lines.Line2D object at ...>]
-    >>> plt.ylim([-20, 20])
+    >>> ax1.set_ylim([-20, 20])
     (-20, 20)
-    >>> plt.title('Unwindowed data, 2 records.')
-    <matplotlib.text.Text object at ...>
-    >>> plt.ylabel('$x(t)$')
-    <matplotlib.text.Text object at ...>
-    >>> plt.subplot(2, 1, 2)
-    <matplotlib.axes._subplots.AxesSubplot object at ...>
-    >>> plt.title('Original (raw) data.')
-    <matplotlib.text.Text object at ...>
-    >>> plt.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,'--',time[0,:],-vt.hanning(x)[0,:]*A,'--')
+    >>> ax1.set_title('Original (raw) data.')
+    Text(0.5,1,'Original (raw) data.')
+    >>> ax1.set_ylabel('$x(t)$')
+    Text(0,0.5,'$x(t)$')
+    >>> ax2.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,'--',time[0,:],-vt.hanning(x)[0,:]*A,'--')
     [<matplotlib.lines.Line2D object at ...>]
-    >>> plt.ylabel('Hanning windowed $x(t)$')
-    <matplotlib.text.Text object at ...>
-    >>> plt.xlabel('time')
-    <matplotlib.text.Text object at ...>
-    >>> plt.title('Effect of window. Note the scaling to conserve ASD amplitude')
-    <matplotlib.text.Text object at ...>
-    >>> plt.show()
-
+    >>> ax2.set_ylabel('Hanning windowed $x(t)$')
+    Text(0,0.5,'Hanning windowed $x(t)$')
+    >>> ax2.set_xlabel('time')
+    Text(0.5,0,'time')
+    >>> ax2.set_title('Effect of window. Note the scaling to conserve ASD amplitude')
+    Text(0.5,1,'Effect of window. Note the scaling to conserve ASD amplitude')
+    >>> fig.tight_layout()
     """
 
     if isinstance(x, (list, tuple, np.ndarray)):
-        # Create Hanning windowing array of dimension n by N by nr
-        # where N is number of data points and n is the number of number of inputs or outputs.
-        # and nr is the number of records.
+        '''Create Hanning windowing array of dimension n by N by nr
+        where N is number of data points and n is the number of number of
+        inputs or outputs.
+        and nr is the number of records.'''
 
         swap = 0
         if len(x.shape) == 1:
             # We have either a scalar or 1D array
             if x.shape[0] == 1:
-                print(
-                    "x is a scalar... and shouldn\'t have entered this part of the loop.")
+                print("x is a scalar... and shouldn\'t have entered this \
+                      part of the loop.")
             else:
                 N = len(x)
 
-            f = self.window(N, windowname=windowname)
+            f = window(N, windowname=windowname)
 
         elif len(x.shape) == 3:
 
             if x.shape[0] > x.shape[1]:
                 x = sp.swapaxes(x, 0, 1)
                 swap = 1
-                print(
-                    'Swapping axes temporarily to be compliant with expectations. I\'ll fix them in your result')
+                print('You shouldn\'t do that.')
+                print('The 1 dimension is the time (or frequency) \
+                       incrementing dimension.')
+                print('Swapping axes temporarily to be compliant with \
+                      expectations. I\'ll fix them in your result')
 
+            N = x.shape[1]
             f = window(N, windowname=windowname)
             f, _, _ = np.meshgrid(f, np.arange(
                 x.shape[0]), np.arange(x.shape[2]))
@@ -155,8 +154,12 @@ def window(x, windowname='hanning', normalize=False):
             if x.shape[0] > x.shape[1]:
                 x = sp.swapaxes(x, 0, 1)
                 swap = 1
-                print(
-                    'Swapping axes temporarily to be compliant with expectations. I\'ll fix them in your result')
+                print('You shouldn\'t do that.')
+                print('The 1 dimension is the time (or frequency) ' +
+                      'incrementing dimension.')
+                print('Swapping axes temporarily to be compliant with ' +
+                      'expectations.')
+                print('I\'ll reluctantly return a transposed result.')
 
             f = window(x.shape[1], windowname=windowname)
             f, _ = np.meshgrid(f, np.arange(x.shape[0]))
@@ -171,15 +174,18 @@ def window(x, windowname='hanning', normalize=False):
         if windowname is 'hanning':
             f = np.sin(np.pi * np.arange(N) / (N - 1))**2 * np.sqrt(8 / 3)
         elif windowname is 'hamming':
-            f = (0.54 - 0.46 * np.cos(2 * np.pi *
-                                      (np.arange(N)) / (N - 1))) * np.sqrt(5000 / 1987)
+            f = (0.54 - 0.46 * np.cos(2 * np.pi * (np.arange(N)) / (N - 1)))\
+                * np.sqrt(5000 / 1987)
         elif windowname is 'blackman':
             print('blackman')
-            f = (0.42 - 0.5 * np.cos(2 * np.pi * (np.arange(N) + .5) / (N)) + .08 *
-                 np.cos(4 * np.pi * (np.arange(N) + .5) / (N))) * np.sqrt(5000 / 1523)
+            f = (0.42 - 0.5 * np.cos(2 * np.pi * (np.arange(N) + .5) / (N))
+                 + .08 * np.cos(4 * np.pi * (np.arange(N) + .5) / (N)))\
+                * np.sqrt(5000 / 1523)
         elif windowname is 'flatwin':
-            f = 1.0 - 1.933 * np.cos(2 * np.pi * (np.arange(N)) / (N - 1)) + 1.286 * np.cos(4 * np.pi * (np.arange(N)) / (
-                N - 1)) - 0.338 * np.cos(6 * np.pi * (np.arange(N)) / (N - 1)) + 0.032 * np.cos(8 * np.pi * (np.arange(N)) / (N - 1))
+            f = 1.0 - 1.933 * np.cos(2 * np.pi * (np.arange(N)) / (N - 1))\
+                + 1.286 * np.cos(4 * np.pi * (np.arange(N)) / (N - 1))\
+                - 0.338 * np.cos(6 * np.pi * (np.arange(N)) / (N - 1))\
+                + 0.032 * np.cos(8 * np.pi * (np.arange(N)) / (N - 1))
         elif windowname is 'boxwin':
             f = np.ones((1, N))
         else:
@@ -187,28 +193,34 @@ def window(x, windowname='hanning', normalize=False):
             print("I don't recognize that window name. Sorry")
 
         if normalize is True:
-            f = f / np.linalg.norm(f) * np.sqrt(N)
+            f = f / la.norm(f) * np.sqrt(N)
     return f
 
 
 def hanning(x, normalize=False):
-    """returns w
-    Create a hanning window of length :math:`x`, or a hanning window sized to match :math:`x`
-    such that x*w is the windowed result.
+    """Returns hanning window
+
+    Create a hanning window of length :math:`x`, or a hanning window sized to
+    match :math:`x` that :math:`x\\times w` is the windowed result.
 
     Parameters
-
-    x:                 1) Integer. Number of points in desired hanning windows.
-                       2) Array to which window needs to be applied.
-    normalize (False): Adjust power level (for use in ASD) to 1
+    ----------
+    x: integer, float array
+       | If integer- number of points in desired hanning windows.
+       | If array- array provides size of window returned.
+    windowname: string
+       One of: hanning, hamming, blackman, flatwin, boxwin
+    normalize: bool, optional(False)
+       Adjust power level (for use in ASD) to 1
 
     Returns
+    -------
+    w: float array
+       | window array of size x
+       | window array. Windowed array is then :math:`x\\times w`
 
-    w: 1) hanning window array of size x
-       2) windowing array. Windowed array is then x*w
-
-    :Example:
-
+    Examples
+    --------
     >>> import numpy as np
     >>> import vibrationtesting as vt
     >>> import matplotlib.pyplot as plt
@@ -223,43 +235,37 @@ def hanning(x, normalize=False):
     >>> xcos = A*np.cos(2*np.pi*freq*time)
     >>> x=np.dstack((xsin,xcos)) # assembling individual records. vstack
     >>> xw=vt.hanning(x)*x
-    >>> plt.subplot(2, 1, 1)
-    <matplotlib.axes._subplots.AxesSubplot object at ...>
-    >>> plt.plot(time.T,x.T)
+    >>> fig, (ax1, ax2) = plt.subplots(2, 1)
+    >>> ax1.plot(time.T,x[:,:,1].T)
     [<matplotlib.lines.Line2D object at ...>]
-    >>> plt.ylim([-20, 20])
+    >>> ax1.set_ylim([-20, 20])
     (-20, 20)
-    >>> plt.title('Unwindowed data, 2 records.')
-    <matplotlib.text.Text object at ...>
-    >>> plt.ylabel('$x(t)$')
-    <matplotlib.text.Text object at ...>
-    >>> plt.subplot(2, 1, 2)
-    <matplotlib.axes._subplots.AxesSubplot object at ...>
-    >>> plt.title('Original (raw) data.')
-    <matplotlib.text.Text object at ...>
-    >>> plt.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,'--',time[0,:],-vt.hanning(x)[0,:]*A,'--')
+    >>> ax1.set_title('Unwindowed data, 2 records.')
+    Text(0.5,1,'Unwindowed data, 2 records.')
+    >>> ax1.set_ylabel('$x(t)$')
+    Text(0,0.5,'$x(t)$')
+    >>> ax2.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,'--',time[0,:],-vt.hanning(x)[0,:]*A,'--')
     [<matplotlib.lines.Line2D object at ...>]
-    >>> plt.ylabel('Hanning windowed $x(t)$')
-    <matplotlib.text.Text object at ...>
-    >>> plt.xlabel('time')
-    <matplotlib.text.Text object at ...>
-    >>> plt.title('Effect of window. Note the scaling to conserve ASD amplitude')
-    <matplotlib.text.Text object at ...>
-    >>> plt.show()
-
+    >>> ax2.set_ylabel('Hanning windowed $x(t)$')
+    Text(0,0.5,'Hanning windowed $x(t)$')
+    >>> ax2.set_xlabel('time')
+    Text(0.5,0,'time')
+    >>> ax2.set_title('Effect of window. Note the scaling to conserve ASD amplitude')
+    Text(0.5,1,'Effect of window. Note the scaling to conserve ASD amplitude')
+    >>> fig.tight_layout()
     """
 
     if isinstance(x, (list, tuple, np.ndarray)):
-        # Create Hanning windowing array of dimension n by N by nr
-        # where N is number of data points and n is the number of number of inputs or outputs.
-        # and nr is the number of records.
-        #print(len(x.shape))
+        '''Create Hanning windowing array of dimension n by N by nr
+        where N is number of data points and n is the number of number of
+        inputs or outputs and nr is the number of records.'''
+
         swap = 0
         if len(x.shape) == 1:
             # We have either a scalar or 1D array
             if x.shape[0] == 1:
-                print(
-                    " x is a scalar... and shouldn\'t have entered this part of the loop.")
+                print("x is a scalar... and shouldn\'t have \
+                       entered this part of the loop.")
             else:
                 N = len(x)
             f = hanning(N)
@@ -271,8 +277,8 @@ def hanning(x, normalize=False):
             if x.shape[0] > x.shape[1]:
                 x = sp.swapaxes(x, 0, 1)
                 swap = 1
-                print(
-                    'Swapping axes temporarily to be compliant with expectations. I\'ll fix them in your result')
+                print('Swapping axes temporarily to be compliant with \
+                      expectations. I\'ll fix them in your result')
 
             f = hanning(x.shape[1])
             f, _, _ = np.meshgrid(f, np.arange(
@@ -283,19 +289,17 @@ def hanning(x, normalize=False):
         elif len(x.shape) == 2:
             # f,_=np.meshgrid(f[0,:],np.arange(x.shape[0]))
             # print('b')
-            print('length = 2')
-            print(x.shape)
+            # print('length = 2')
+            # print(x.shape)
             if x.shape[0] > x.shape[1]:
                 x = sp.swapaxes(x, 0, 1)
                 swap = 1
-                print(
-                    'Swapping axes temporarily to be compliant with expectations. I\'ll fix them in your result')
-
+                print('Swapping axes temporarily to be compliant with \
+                      expectations. I\'ll fix them in your result')
             f = hanning(x.shape[1])
             f, _ = np.meshgrid(f, np.arange(x.shape[0]))
             if swap == 1:
                 f = sp.swapaxes(f, 0, 1)
-
     else:
         # print(x)
         # Create hanning window of length x
@@ -303,15 +307,13 @@ def hanning(x, normalize=False):
         # print(N)
         f = np.sin(np.pi * np.arange(N) / (N - 1))**2 * np.sqrt(8 / 3)
         if normalize is True:
-            f = f / np.linalg.norm(f) * np.sqrt(N)
+            f = f / la.norm(f) * np.sqrt(N)
     return f
 
 
 def blackwin(x):
-    """
-    w=blackwin(n)
-    Return the n point Blackman window
-    x_windows=blackwin(x)
+    """Return the n point Blackman window
+
     Returns x as the Blackman windowing array x_window
     The windowed signal is then x*x_window
     """
@@ -326,23 +328,21 @@ def blackwin(x):
         else:
             f, _ = np.meshgrid(f[0, :], np.arange(x.shape[0]))
     else:
-
         n = x
-        f = np.reshape((0.42 - 0.5 * np.cos(2 * np.pi * (np.arange(n) + .5)) / (n) + .08 *
-                        np.cos(4 * np.pi * (np.arange(n) + .5)) / (n)) * np.sqrt(5000 / 1523), (1, -1))
-        f = f / np.linalg.norm(f) * np.sqrt(n)
-
+        f = np.reshape((0.42 - 0.5 * np.cos(2 * np.pi * (np.arange(n) + .5)) /
+                        (n) + .08 * np.cos(4 * np.pi * (np.arange(n) + .5)) /
+                        (n)) * np.sqrt(5000 / 1523), (1, -1))
+        f = f / la.norm(f) * np.sqrt(n)
     return f
 
 
 def expwin(x, ts=.75):
-    """
-    w=expwin(n)
-    Return the n point exponential window
-    x_windows=expwin(x)
+    """Return the n point exponential window
+
     Returns x as the expwin windowing array x_windowed
     The windowed signal is then x*x_window
-    The optional second argument set the 5% "settling time" of the window. Default is ts=0.75
+    The optional second argument set the 5% "settling time" of the window.
+    Default is ts=0.75
     """
     print('expwin is untested')
     tc = -ts / np.log(.05)
@@ -358,19 +358,17 @@ def expwin(x, ts=.75):
     else:
         n = x
         v = (n - 1) / n * np.arange(n) + (n - 1) / n / 2
-        f = exp(-v / tc / (n - 1))
-        f = f / np.linalg.norm(f) * np.sqrt(n)
+        f = np.exp(-v / tc / (n - 1))
+        f = f / la.norm(f) * np.sqrt(n)
         f = np.reshape(f, (1, -1))
-        f = f / np.linalg.norm(f) * np.sqrt(n)
+        f = f / la.norm(f) * np.sqrt(n)
 
     return f
 
 
 def hammwin(x):
-    """
-    w=hammwin(n)
-    Return the n point hamming window
-    x_windows=hamming(x)
+    """Return the n point hamming window
+
     Returns x as the hamming windowingarray x_windowed
     The windowed signal is then x*x_window
     """
@@ -387,17 +385,17 @@ def hammwin(x):
     else:
 
         n = x
-        f = np.reshape((0.54 - 0.46 * np.cos(2 * np.pi *
-                                             (np.arange(n)) / (n - 1))) * np.sqrt(5000 / 1987), (1, -1))
-        f = f / np.linalg.norm(f) * np.sqrt(n)
+        f = np.reshape((0.54 - 0.46 * np.cos(2 * np.pi * (np.arange(n)) /
+                                             (n - 1))) * np.sqrt(5000 / 1987),
+                       (1, -1))
+        f = f / la.norm(f) * np.sqrt(n)
 
     return f
 
 
 def flatwin(x):
-    """
-    w=flatwin(n)
-    Return the n point flat top window
+    """Return the n point flat top window
+
     x_windows=flatwin(x)
     Returns x as the flat top windowing array x_windowed
     The windowed signal is then x*x_window
@@ -416,18 +414,20 @@ def flatwin(x):
     else:
 
         n = x
-        f = np.reshape((1.0 - 1.933 * np.cos(2 * np.pi * (np.arange(n)) / (n - 1)) + 1.286 * np.cos(4 * np.pi * (np.arange(n)) / (n - 1)) -
-                        0.338 * np.cos(6 * np.pi * (np.arange(n)) / (n - 1)) + 0.032 * np.cos(8 * np.pi * (np.arange(n)) / (n - 1))), (1, -1))
-        f = f / np.linalg.norm(f) * np.sqrt(n)
+        f = np.reshape(
+            (1.0 - 1.933 * np.cos(2 * np.pi * (np.arange(n)) / (n - 1))
+             + 1.286 * np.cos(4 * np.pi * (np.arange(n)) / (n - 1))
+                 - 0.338 * np.cos(6 * np.pi * (np.arange(n)) / (n - 1))
+             + 0.032 * np.cos(8 * np.pi * (np.arange(n)) / (n - 1))),
+            (1, -1))
+        f = f / la.norm(f) * np.sqrt(n)
 
     return f
 
 
 def boxwin(x):
-    """
-    w=boxwin(n)
-    Return the n point box window (uniform)
-    x_windows=boxwin(x)
+    """Return the n point box window (uniform)
+
     Returns x as the boxwin windowing array x_windowed
     The windowed signal is then x*x_window
     """
@@ -446,27 +446,44 @@ def boxwin(x):
         n = x
         # f=np.reshape((1.0-1.933*np.cos(2*np.pi*(np.arange(n))/(n-1))+1.286*np.cos(4*np.pi*(np.arange(n))/(n-1))-0.338*np.cos(6*np.pi*(np.arange(n))/(n-1))+0.032*np.cos(8*np.pi*(np.arange(n))/(n-1))),(1,-1))
         f = np.reshape(np.ones((1, n)), (1, -1))
-        f = f / np.linalg.norm(f) * np.sqrt(n)
+        f = f / la.norm(f) * np.sqrt(n)
 
     return f
 
 
-def hannwin(x):
-    f = hanning(x)
-    return f
+def hannwin(*args, **kwargs):
+    return hanning(*args, **kwargs)
 
 
 def asd(x, t, windowname="hanning", ave=bool(True)):
-    """
-    Calculate the autospectrum (power spectrum) density of a signal x
+    """Return autospectrum (power spectrum) density of a signal x
 
-    :Example:
+    Parameters
+    ----------
+    x : float array
+        Data array (n x N x m) where n is the number of sensors, m the
+        number of experiments.
+    t : float array
+        Time array (1 x N)
+    windowname : string
+        Name of windowing function to use. See `window`.
+    ave : bool, optional(True)
+        Average result or not?
 
+    Returns
+    -------
+    f : float array
+        Frequency vector (1 x N)
+    Pxx : float array
+          Autospectrum (n x N) or (n x N x m) if not averaged.
+
+    Examples
+    --------
     >>> from scipy import signal
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
     >>> import vibrationtesting as vt
-    >>> from numpy import linalg
+    >>> import numpy.linalg as la
 
     Generate a 5 second test signal, a 10 V sine wave at 50 Hz, corrupted by
     0.001 V**2/Hz of white noise sampled at 1 kHz.
@@ -481,31 +498,27 @@ def asd(x, t, windowname="hanning", ave=bool(True)):
     >>> time = np.reshape(time, (1, -1))
     >>> x = A*np.sin(2*np.pi*sig_freq*time)
     >>> x = x + np.random.normal(scale=np.sqrt(noise_power), size=(1, time.shape[1]))
-    >>> plt.subplot(2,1,1)
-    <matplotlib...>
-    >>> plt.plot(time[0,:],x[0,:])
+    >>> fig, (ax1, ax2) = plt.subplots(2,1)
+    >>> ax1.plot(time[0,:],x[0,:])
     [<matplotlib.lines.Line2D object at ...>]
-    >>> plt.title('Time history')
-    <matplotlib...>
-    >>> plt.xlabel('Time (sec)')
-    <matplotlib...>
-    >>> plt.ylabel('$x(t)$')
-    <matplotlib...>
+    >>> ax1.set_title('Time history')
+    Text(0.5,1,'Time history')
+    >>> ax1.set_xlabel('Time (sec)')
+    Text(0.5,0,'Time (sec)')
+    >>> ax1.set_ylabel('$x(t)$')
+    Text(0,0.5,'$x(t)$')
 
     Compute and plot the autospectrum density.
 
-    >>> freq_vec, Pxx = vt.asd(x, time, window="hanning", ave=bool(False))
-    >>> plt.subplot(2,1,2)
-    <matplotlib...>
-    >>> plt.plot(freq_vec[0,:], 20*np.log10(Pxx[0,:,:]))
+    >>> freq_vec, Pxx = vt.asd(x, time, windowname="hanning", ave=bool(False))
+    >>> ax2.plot(freq_vec, 20*np.log10(Pxx[0,:]))
     [<matplotlib.lines.Line2D object at ...>]
-    >>> plt.ylim([-400, 100])
+    >>> ax2.set_ylim([-400, 100])
     (-400, 100)
-    >>> plt.xlabel('frequency [Hz]')
-    <matplotlib.text.Text object at ...>
-    >>> plt.ylabel('PSD [V**2/Hz]')
-    <matplotlib.text.Text object at ...>
-    >>> plt.show()
+    >>> ax2.set_xlabel('frequency (Hz)')
+    Text(0.5,0,'frequency (Hz)')
+    >>> ax2.set_ylabel('PSD (V**2/Hz)')
+    Text(0,0.5,'PSD (V**2/Hz)')
 
     If we average the last half of the spectral density, to exclude the
     peak, we can recover the noise power on the signal.
@@ -520,13 +533,32 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     """
     Calculate the cross spectrum (power spectrum) density between two signals.
 
-    :Example:
+    Parameters
+    ----------
+    x, y : arrays
+        Data array (n x N x m) where n is the number of sensors, m the
+        number of experiments.
+    t : array
+        Time array (1 x N)
+    windowname : string
+        Name of windowing function to use
+    ave : bool, optional
+        Average result or not?
 
+    Returns
+    -------
+    f : array
+        Frequency vector (1 x N)
+    Pxy : array
+          Autospectrum (n x N) or (n x N x m) if not averaged.
+
+    Examples
+    --------
     >>> from scipy import signal
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
     >>> import vibrationtesting as vt
-    >>> from numpy import linalg
+    >>> import numpy.linalg as la
 
     Generate a 5 second test signal, a 10 V sine wave at 50 Hz, corrupted by
     0.001 V**2/Hz of white noise sampled at 1 kHz.
@@ -540,50 +572,41 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     >>> time = np.arange(0,tfinal,1/sample_freq)
     >>> time = np.reshape(time, (1, -1))
     >>> x = A*np.sin(2*np.pi*sig_freq*time)
-    >>> x = x + np.random.normal(scale=np.sqrt(noise_power), size=(1, time.shape[1]))
+    >>> x = x + np.random.normal(scale=np.sqrt(noise_power),
+    ...                          size=(1, time.shape[1]))
+    >>> fig = plt.figure()
     >>> plt.subplot(2,1,1)
     <matplotlib...>
     >>> plt.plot(time[0,:],x[0,:])
     [<matplotlib.lines.Line2D object at ...>]
     >>> plt.title('Time history')
-    <matplotlib...>
+    Text(0.5,1,'Time history')
     >>> plt.xlabel('Time (sec)')
-    <matplotlib...>
+    Text(0.5,0,'Time (sec)')
     >>> plt.ylabel('$x(t)$')
-    <matplotlib...>
+    Text(0,0.5,'$x(t)$')
 
     Compute and plot the autospectrum density.
-
-    >>> freq_vec, Pxx = vt.asd(x, time, window="hanning", ave=bool(False))
+    >>> freq_vec, Pxx = vt.asd(x, time, windowname="hanning", ave=bool(False))
     >>> plt.subplot(2,1,2)
     <matplotlib...>
-    >>> plt.plot(freq_vec[0,:], 20*np.log10(Pxx[0,:,:]))
+    >>> plt.plot(freq_vec, 20*np.log10(Pxx[0,:]))
     [<matplotlib.lines.Line2D object at ...>]
     >>> plt.ylim([-400, 100])
     (-400, 100)
-    >>> plt.xlabel('frequency [Hz]')
-    <matplotlib.text.Text object at ...>
-    >>> plt.ylabel('PSD [V**2/Hz]')
-    <matplotlib.text.Text object at ...>
-    >>> plt.show()
-
-    If we average the last half of the spectral density, to exclude the
-    peak, we can recover the noise power on the signal.
-
-
-    Now compute and plot the power spectrum.
+    >>> plt.xlabel('frequency (Hz)')
+    Text(0.5,0,'frequency (Hz)')
+    >>> plt.ylabel('PSD (V**2/Hz)')
+    Text(0,0.5,'PSD (V**2/Hz)')
+    >>> fig.tight_layout()
     """
-    # t=np.reshape(t,(1,-1))
+    # t_shape = t.shape
+    t = t.flatten()
+    dt = t[2] - t[1]
 
-    if t.shape[0] > 1:
-        dt = t[2] - t[1]
-    elif t.shape[1] > 1:
-        dt = t[2] - t[1]
-        print('t must be a scalar or size (n,1)')
-    elif t.shape[1] == 1 and t.shape[0] == 1:
-        dt = t[0]
     if dt <= 0:
-        print('You sent in bad data. Delta t is negative. Please check your inputs.')
+        print('You sent in bad data. Delta t is negative. \
+              Please check your inputs.')
 
     if len(x.shape) == 1:
         x = sp.expand_dims(x, axis=0)
@@ -611,36 +634,37 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     #         y=y.reshape(may(y.shape),-1,1)
     # # Should use scipy.signal windows. I need to figure this out. Problem is: They don't scale the ASDs by the windowing "weakening".
 
-    if window == "none":
-        a = 1
-    else:
-        #print('This doesn\'t work yet')
+    if windowname == "none":
         win = 1
-        if window == "hanning":  # BLACKWIN, BOXWIN, EXPWIN, HAMMWIN, FLATWIN and TRIWIN
-            #print('shape of x')
+    else:
+        # print('This doesn\'t work yet')
+        win = 1
+        if windowname == "hanning":
+            # print('shape of x')
             # print(x.shape)
             win = window(x, windowname='hanning')
-        elif window == "blackwin":
+        elif windowname == "blackwin":
             win = window(x, windowname='blackwin')
-        elif window == "boxwin":
+        elif windowname == "boxwin":
             win = window(x, windowname='boxwin')
-        elif window == "expwin":
+        elif windowname == "expwin":
             win = window(x, windowname='expwin')
-        elif window == "hammwin":
+        elif windowname == "hammwin":
             win = window(x, windowname='hamming')
-        elif window == "triwin":
+        elif windowname == "triwin":
             win = window(x, windowname='triwin')
-        elif window == "flatwin":
+        elif windowname == "flatwin":
             win = window(x, windowname='flatwin')
 
         y = y * win
         x = x * win
         del win
-
+    # print(y.shape)
     ffty = np.fft.rfft(y, axis=1) * dt
-
+    # print(ffty.shape)
+    # print(x.shape)
     fftx = np.fft.rfft(x, n, axis=1) * dt
-
+    # print(fftx.shape)
     Pxy = np.conj(fftx) * ffty / (n * dt) * 2
 
     if len(Pxy.shape) == 3 and Pxy.shape[2] > 1 and ave:
@@ -652,115 +676,92 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     return f, Pxy
 
 
-def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,options)
-    """returns freq, H1, H2, coh, Hv
+def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
+    """Returns freq, H1, H2, coh, Hv
 
-    Estimates the :math:`H(j\\omega)` Frequency Response Functions (FRFs) between :math:`x` and :math:`f`.
+    Estimates the :math:`H(j\\omega)` Frequency Response Functions (FRFs)
+    between :math:`x` and :math:`f`.
 
-        - parameters using ``:param <name>: <description>``
-        - type of parameters ``:type <name>: <description>``
-        - returns using ``:returns: <description>``
-        - examples (doctest)
-        - seealso using ``.. seealso:: text``
-        - notes using ``.. note:: text``
-        - warning using ``.. warning:: text``
-        - todo ``.. todo:: text``
+    Parameters
+    ----------
+    x : float array
+        output or response of system
+    f : float array
+        input to system
+    dt : float
+        time step of samples
+    windowname : string - locked to Hanning
+        name of leakage window to use
+    ave : bool, optional(True)- currently locked
+        whether or not to average PSDs and ASDs or calculate raw FRFs
+    Hv : bool, optional(False)
+        calculate the :math:`H_v` frequency response function
 
+    Returns
+    -------
+    freq : float array
+        frequency vector (1xN)
+    H1 :  float array
+        Frequency Response Function :math:`H_1` estimate, (nxN) or (nxNxm)
+    H2 :  float array
+        Frequency Response Function :math:`H_2` estimate, (nxN) or (nxNxm)
+    coh :  float array
+        Coherance Function :math:`\gamma^2` estimate, (nxN)
+    Hv : float array
+        Frequency Response Function :math:`H_v` estimate, (nxN) or (nxNxm)
 
-    :param x: output or response of system
-    :param f: input to system
-    :param dt: time step or time array
-    :param window: name of data window to apply
-    :param ave: apply averaging
-    :param Hv: calculate :math:`H_v` Frequency Response Function Estimation
-    :type x: float array
-    :type f: float array
-    :type dt: float
-    :type window: string
-    :type ave: Boolean
-    :type Hv: Boolean
-    :returns: freq, H1, H2, coh, Hv
-    :return freq: frequency vector
-    :type freq: float array
-    :rtype: float array, float array, float array, float array, float array
+    Currently ``windowname`` and ``ave`` are locked to default values.
 
-    Currently ``window`` and ``ave`` are locked to default values.
-
-    :Example:
-
+    Examples
+    --------
     >>> import control as ctrl
     >>> import matplotlib.pyplot as plt
     >>> import vibrationtesting as vt
     >>> import numpy as np
     >>> sample_freq = 1e3
     >>> noise_power = 0.001 * sample_freq / 2
-    >>> A = np.array([[0, 0, 1, 0],\
-              [0, 0, 0, 1],\
-              [-200, 100, -.2, .1],\
-              [100, -200, .1, -.2]])
+    >>> A = np.array([[0, 0, 1, 0],
+    ...               [0, 0, 0, 1],
+    ...               [-200, 100, -.2, .1],
+    ...               [100, -200, .1, -.2]])
     >>> B = np.array([[0], [0], [1], [0]])
     >>> C = np.array([[35, 0, 0, 0], [0, 35, 0, 0]])
     >>> D = np.array([[0], [0]])
     >>> sys = ctrl.ss(A, B, C, D)
     >>> tin = np.arange(0, 51.2, .1)
-    >>> nr=.5   # 0 is all noise on input
-    >>> for i in np.arange(5): #was 2*50
+    >>> nr = .5   # 0 is all noise on input
+    >>> for i in np.arange(520):
     ...     u = np.random.normal(scale=np.sqrt(noise_power), size=tin.shape)
     ...     #print(u)
-    ...     t, yout, xout = ctrl.forced_response(sys, tin, u,rtol=1e-12,transpose=True)
+    ...     t, yout, xout = ctrl.forced_response(sys, tin, u,rtol=1e-12)
     ...     if 'Yout' in locals():
-    ...         Yout=np.dstack((Yout,yout+nr*np.random.normal(scale=.050*np.std(yout[0,:]), size=yout.shape)))
-    ...         Ucomb=np.dstack((Ucomb,u+(1-nr)*np.random.normal(scale=.05*np.std(u), size=u.shape)))
+    ...         Yout=np.dstack((Yout,yout
+    ...                 +nr*np.random.normal(scale=.050*np.std(yout[0,:]),
+    ...                  size=yout.shape)))
+    ...         Ucomb=np.dstack((Ucomb,u+(1-nr)
+    ...                 *np.random.normal(scale=.05*np.std(u),
+    ...                  size=u.shape)))
     ...     else:
-    ...         Yout=yout+nr*np.random.normal(scale=.050*np.std(yout[0,:]), size=yout.shape) # 5% half the noise on output as on input
-    ...         Ucomb=u+(1-nr)*np.random.normal(scale=.05*np.std(u), size=u.shape)#(1, len(tin))) #10% noise signal on input
-    >>> plt.plot(tin,Yout[:,0,:])
-    >>> Yout=Yout*np.std(Ucomb)/np.std(Yout)#40
-    [<matplotlib.lines.Line2D object at ...]
-    >>> plt.title('time response')
-    <matplotlib.text.Text object...>
-    >>> plt.show()
-    >>> freq_vec, Pxx = vt.asd(Yout, tin, window="hanning", ave=bool(False))
-    >>> plt.plot(freq_vec[0,:], 20*np.log10(Pxx[0,:,:]))
-    [<matplotlib.lines.Line2D object at ...]
-    >>> plt.title('Raw ASDs')
-    <matplotlib.text.Text...>
-    >>> plt.show()
-    >>> freq_vec, Pxx = vt.asd(Yout, tin, window="hanning", ave=bool(True))
-    >>> plt.plot(freq_vec[0,:], 20*np.log10(Pxx[0,:]))
-    [<matplotlib.lines.Line2D object at ...]
-    >>> plt.title('Averaged ASDs')
-    <matplotlib...>
-    >>> plt.show()
-    >>> f, Txy1, Txy2, coh, Txyv = vt.frfest(Yout, Ucomb, t,Hv=bool(True))
-    >>> #fig_amp,=plt.plot(f[0,:],20*np.log10(np.abs(Txy1[0,:])),legend='$H_1$',f[0,:],20*np.log10(np.abs(Txy2[0,:])),legend='$H_2$',f[0,:],20*np.log10(np.abs(Txyv[0,:])),legend='$H_v$')
-    >>> (line1, line2, line3) = plt.plot(f[0,:],20*np.log10(np.abs(Txy1[0,:])),f[0,:],20*np.log10(np.abs(Txy2[0,:])),f[0,:],20*np.log10(np.abs(Txyv[0,:])))
-    >>> plt.title('FRF of ' + str(Yout.shape[2]) + ' averages.')
-    <matplotlib.text.Text object at ...>
-    >>> plt.legend((line1,line2,line3),('$H_1$','$H_2$','$H_v$'))
-    <matplotlib.legend.Legend object ...>
-    >>> plt.show()
-    >>> plt.plot(f[0,:],180.0/np.pi*np.unwrap(np.angle(Txy1[0,:])),f[0,:],180.0/np.pi*np.unwrap(np.angle(Txy2[0,:])),f[0,:],180.0/np.pi*np.unwrap(np.angle(Txyv[0,:])))
-    [<matplotlib.lines.Line2D object at ...]
-    >>> plt.title('FRF of ' + str(Yout.shape[2]) + ' averages.')
-    <matplotlib.text.Text object at ...>
-    >>> plt.show()
-    >>> plt.plot(f[0,:],coh[0,:])
-    [<matplotlib.lines.Line2D object at...
-    >>> plt.show()
-    >>> vt.frfplot(f,Txy1,freq_max=3.5)
+    ...         Yout=yout+nr*np.random.normal(scale=.05*np.std(yout[0,:]),
+    ...                   size=yout.shape)
+    ...                   # noise on output is 5% scale of input
+    ...         Ucomb=u+(1-nr)*np.random.normal(scale=.05*np.std(u),
+    ...                   size=u.shape)#(1, len(tin)))
+    ...                   # 5% noise signal on input
+    >>> f, Hxy1, Hxy2, coh, Hxyv = vt.frfest(Yout, Ucomb, t, Hv=bool(True))
+    >>> vt.frfplot(f,Hxy2,freq_max=3.5, legend=['$H_{11}$', '$H_{12}$'])
+    ...               # doctest: +SKIP
+    >>> vt.frfplot(f, np.vstack((Hxy1[0,:], Hxy2[0,:], Hxyv[0,:])),
+    ...               legend=['$H_{11-1}$','$H_{11-2}$','$H_{11-v}$'])
+    ...               # doctest: +SKIP
 
-
-    Copyright 1994 by Joseph C. Slater
-
-    :Modifications:
-
-    7/6/00: Changed default FRF calculation from H2 to H1, Added H1, H2, and Hv options.
+    Notes
+    -----
     4/13/15: Converted to Python
-
-    .. note:: Not comptible with scipy.signal functions
+    .. note:: Not compatible with scipy.signal functions
     .. seealso:: :func:`asd`, :func:`crsd`, :func:`frfplot`.
-    .. warning:: hanning window cannot be selected yet. Averaging cannot be unslected yet.
+    .. warning:: hanning window cannot be selected yet. Averaging cannot be
+    unslected yet.
     .. todo:: Fix averaging, windowing, multiple input.
     """
 
@@ -778,31 +779,31 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
 
     # Note: Two different ways to ignore returned values shown
     Pff = asd(f, dt)[1]
-    print('works until here?')
-    print(x.shape)
-    print(f.shape)
+    # print('works until here?')
+    # print(x.shape)
+    # print(f.shape)
     freq, Pxf = crsd(x, f, dt)
     _, Pxx = asd(x, dt)
 
     # Note Pfx=conj(Pxf) is applied in the H1 FRF estimation
     Txf1 = np.conj(Pxf / Pff)
     Txf2 = Pxx / Pxf
-    Txfv = Txf1 * 0  # Nulled to avoid output problems/simplify calls if unrequested
+    # Nulled to avoid output problems/simplify calls if unrequested
+    Txfv = np.zeros_like(Txf1)
 
     coh = (Pxf * np.conj(Pxf)).real / Pxx / Pff
 
     if Hv:
-        import numpy.linalg as la
         for i in np.arange(Pxx.shape[1]):
             frfm = np.array(
                 [[Pff[0, i], np.conj(Pxf[0, i])], [Pxf[0, i], Pxx[0, i]]])
-            #print('index number ' + str(i))
+            # print('index number ' + str(i))
             # print(frfm)
             alpha = 1  # np.sqrt(Pff[0,i]/Pxx[0,i])
             # print(alpha)
             frfm = np.array([[Pff[0, i], alpha * np.conj(Pxf[0, i])],
                              [alpha * Pxf[0, i], alpha**2 * Pxx[0, i]]])
-            #print('new frfm')
+            # print('new frfm')
             # print(frfm)
             lam, vecs = la.eigh(frfm)
             # print(lam)
@@ -813,7 +814,7 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
             # print(lam)
             vecs = vecs[:, index]
             # print(vecs)
-            #print(np.array([Txf1[0,i], -(vecs[0,0]/vecs[1,0]), -(vecs[1,0]/vecs[1,1]), Txf2[0,i]]))
+            # print(np.array([Txf1[0,i], -(vecs[0,0]/vecs[1,0]), -(vecs[1,0]/vecs[1,1]), Txf2[0,i]]))
             Txfv[0, i] = -(vecs[0, 0] / vecs[1, 0]) / alpha  # *np.sqrt(alpha)
             a = 1
             b = -Pxx[0, i] - Pff[0, i]
@@ -822,13 +823,13 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
             lambda1 = (-b - np.sqrt(b**2 - 4 * a * c)) / 2 / a
             # Txfv[0,i]=np.conj(Pxf[0,i])/(Pff[0,i]-lambda1)*alpha
             # print(Txfv[0,i])
-            #person = input('Next point: ')
-            #print(np.dot(frfm, vecs[:, 0]) - lam[0] * vecs[:, 0])
-            #print(np.dot(frfm, vecs[:, 1]) - lam[1] * vecs[:, 1])
+            # person = input('Next point: ')
+            # print(np.dot(frfm, vecs[:, 0]) - lam[0] * vecs[:, 0])
+            # print(np.dot(frfm, vecs[:, 1]) - lam[1] * vecs[:, 1])
 
     return freq, Txf1, Txf2, coh, Txfv
 
-    # def acorr(self, x, **kwargs):
+    '''# def acorr(self, x, **kwargs):
     # """
     # Plot the autocorrelation of `x`.
 
@@ -973,72 +974,93 @@ def frfest(x, f, dt, window="hanning", ave=bool(True), Hv=bool(False)):  # ,n,op
     ##         kwargs.setdefault('linestyle', 'None')
     ##         a, = self.plot(lags, c, **kwargs)
     ##         b = None
-    # return lags, c, a, b
+    # return lags, c, a, b'''
 
 
-def frfplt(freq, H, freq_min=0, freq_max=0, FLAG=1):
-    """returns
+def frfplot(freq, H, freq_min=0, freq_max=0, type=1, legend=[]):
+    """Frequency Response function pretty plotting.
 
     Plots frequency response functions in a variety of formats
 
-        - parameters using ``:param <name>: <description>``
-        - type of parameters ``:type <name>: <description>``
-        - returns using ``:returns: <description>``
-        - examples (doctest)
-        - seealso using ``.. seealso:: text``
-        - notes using ``.. note:: text``
-        - warning using ``.. warning:: text``
-        - todo ``.. todo:: text``
+    Parameters
+    ----------
+    freq : float array
+        Frequency vector (rad/sec), (1xN)
+    H : float array
+        Frequency response functions (nxN)
+    freq_min : float, optional
+        Low frequency for plot (default 0)
+    freq_min : float, optional
+        High frequency for plot (default max frequency)
+    legend : string array
+        Array of string for use in legend.
+    type : int, optional
+        Plot type. See notes.
 
-
-    :param freq: frequency data (Hz) of shape (1,n_points)
-    :param H: Frequency Response Functions, shape (n,n_points)
-    :param freq_min: lowest frequency to plot
-    :param freq_min: highest frequency to plot
-    :param FLAG: type of plot
-    :type freq: float array
-    :type H: float array
-    :type freq_min: float
-    :type freq_max: float
-    :type FLAG: integer
-    :returns:
-
-    =======  =============================================================
-    FLAG     Plot Type
-    -------  -------------------------------------------------------------
-    1 (def)   Magnitude and Phase versus F
-    2         Magnitude and Phase versus log10(F)
-    3         Bodelog  (Magnitude and Phase versus log10(w))
-    4         Real and Imaginary
-    5         Nyquist  (Real versus Imaginary)
-    6         Magnitude versus F
-    7         Phase versus F
-    8         Real versus F
-    9         Imaginary versus F
-    10         Magnitude versus log10(F)
-    11         Phase versus log10(F)
-    12         Real versus log10(F)
-    13         Imaginary versus log10(F)
-    14         Magnitude versus log10(w)
-    15         Phase versus log10(w)
-    =======  =============================================================
-
-
-    :Example:
-
-    >>> f=(0:.01:100)';
-    >>> w=f*2*pi;
+    Examples
+    --------
+    >>> import matplotlib.pyplot as plt
+    >>> import vibrationtesting as vt
+    >>> import numpy as np
+    >>> f=np.linspace(0,100,10000).reshape(-1,1);
+    >>> w=f*2*np.pi;
     >>> k=1e5;m=1;c=1;
-    >>> tf=1./(m*(w*j).^2+c*j*w+k);
-    >>> figure(1);frfplot(f,tf)
-    >>> figure(2);frfplot(f,tf,5)
+    >>> frf1=1./(m*(w*1j)**2+c*1j*w+k)
+    >>> frf2=1./(m*(w*1j)**2+c*1j*w+k*3)
+    >>> vt.frfplot(f,np.hstack((frf1,frf2)), legend = ['FRF 1','FRF 2'])
+    ...                                      # doctest: +SKIP
+
+    Notes
+    -----
+    +---------+------------------------------------------------+
+    |  type   |  Plot style                                    |
+    +=========+================================================+
+    | 1 (def) |  Magnitude and Phase versus F                  |
+    +---------+------------------------------------------------+
+    | 2       |  Magnitude and Phase versus log10(F)           |
+    +---------+------------------------------------------------+
+    | 3       |  Bodelog (Magnitude and Phase versus log10(w)) |
+    +---------+------------------------------------------------+
+    | 4       |  Real and Imaginary                            |
+    +---------+------------------------------------------------+
+    | 5       |  Nyquist (Imaginary versus Real)               |
+    +---------+------------------------------------------------+
+    | 6       |  Magnitude versus F                            |
+    +---------+------------------------------------------------+
+    | 7       |  Phase versus F                                |
+    +---------+------------------------------------------------+
+    | 8       |  Real versus F                                 |
+    +---------+------------------------------------------------+
+    | 9       |  Imaginary versus F                            |
+    +---------+------------------------------------------------+
+    | 10      |  Magnitude versus log10(F)                     |
+    +---------+------------------------------------------------+
+    | 11      |  Phase versus log10(F)                         |
+    +---------+------------------------------------------------+
+    | 12      |  Real versus log10(F)                          |
+    +---------+------------------------------------------------+
+    | 13      |  Imaginary versus log10(F)                     |
+    +---------+------------------------------------------------+
+    | 14      |  Magnitude versus log10(w)                     |
+    +---------+------------------------------------------------+
+    | 15      |  Phase versus log10(w)                         |
+    +---------+------------------------------------------------+
+
+    .. seealso:: `frfest`
 
     Copyright J. Slater, Dec 17, 1994
     Updated April 27, 1995
     Ported to Python, July 1, 2015
     """
+
+    FLAG = type  # Plot type, should libe renamed throughout.
     freq = freq.reshape(1, -1)
-    lenF = freq.shape[0]
+    lenF = freq.shape[1]
+    if len(H.shape) is 1:
+        H = H.reshape(1, -1)
+
+    if H.shape[0] > H.shape[1]:
+        H = H.T
 
     #    if lenF==1;
     #    F=(0:length(Xfer)-1)'*F;
@@ -1051,21 +1073,25 @@ def frfplt(freq, H, freq_min=0, freq_max=0, FLAG=1):
         raise ValueError('freq_min must be less than freq_max.')
 
     # print(str(np.amin(freq)))
-    inlow = lenF * (freq_min - np.amin(freq)
-                    ) // (np.amax(freq) - np.amin(freq))
+    inlow = int(lenF * (freq_min - np.amin(freq)
+                        ) // (np.amax(freq) - np.amin(freq)))
 
-    inhigh = lenF * (freq_max - np.amin(freq)
-                     ) // (np.amax(freq) - np.amin(freq)) - 1
+    inhigh = int(lenF * (freq_max - np.amin(freq)
+                         ) // (np.amax(freq) - np.amin(freq)) - 1)
     # if inlow<1,inlow=1;end
     # if inhigh>lenF,inhigh=lenF;end
-    print(H.shape)
+    '''print('freq shape: {}'.format(freq.shape))
+    print('H shape: {}'.format(H.shape))
+    print('Index of low frequency: {}'.format(inlow))
+    print('Index of high frequency: {}'.format(inhigh))'''
     H = H[:, inlow:inhigh]
     # print(H.shape)
     freq = freq[:, inlow:inhigh]
     mag = 20 * np.log10(np.abs(H))
-
-    minmag = np.amin(mag)
-    maxmag = np.amax(mag)
+    # print(mag)
+    # print(mag.shape)
+    minmag = np.min(mag)
+    maxmag = np.max(mag)
     phase = np.unwrap(np.angle(H)) * 180 / np.pi
     #    phmin_max=[min(phase)//45)*45 ceil(max(max(phase))/45)*45];
     phmin = np.amin(phase) // 45 * 45.0
@@ -1074,49 +1100,55 @@ def frfplt(freq, H, freq_min=0, freq_max=0, FLAG=1):
     maxreal = np.amax(np.real(H))
     minimag = np.amin(np.imag(H))
     maximag = np.amax(np.imag(H))
-    if FLAG == 1:
-        plt.subplot(2, 1, 1)
-        plt.plot(freq.T, mag.T)
-        plt.xlabel('Frequency (Hz)')
-        plt.ylabel('Mag (dB)')
-        plt.grid()
-        plt.xlim(xmax=freq_max, xmin=freq_min)
-        plt.ylim(ymax=maxmag, ymin=minmag)
 
-        plt.subplot(2, 1, 2)
-        plt.plot(freq.T, phase.T)
-        plt.xlabel('Frequency (Hz)')
-        plt.ylabel('Phase (deg)')
-        plt.grid()
-        plt.xlim(xmax=freq_max, xmin=freq_min)
-        plt.ylim(ymax=phmax, ymin=phmin)
+    if FLAG is 1:
+        fig, (ax1, ax2) = plt.subplots(2, 1)
+        ax1.plot(freq.T, mag.T)
+        ax1.set_xlabel('Frequency (Hz)')
+        ax1.set_ylabel('Mag (dB)')
+        ax1.grid()
+        ax1.set_xlim(xmax=freq_max, xmin=freq_min)
+        ax1.set_ylim(ymax=maxmag, ymin=minmag)
 
-        plt.yticks(np.arange(phmin, (phmax + 45), 45))
-        plt.show()
+        ax2.plot(freq.T, phase.T)
+        ax2.set_xlabel('Frequency (Hz)')
+        ax2.set_ylabel('Phase (deg)')
+        ax2.grid()
+        ax2.set_xlim(xmax=freq_max, xmin=freq_min)
+        ax2.set_ylim(ymax=phmax, ymin=phmin)
+        ax2.set_yticks(np.arange(phmin, (phmax + 45), 45))
+        fig.tight_layout()
 
-    # elif FLAG==2:
+        if len(legend) > 0:
+            plt.legend(legend)
+
+    else:
+        print("Sorry, that option isn't supported yet")
+        return
+
+    '''# elif FLAG==2:
     # subplot(2,1,1)
     # semilogx(F,mag)
-    ##   xlabel('Frequency (Hz)')
-    ##   ylabel('Mag (dB)')
+    #   xlabel('Frequency (Hz)')
+    #   ylabel('Mag (dB)')
     # grid on
     # %  Fmin,Fmax,min(mag),max(mag)
     # axis([Fmin Fmax minmag maxmag])
 
     # subplot(2,1,2)
     # semilogx(F,phase)
-    ##   xlabel('Frequency (Hz)')
-    ##   ylabel('Phase (deg)')
+    # xlabel('Frequency (Hz)')
+    # ylabel('Phase (deg)')
     # grid on
     # axis([Fmin Fmax  phmin_max(1) phmin_max(2)])
     # gridmin_max=round(phmin_max/90)*90;
     # set(gca,'YTick',gridmin_max(1):90:gridmin_max(2))
 
     # elif FLAG==3:
-      # subplot(2,1,1)
-      # mag=20*log10(abs(Xfer));
-      # semilogx(F*2*pi,mag)
-      ## xlabel('Frequency (Rad/s)')
+    # subplot(2,1,1)
+    # mag=20*log10(abs(Xfer));
+    # semilogx(F*2*pi,mag)
+    # xlabel('Frequency (Rad/s)')
       ## ylabel('Mag (dB)')
       # grid on
       # axis([Wmin Wmax minmag maxmag])
@@ -1264,19 +1296,20 @@ def frfplt(freq, H, freq_min=0, freq_max=0, FLAG=1):
      # gridmin_max=round(phmin_max/90)*90;
      # set(gca,'YTick',gridmin_max(1):90:gridmin_max(2))
      # zoom on
+     '''
 
 
 def xcorr(t, x, y, zeropad=True):
-
+    '''Sorry, no docs or tests yet'''
     tau = t
-    sx = len(x)
-    sy = len(y)
-    if zeropad == True:
-        Xn = sp.fft(x, n=len(x) * 2)
-        Yn = sp.conj(sp.fft(y, n=len(x) * 2))
+    # sx = len(x)
+    # sy = len(y)
+    if zeropad is True:
+        Xn = np.fft.rfft(x, n=len(x) * 2)
+        Yn = np.conj(sp.fft(y, n=len(x) * 2))
     else:
-        Xn = sp.fft(x)
-        Yn = sp.conj(sp.fft(y))
+        Xn = np.fft.rfft(x)
+        Yn = np.conj(np.fft.rfft(y))
 
     xcor = sp.real(fftpack.fftshift(sp.ifft(Xn * Yn)))
     dt = t[1] - t[0]
@@ -1284,198 +1317,3 @@ def xcorr(t, x, y, zeropad=True):
     tau = sp.linspace(-len(xcor) / 2 * dt - dt / 2,
                       len(xcor) / 2 * dt - dt / 2, len(xcor))
     return tau, xcor
-
-
-'''
-    function [tout,crcorout]=crcor(x,y,dt,type,ave)
-%CRCOR Cross correlation.
-% [Tau,COR]=CRCOR(X,Y,DT,TYPE,AVE) returns the Cross Correlation
-% between signals X and Y.
-% [Tau,COR]=CRCOR(X,X,DT,TYPE,AVE) returns the Auto Correlation
-% of the signal X.
-% DT is the time between samples.
-% If DT is the time vector, DT is extracted as T(2)-T(1).
-% TYPE is the type of correlation. TYPE = 1 causes CRCOR
-% to return the linear correlation function. TYPE = 2
-% causes CRCOR to return the circular correlation function.
-% The default value is 1.
-% If X and Y are matrices, averaging will be performed on the
-% Correlations unless AVE is set to 'noave'. TYPE and AVE are
-% optional. Either can be left out.
-%
-% COH(X,Y,DT,N,AVE) plots the Correlation if there are no ouput
-% arguments. Click in the region of interest to zoom in.
-% Each click will double the size of the plot. Double click
-% to return to full scale.
-%
-% See also TFEST, ASD, COH, CRSD, and TFPLOT.
-
-%	Copyright (c) 1994 by Joseph C. Slater
-sy=size(y);
-sy=size(y);
-if nargin==3
-  type=1;
-  ave='yes';
- elseif nargin==4
-  if strcmp(type,'noave')
-   ave=n;
-   type=1;
-  else
-   ave='yes';
-  end
-end
-
-if isempty(type)
-  type=1;
-end
-
-sx=size(x);
-nc=sx(2);
-
-if type==1
-  n=sx(1)*2;
- else
-  n=sx(1);
-end
-
-if length(dt)~=1
- dt=dt(2)-dt(1);
-end
-
-tmax=dt*(length(x)-1);
-t=(-tmax:(2*tmax/(n-1)):tmax)'-(tmax/(n-1));
-
-X=fft(x,n);
-Y=fft(y,n);
-pxy=real(ifft(conj(X).*Y));
-
-crcr=fftshift(real(pxy));
-crcr=crcr(1:length(crcr),:);
-
-if nc~=1 & ~strcmp(ave,'noave')
- crcr=mean(crcr')';
-end
-
-if nargout==0
- plot(t,crcr)
- %logo
- if type==1
-   text1='Linear ';
-  else
-   text1='Circular ';
- end
- if x==y
-   text2='Auto ';
-  else
-   text2='Cross ';
- end
- text3=[text1 text2 'Correlation'];
- title(text3)
- xlabel('Time')
- ylabel(text3)
- grid
- zoom on
- return
-end
-
-crcorout=crcr;
-tout=t;
-'''
-
-
-def d2c(Ad, Bd, C, D, dt):
-    """returns A, B, C, D
-    Converts a set of digital state space system matrices to their continuous counterpart.
-    """
-    A = la.logm(Ad) / dt
-    B = la.solve((Ad - sp.eye(A.shape[0])), A) @ Bd
-    return A, B, C, D
-
-
-def c2d(A, B, C, D, dt):
-    """returns Ad, Bd, C, D
-    Converts a set of digital state space system matrices to their continuous counterpart.
-    Simply calls scipy.signal.cont2discrete
-    """
-
-    Ad, Bd, _, _, _ = sig.cont2discrete((A, B, C, D), dt)
-    Ad = la.expm(A * dt)
-    Bd = la.solve(A, (Ad - sp.eye(A.shape[0]))) @ B
-    return Ad, Bd, C, D
-
-
-def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
-    """returns omega, H
-    obtains the computed FRF of a state space system between selected input
-    and output over frequency range of interest.
-    """
-    #A, B, C, D = ctrl.ssdata(sys)
-    sa = A.shape[0]
-    omega = sp.linspace(omega_low, omega_high, 1000)
-    H = omega * 1j
-    i = 0
-    for i in sp.arange(len(omega)):
-        w = omega[i]
-        H[i] = (C@la.solve(w * 1j * sp.eye(sa) - A, B) + D)[out_index, in_index]
-    return omega, H
-
-
-def so2ss(M, C, K, Bt, Cd, Cv, Ca):
-    """returns A, B, C, D
-    Given second order linear matrix equation of the form
-    :math:`M\\ddot{x} + C \\dot{x} + K x= Bt u`
-    and
-    :math:`y = Cd x + + Cv \\dot{x} + Ca\\ddot{x}`
-    returns the state space form equations
-    :math:`\\dot{z} = A z + B u`
-    :math:`y = C z + D u`
-    """
-
-    A = sp.vstack((sp.hstack((sp.eye(2) * 0, sp.eye(2))),
-                   sp.hstack((-la.solve(M, K), -la.solve(M, C)))))
-    B = sp.vstack((sp.zeros((Bt.shape[0], 1)), Bt))
-    C_ss = sp.hstack((Cd - Ca@la.solve(M, K), Cv - Ca@la.solve(M, C)))
-    D = Ca@la.solve(M, Bt)
-
-    return A, B, C_ss, D
-
-
-def damp(A):
-
-    # Original Author: Kai P. Mueller <mueller@ifr.ing.tu-bs.de> for Octave
-    # Created: September 29, 1997.
-
-    print("............... Eigenvalue ...........     Damping     Frequency")
-    print("--------[re]---------[im]--------[abs]----------------------[Hz]")
-    e, _ = la.eig(A)
-
-    for i in range(len(e)):
-        pole = e[i]
-
-        d0 = -sp.cos(math.atan2(sp.imag(pole), sp.real(pole)))
-        f0 = 0.5 / sp.pi * abs(pole)
-        if (abs(sp.imag(pole)) < abs(sp.real(pole))):
-            print('      {:.3f}                    {:.3f}       {:.3f}         {:.3f}'.
-                  format(float(sp.real(pole)), float(abs(pole)), float(d0), float(f0)))
-
-        else:
-            print('      {:.3f}        {:+.3f}      {:.3f}       {:.3f}         {:.3f}'.
-                  format(float(sp.real(pole)), float(sp.imag(pole)),
-                         float(abs(pole)), float(d0), float(f0)))
-
-
-if __name__ == "__main__":
-    import doctest
-    #import vibrationtesting as vt
-    # doctest.testmod(optionflags=doctest.ELLIPSIS)
-    doctest.run_docstring_examples(
-        frfest, globals(), optionflags=doctest.ELLIPSIS)
-    # doctest.run_docstring_examples(asd,globals(),optionflags=doctest.ELLIPSIS)
-    """ What this does.
-    python (name of this file)  -v
-    will test all of the examples in the help.
-
-    Leaving off -v will run the tests without any output. Success will return nothing.
-
-    See the doctest section of the Sphinx manual.
-    """

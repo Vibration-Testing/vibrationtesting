@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Vibration Toolbox documentation build configuration file, created by
+# Vibration Testing documentation build configuration file, created by
 # sphinx-quickstart on Sun Apr  9 10:02:35 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -27,7 +27,7 @@ sys.path.insert(0, os.path.abspath('.'))
 sys.path.append('../vibrationtesting')
 sys.path.append('../JupyterNotebooks')
 sys.path.append('..')
-
+sys.path.append(os.path.join(os.path.dirname(__name__), '..'))
 
 # Avoid needin to update version here for release
 from vibrationtesting import __version__, __title__, __author__, __license__,\
@@ -163,7 +163,7 @@ html_theme_options = {
     'description': 'Vibration Testing Analysis',
     'github_button': 'True',
     'github_user': 'vibrationtesting',
-#    'analytics_id': 'UA-62100376-4',
+    'analytics_id': 'UA-62100376-6',
 }
 
 

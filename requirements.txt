@@ -4,3 +4,4 @@ matplotlib
 sphinx
 ipython
 control
+vibration_toolbox

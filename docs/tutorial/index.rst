@@ -1,16 +1,14 @@
 Tutorial
 --------
 
+Tutorials with worked examples using the Vibration Testing module.
 
-Tutorials with worked examples and background information for the Vibration Toolbox.
+Please excuse the mess while this is brought online.
 
 .. sectionauthor:: Joseph C. Slater
 
 .. toctree::
    :maxdepth: 2
 
-   sdof_notebook.ipynb
-   mdof_notebook.ipynb
-   continuous_systems_notebook.ipynb
-   vibesystem_notebook.ipynb
-
+   Notebooks/Signal.ipynb
+   Notebooks/Ho-Kalman-Demo.ipynb

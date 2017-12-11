@@ -1,13 +1,13 @@
 # This Makefile was created by transforming the one for oct2py
 # The line #------------------ shows where editing to date has been completed
 # for the first attempt.
-# Note: This is meant for vibration_toolbox developer use only
+# Note: This is meant for vibrationtesting developer use only
 
 .PHONY: all clean test cover release gh-pages docs
 
 # I don't know what the following line means/does
 #export TEST_ARGS=--exe -v --with-doctest
-export NAME=vibration_toolbox
+export NAME=vibrationtesting
 
 export GHP_MSG="Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`"
 export VERSION=`python -c "import $(NAME); print($(NAME).__version__)"`
@@ -54,10 +54,10 @@ release: clean
 	git tag v$(VERSION)
 	git push origin --all
 	git push origin --tags
-	printf '\nUpgrade vibration toolbox with release and sha256 sum:'
+	printf '\nUpgrade vibration testing with release and sha256 sum:'
 	printf '\nOK, no sha256 sum yet:'
 	twine upload dist/*
-	shasum -a 256 dist/*.tar.gz
+	shasum -a 256 dist/*.whl
 
 wheel:
 	rm -rf dist

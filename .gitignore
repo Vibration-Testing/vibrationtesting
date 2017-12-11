@@ -76,3 +76,5 @@ docs/_build/
 
 # PyBuilder
 target/
+vibrationtesting/.DS_Store
+.DS_Store

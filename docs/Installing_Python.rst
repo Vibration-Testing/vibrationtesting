@@ -3,9 +3,9 @@
 Installing Python
 _________________
 
-In order to be able to use the Vibration Toolbox you need a working scientific python installation.
+In order to be able to use the Vibration Testing module you need a working scientific python installation.
 
-The easiest path to this is to install Python via `Anaconda`_. **You must install** Python 3.5 or later for the Vibration Toolbox to work. **Do note install Python 2.7.** 
+The easiest path to this is to install Python via `Anaconda`_. **You must install** Python 3.5 or later for the Vibration Testing module to work. **Do note install Python 2.7.**
 
 This proceeds as a normal install on your platform (Mac, Windows, Linux...).
 

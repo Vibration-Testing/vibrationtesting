@@ -21,11 +21,11 @@ To contribute code we recommend you follow these steps:
 
 #. Clone the repository to your favorite location on your drive where you want to work on it.
 
-#. To work in `developer mode <https://packaging.python.org/distributing/#working-in-development-mode>`_, at the top level directory inside the ``vibration testing toolbox`` type::
+#. To work in `developer mode <https://packaging.python.org/distributing/#working-in-development-mode>`_, from a terminal (python enabled) at the top level directory inside the ``vibration testing module`` type::
 
     $ pip install -e .
 
-   This will allow you to edit the code while having it pretend to be installed. Keep in mind, if you have actually installed the ``vibration testing toolbox`` you may have a conflict. You must uninstall it and install your development version with the command above.
+   This will allow you to edit the code while having it pretend to be installed. Keep in mind, if you have actually installed the ``vibration testing module`` you may have a conflict. You must uninstall it and install your development version with the command above.
 
 #. If a new function is added
    please provide docstrings following the `Numpy standards for docstrings <https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt>`_.
@@ -62,7 +62,7 @@ To contribute code we recommend you follow these steps:
 
     2. To run the tests from ``spyder`` see `spyder-unittest <https://github.com/spyder-ide/spyder-unittest`_.
 
-#. Commit and check `travis-ci <https://travis-ci.org/vibrationtoolbox/vibration_toolbox>`_ tests regularly. Having a great number of changes before a commit can make tracing errors very hard. Make sure you are looking at your branch when assessing whether it's working.
+#. Commit and check `travis-ci <https://travis-ci.org/Vibration-Testing/vibrationtesting>`_ tests regularly. Having a great number of changes before a commit can make tracing errors very hard. Make sure you are looking at your branch when assessing whether it's working.
 
 #. You may need to `update from the main repository <https://www.sitepoint.com/quick-tip-sync-your-fork-with-the-original-without-the-cli/>`_ before submitting a pull request. This allows you to see the complete results before we look at them.  If it doesn't work, the pull will (should) be denied. This can be a bit daunting for some, so it's recommended but not necessary.
 
@@ -76,7 +76,7 @@ Instructions bellow are directed to main developers
 To make distribution and release
 --------------------------------
 
-1) Edit the version number in ``vibration_toolbox/__init__.py``
+1) Edit the version number in ``vibrationtesting/__init__.py``
 2) Use the Makefile, ``make release``
 
 The ``conf.py`` file for the documentation pulls the version from ``__init__.py``
@@ -91,9 +91,7 @@ To make a distribution (for testing or posting to github)
 To test before release
 ----------------------
 
-.. code-block:: bash
-
-  >> pip install --force-reinstall --upgrade --no-deps dist/vibration_toolbox-0.5b9-py3-none-any.whl
+TravisCI does this for us. 
 
 See `notes <https://packaging.python.org/distributing/#working-in-development-mode>`_ on working in development mode.
 
