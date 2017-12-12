@@ -280,16 +280,23 @@ def damp(A):
                                                 float(f0)))
 
 
-def undamped_modes(M, K):
+def undamped_modes(M, K, C = False, damp_diag = 0.01):
     '''Undamped modes and natural frequencies from Mass and Stiffness matrix.
 
     Optimally find mass normalized mode shapes and natural frequencies
     of a system modelled by :math:`M\ddot{x}+Kx=0`.
 
+    If provided, obtain damping ratios presuming :math:`C` can be decoupled.
+
     Parameters
     ----------
     M, K : float arrays
         Mass and stiffness matrices
+    C : float array, optional
+        Damping matrix
+    damp_diag : float, optional
+        Maximum amount of off-diagonal error allowed in assuming C can be
+        diagonalized
 
     Returns
     -------
@@ -297,6 +304,8 @@ def undamped_modes(M, K):
         Vector of natural frequencies (rad/sec)
     Psi : float array (NxN)
         Matrix of mass normalized mode shapes by column
+    zeta : float array (1xN)
+        Vector of damping ratios
 
     Examples
     --------
@@ -317,15 +326,45 @@ def undamped_modes(M, K):
     '''
     lam, psi_flipped = la.eigh(M, K)
 
-    omega = np.real(np.sqrt(1 / lam[-1::-1]))
+    omega = np.real(np.sqrt(1.0 / lam[-1::-1]))
 
     Psi = np.fliplr(psi_flipped)
 
-    norms = np.diag(1 / np.sqrt(np.diag(Psi.T@M@Psi)))
+    norms = np.diag(1.0 / np.sqrt(np.diag(Psi.T@M@Psi)))
 
     Psi = Psi @ norms
 
-    return omega, Psi
+    zeta = np.zeros_like(omega)
+
+    if C is True:
+        diagonalized_C = Psi.T@C@Psi
+
+        diagonal_C = np.diag(diagonalized_C)
+
+        if min(omega) > 1e-5:
+            zeta = diagonal_C/2/omega  # error if omega = 0
+            max_off_diagonals = max(np.abs(diagonalized_C
+                                   -np.diag(np.diag(diagonalized_C))))
+            damp_error = max(max_off_diagonals/diagonal_C)  # error if no damping
+        else:
+            zeta = np.zeros_like(omega)
+            damp_error = np.zeros_like(omega)
+            de_diag_C = diagonalized_C - np.diagonal(diagonal_C)
+            for mode_num, omega_i in enumerate(omega):
+                if omega[mode_num] > 1e-5:
+                    zeta[mode_num] = diagonal_C[mode_num]/2/omega_i
+                    damp_error=(max(np.abs(de_diag_C[:,mode_num]))
+                                / diagonal_C[mode_num])
+
+        max_off_diagonals = max(np.abs(diagonalized_C
+                                   -np.diag(np.diag(diagonalized_C))))
+
+        damp_error = max(max_off_diagonals/diagonal_C)  # error if no damping
+
+        if damp_error > damp_diag:
+            print('Damping matrix cannot be completely diagonalized.')
+
+    return omega, Psi, zeta
 
 
 def serep(M, K, master):
