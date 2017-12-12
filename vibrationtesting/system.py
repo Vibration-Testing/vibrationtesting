@@ -16,6 +16,7 @@ import scipy.signal as sig
 import scipy.linalg as la
 #np.set_printoptions(precision=4, suppress=True)
 
+
 def d2c(Ad, Bd, C, D, dt):
     """Returns continuous A, B, C, D from discrete
 
@@ -243,7 +244,7 @@ def so2ss(M, C, K, Bt, Cd, Cv, Ca):
 
     A = np.vstack((np.hstack((np.zeros_like(M), np.eye(M.shape[0]))),
                    np.hstack((-la.solve(M, K), -la.solve(M, C)))))
-    B = np.vstack((np.zeros_like(Bt), la.solve(M,Bt)))
+    B = np.vstack((np.zeros_like(Bt), la.solve(M, Bt)))
     C_ss = np.hstack((Cd - Ca@la.solve(M, K), Cv - Ca@la.solve(M, C)))
     D = Ca@la.solve(M, Bt)
 
@@ -280,7 +281,7 @@ def damp(A):
                                                 float(f0)))
 
 
-def undamped_modes(M, K, C = False, damp_diag = 0.01):
+def undamped_modes(M, K, C=False, damp_diag=0.01, shift = 1):
     '''Undamped modes and natural frequencies from Mass and Stiffness matrix.
 
     Optimally find mass normalized mode shapes and natural frequencies
@@ -297,6 +298,9 @@ def undamped_modes(M, K, C = False, damp_diag = 0.01):
     damp_diag : float, optional
         Maximum amount of off-diagonal error allowed in assuming C can be
         diagonalized
+    shift : float, optional
+        Shift used in eigensolution. Should be approximately equal to the first
+        non-zero eigenvalue.
 
     Returns
     -------
@@ -309,6 +313,7 @@ def undamped_modes(M, K, C = False, damp_diag = 0.01):
 
     Examples
     --------
+    >>> import numpy as np
     >>> import vibrationtesting as vt
     >>> M = np.array([[4, 0, 0],
     ...               [0, 4, 0],
@@ -316,19 +321,55 @@ def undamped_modes(M, K, C = False, damp_diag = 0.01):
     >>> K = np.array([[8, -4, 0],
     ...               [-4, 8, -4],
     ...               [0, -4, 4]])
-    >>> omega, Psi = vt.undamped_modes(M, K)
+    >>> omega, zeta, Psi = vt.undamped_modes(M, K, K/10)
     >>> print(omega)
     [ 0.445   1.247   1.8019]
     >>> print(Psi)
     [[ 0.164  -0.3685 -0.2955]
      [ 0.2955 -0.164   0.3685]
      [ 0.3685  0.2955 -0.164 ]]
+
+    Check that it works for rigid body modes.
+
+    >>> K2 = K-np.eye(K.shape[0])@M*(Psi.T@K@Psi)[0,0]
+    >>> omega, zeta, Psi = vt.undamped_modes(M, K2)
+    >>> print(omega)
+    [ 0.445   1.247   1.8019]
+    >>> print(Psi)
+    [[ 0.164  -0.3685 -0.2955]
+     [ 0.2955 -0.164   0.3685]
+     [ 0.3685  0.2955 -0.164 ]]
+
+    How about non-proportional damping
+
+    >>> C = K/10
+    >>> C[0,0] = 2 * C[0,0]
+    >>> omega, zeta, Psi = vt.undamped_modes(M, K2, C)
+    >>> print(omega)
+    [ 0.445   1.247   1.8019]
+    >>> print(Psi)
+    [[-0.164   0.3685 -0.2955]
+     [-0.2955  0.164   0.3685]
+     [-0.3685 -0.2955 -0.164 ]]
     '''
-    lam, psi_flipped = la.eigh(M, K)
 
-    omega = np.real(np.sqrt(1.0 / lam[-1::-1]))
+    # K = K + shift * np.eye(K.shape[0])  # Shift eigenvalues up by 1.
 
-    Psi = np.fliplr(psi_flipped)
+    # lam, psi_flipped = la.eigh(M, K)
+
+    # lam = lam - shift
+
+    # omega = np.real(np.sqrt(1.0 / lam[-1::-1]))
+
+    K = K + M * shift
+
+    lam, Psi = la.eigh(K, M)
+
+    # omega = np.real(np.sqrt(lam[-1::-1]))
+
+    omega = np.sqrt(np.abs(lam-shift))  # round to zero
+
+    # Psi = np.fliplr(Psi)  # Eigenvalues/vectors reported backwards
 
     norms = np.diag(1.0 / np.sqrt(np.diag(Psi.T@M@Psi)))
 
@@ -336,35 +377,32 @@ def undamped_modes(M, K, C = False, damp_diag = 0.01):
 
     zeta = np.zeros_like(omega)
 
-    if C is True:
+    if C is not False:
         diagonalized_C = Psi.T@C@Psi
 
         diagonal_C = np.diag(diagonalized_C)
 
         if min(omega) > 1e-5:
-            zeta = diagonal_C/2/omega  # error if omega = 0
-            max_off_diagonals = max(np.abs(diagonalized_C
-                                   -np.diag(np.diag(diagonalized_C))))
-            damp_error = max(max_off_diagonals/diagonal_C)  # error if no damping
+            zeta = diagonal_C / 2 / omega  # error if omega = 0
+            max_off_diagonals = np.amax(np.abs(diagonalized_C
+                                           - np.diag(diagonal_C)), axis = 0)
+            # error if no damping
+            damp_error = np.max(max_off_diagonals / diagonal_C)
         else:
             zeta = np.zeros_like(omega)
             damp_error = np.zeros_like(omega)
-            de_diag_C = diagonalized_C - np.diagonal(diagonal_C)
+            de_diag_C = diagonalized_C - np.diag(diagonal_C)
             for mode_num, omega_i in enumerate(omega):
                 if omega[mode_num] > 1e-5:
-                    zeta[mode_num] = diagonal_C[mode_num]/2/omega_i
-                    damp_error=(max(np.abs(de_diag_C[:,mode_num]))
-                                / diagonal_C[mode_num])
-
-        max_off_diagonals = max(np.abs(diagonalized_C
-                                   -np.diag(np.diag(diagonalized_C))))
-
-        damp_error = max(max_off_diagonals/diagonal_C)  # error if no damping
+                    zeta[mode_num] = diagonal_C[mode_num] / 2 / omega_i
+                    damp_error = (np.max(np.abs(de_diag_C[:, mode_num]))
+                                  / diagonal_C[mode_num])
 
         if damp_error > damp_diag:
             print('Damping matrix cannot be completely diagonalized.')
+            print('Off diagonal error of {:4.0%}.'.format(damp_error * 100))
 
-    return omega, Psi, zeta
+    return omega, zeta, Psi
 
 
 def serep(M, K, master):
@@ -417,15 +455,15 @@ def serep(M, K, master):
     '''
 
     nm = int(max(master.shape))  # number of modes to keep;
-    master = master.reshape(-1)-1  # retained dofs
+    master = master.reshape(-1) - 1  # retained dofs
 
     ndof = int(M.shape[0])  # length(M);
 
-    omega, Psi = undamped_modes(M, K)
+    omega, zeta, Psi = undamped_modes(M, K)
     Psi_tr = Psi[nm:, :nm]  # Truncated modes
     Psi_rr = Psi[:nm, :nm]  # Retained modes
 
-    truncated_dofs = list(set(np.arange(ndof))-set(master))
+    truncated_dofs = list(set(np.arange(ndof)) - set(master))
 
     T = np.zeros((ndof, nm))
     T[master, :nm] = np.eye(nm)
@@ -433,4 +471,4 @@ def serep(M, K, master):
     Mred = T.T @ M @T
     Kred = T.T @ K @T
 
-    return Mred, Kred, T, np.array(truncated_dofs)+1
+    return Mred, Kred, T, np.array(truncated_dofs) + 1
