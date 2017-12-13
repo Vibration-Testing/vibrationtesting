@@ -324,33 +324,42 @@ def undamped_modes(M, K, C=False, damp_diag=0.01, shift = 1):
     >>> omega, zeta, Psi = vt.undamped_modes(M, K, K/10)
     >>> print(omega)
     [ 0.445   1.247   1.8019]
-    >>> print(Psi)
-    [[ 0.164  -0.3685 -0.2955]
-     [ 0.2955 -0.164   0.3685]
-     [ 0.3685  0.2955 -0.164 ]]
+    >>> print(Psi.T@K@Psi)
+    [[ 0.1981  0.     -0.    ]
+     [ 0.      1.555  -0.    ]
+     [-0.     -0.      3.247 ]]
 
     Check that it works for rigid body modes.
 
     >>> K2 = K-np.eye(K.shape[0])@M*(Psi.T@K@Psi)[0,0]
     >>> omega, zeta, Psi = vt.undamped_modes(M, K2)
     >>> print(omega)
-    [ 0.445   1.247   1.8019]
+    [ 0.      1.1649  1.7461]
     >>> print(Psi)
-    [[ 0.164  -0.3685 -0.2955]
-     [ 0.2955 -0.164   0.3685]
-     [ 0.3685  0.2955 -0.164 ]]
+    [[-0.164   0.3685 -0.2955]
+     [-0.2955  0.164   0.3685]
+     [-0.3685 -0.2955 -0.164 ]]
+    >>> print(Psi.T@K2@Psi)
+    [[ 0.      0.     -0.    ]
+     [-0.      1.3569  0.    ]
+     [-0.      0.      3.0489]]
 
     How about non-proportional damping
 
     >>> C = K/10
     >>> C[0,0] = 2 * C[0,0]
     >>> omega, zeta, Psi = vt.undamped_modes(M, K2, C)
+    Damping matrix cannot be completely diagonalized.
+    Off diagonal error of 2208%.
     >>> print(omega)
-    [ 0.445   1.247   1.8019]
-    >>> print(Psi)
-    [[-0.164   0.3685 -0.2955]
-     [-0.2955  0.164   0.3685]
-     [-0.3685 -0.2955 -0.164 ]]
+    [ 0.      1.1649  1.7461]
+    >>> print(zeta)
+    [ 0.      0.1134  0.113 ]
+    >>> print(Psi.T@C@Psi)
+    [[ 0.0413 -0.0483  0.0388]
+     [-0.0483  0.2641 -0.0871]
+     [ 0.0388 -0.0871  0.3946]]
+
     '''
 
     # K = K + shift * np.eye(K.shape[0])  # Shift eigenvalues up by 1.
