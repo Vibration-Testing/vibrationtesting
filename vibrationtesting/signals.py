@@ -6,7 +6,6 @@ __license__ = "Joseph C. Slater"
 
 __docformat__ = 'reStructuredText'
 
-import math
 import warnings
 
 import numpy as np
