@@ -9,7 +9,7 @@ M = np.array([[4, 0, 0],
 K = np.array([[8, -4, 0],
               [-4, 8, -4],
               [0, -4, 4]])
-omega, zeta, Psi = vt.undamped_modes(M, K)
+omega, zeta, Psi = vt.sos_modal(M, K)
 
 
 def test_serep():

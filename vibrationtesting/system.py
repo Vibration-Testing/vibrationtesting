@@ -14,7 +14,7 @@ import numpy as np
 # import control as ctrl
 import scipy.signal as sig
 import scipy.linalg as la
-#np.set_printoptions(precision=4, suppress=True)
+# np.set_printoptions(precision=4, suppress=True)
 
 
 def d2c(Ad, Bd, C, D, dt):
@@ -281,8 +281,8 @@ def damp(A):
                                                 float(f0)))
 
 
-def undamped_modes(M, K, C=False, damp_diag=0.01, shift = 1):
-    '''Undamped modes and natural frequencies from Mass and Stiffness matrix.
+def sos_modal(M, K, C=False, damp_diag=0.01, shift=1):
+    r'''Undamped modes and natural frequencies from Mass and Stiffness matrix.
 
     Optimally find mass normalized mode shapes and natural frequencies
     of a system modelled by :math:`M\ddot{x}+Kx=0`.
@@ -321,7 +321,7 @@ def undamped_modes(M, K, C=False, damp_diag=0.01, shift = 1):
     >>> K = np.array([[8, -4, 0],
     ...               [-4, 8, -4],
     ...               [0, -4, 4]])
-    >>> omega, zeta, Psi = vt.undamped_modes(M, K, K/10)
+    >>> omega, zeta, Psi = vt.sos_modal(M, K, K/10)
     >>> print(omega)
     [ 0.445   1.247   1.8019]
     >>> print(Psi.T@K@Psi)
@@ -332,7 +332,7 @@ def undamped_modes(M, K, C=False, damp_diag=0.01, shift = 1):
     Check that it works for rigid body modes.
 
     >>> K2 = K-np.eye(K.shape[0])@M*(Psi.T@K@Psi)[0,0]
-    >>> omega, zeta, Psi = vt.undamped_modes(M, K2)
+    >>> omega, zeta, Psi = vt.sos_modal(M, K2)
     >>> print(omega)
     [ 0.      1.1649  1.7461]
     >>> print(Psi)
@@ -348,7 +348,7 @@ def undamped_modes(M, K, C=False, damp_diag=0.01, shift = 1):
 
     >>> C = K/10
     >>> C[0,0] = 2 * C[0,0]
-    >>> omega, zeta, Psi = vt.undamped_modes(M, K2, C)
+    >>> omega, zeta, Psi = vt.sos_modal(M, K2, C)
     Damping matrix cannot be completely diagonalized.
     Off diagonal error of 2208%.
     >>> print(omega)
@@ -362,23 +362,11 @@ def undamped_modes(M, K, C=False, damp_diag=0.01, shift = 1):
 
     '''
 
-    # K = K + shift * np.eye(K.shape[0])  # Shift eigenvalues up by 1.
-
-    # lam, psi_flipped = la.eigh(M, K)
-
-    # lam = lam - shift
-
-    # omega = np.real(np.sqrt(1.0 / lam[-1::-1]))
-
     K = K + M * shift
 
     lam, Psi = la.eigh(K, M)
 
-    # omega = np.real(np.sqrt(lam[-1::-1]))
-
-    omega = np.sqrt(np.abs(lam-shift))  # round to zero
-
-    # Psi = np.fliplr(Psi)  # Eigenvalues/vectors reported backwards
+    omega = np.sqrt(np.abs(lam - shift))  # round to zero
 
     norms = np.diag(1.0 / np.sqrt(np.diag(Psi.T@M@Psi)))
 
@@ -394,7 +382,7 @@ def undamped_modes(M, K, C=False, damp_diag=0.01, shift = 1):
         if min(omega) > 1e-5:
             zeta = diagonal_C / 2 / omega  # error if omega = 0
             max_off_diagonals = np.amax(np.abs(diagonalized_C
-                                           - np.diag(diagonal_C)), axis = 0)
+                                               - np.diag(diagonal_C)), axis=0)
             # error if no damping
             damp_error = np.max(max_off_diagonals / diagonal_C)
         else:
@@ -415,7 +403,7 @@ def undamped_modes(M, K, C=False, damp_diag=0.01, shift = 1):
 
 
 def serep(M, K, master):
-    '''System Equivalent Reduction reduced model
+    r'''System Equivalent Reduction reduced model
 
     Reduce size of second order system of equations by SEREP processs while
     returning expansion matrix
@@ -468,7 +456,7 @@ def serep(M, K, master):
 
     ndof = int(M.shape[0])  # length(M);
 
-    omega, zeta, Psi = undamped_modes(M, K)
+    omega, _, Psi = sos_modal(M, K)
     Psi_tr = Psi[nm:, :nm]  # Truncated modes
     Psi_rr = Psi[:nm, :nm]  # Retained modes
 
