@@ -191,7 +191,8 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
     return omega.reshape(1, -1), H.reshape(1, -1)
 
 
-def sos_frf(M, C, K, Bt, Cd, Cv, Ca, omega_low, omega_high, in_index, out_index):
+def sos_frf(M, C, K, Bt, Cd, Cv, Ca, omega_low, omega_high,
+            in_index, out_index):
     """FRF of second order system
 
     Given second order linear matrix equation of the form
