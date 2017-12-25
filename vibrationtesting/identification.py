@@ -10,6 +10,36 @@ import numpy as np
 import scipy.linalg as la
 import matplotlib.pyplot as plt
 
+'''
+======================
+System Identification
+======================
+
+
+Array convention for data/FRFs:
+
+Frequency Response Functions
+----------------------------
+| 0 dimension is the output
+| 1 dimension is the frequency index
+| 2 dimension is the input
+
+Time Histories
+--------------
+| 0 dimension is the output
+| 1 dimension is the time
+| 2 dimension is the instance index
+| 3 dimension is the input
+
+Spectrum Densities
+------------------
+| 0 dimension is the output (Cross Spectrum) or channel (Auto Spectrums)
+| 1 dimension is the frequency index
+| 2 dimension is the instance index
+| 3 dimension is the input (Cross Spectrum Densities)
+
+'''
+
 
 def sdof_cf(f, TF, Fmin=None, Fmax=None):
     """Curve fit to a single degree of freedom FRF.
@@ -302,3 +332,31 @@ def mdof_cf(f, TF, Fmin=None, Fmax=None):
     u = u / np.sqrt(np.abs(a[0, 0]))
 
     return z, nf, u
+
+
+def cmif(f, H, Fmin = None, Fmax = None):
+    '''Complex mode indicator function
+
+    Plots the complex mode indicator function
+
+    Parameters
+    ----------
+    f: array
+        The frequency vector in Hz. Does not have to start at 0 Hz.
+    H: array
+        The complex frequency response function
+    Fmin: int
+        The minimum frequency to be plotted (not live yet)
+    Fmax: int
+        The maximum frequency to be plotted (not live yet)
+
+    Returns
+    -------
+
+    Examples
+    --------
+    >>>
+
+    '''
+
+
