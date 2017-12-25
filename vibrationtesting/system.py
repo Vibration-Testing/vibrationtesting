@@ -191,6 +191,67 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
     return omega.reshape(1, -1), H.reshape(1, -1)
 
 
+def sos_frf(M, C, K, Bt, Cd, Cv, Ca, omega_low, omega_high, in_index, out_index):
+    """FRF of second order system
+
+    Given second order linear matrix equation of the form
+    :math:`M\\ddot{x} + C \\dot{x} + K x= \\tilde{B} u`
+    and
+    :math:`y = C_d x + C_v \\dot{x} + C_a\\ddot{x}`
+    converts to state space form and returns the requested frequency response
+    function
+
+    Parameters
+    ----------
+    M, C, K, Bt, Cd, Cv, Cd: float arrays
+        Mass , damping, stiffness, input, displacement sensor, velocimeter,
+        and accelerometer matrices
+
+    Returns
+    -------
+    A, B, C, D: float arrays
+        State matrices
+
+    Returns
+    -------
+    omega : float array
+            frequency vector
+    H : float array
+        frequency response function
+
+    Examples not working for second order system
+
+    Need to make one for second order expansion
+
+    Examples
+    --------
+    >>> import vibrationtesting as vt
+    >>> A1 = np.array([[ 0.,   0. ,  1.    ,  0.    ]])
+    >>> A2 = np.array([[ 0.,   0. ,  0.    ,  1.    ]])
+    >>> A3 = np.array([[-1.4,  1.2, -0.0058,  0.0014]])
+    >>> A4 = np.array([[ 0.8, -1.4,  0.0016, -0.0038]])
+    >>> A = np.array([[ 0.,   0. ,  1.    ,  0.    ],
+    ...               [ 0.,   0. ,  0.    ,  1.    ],
+    ...               [-1.4,  1.2, -0.0058,  0.0014],
+    ...               [ 0.8, -1.4,  0.0016, -0.0038]])
+    >>> B = np.array([[ 0.],
+    ...               [ 0.],
+    ...               [ 0.],
+    ...               [ 1.]])
+    >>> C = np.array([[-1.4, 1.2, -0.0058, 0.0014]])
+    >>> D = np.array([[-0.2]])
+    >>> omega, H = vt.ssfrf(A, B, C, D, 0, 3.5, 1, 1)
+    >>> vt.frfplot(omega, H) # doctest: +SKIP
+
+    """
+
+    A, B, C, D = so2ss(M, C, K, Bt, Cd, Cv, Ca)
+
+    omega, H = ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index)
+
+    return omega, H
+
+
 def so2ss(M, C, K, Bt, Cd, Cv, Ca):
     """Convert second order system to state space
 
@@ -282,12 +343,15 @@ def damp(A):
 
 
 def sos_modal(M, K, C=False, damp_diag=0.01, shift=1):
-    r'''Undamped modes and natural frequencies from Mass and Stiffness matrix.
+    r'''Eigen analysis of proportionally damped system.
 
     Optimally find mass normalized mode shapes and natural frequencies
     of a system modelled by :math:`M\ddot{x}+Kx=0`.
 
     If provided, obtain damping ratios presuming :math:`C` can be decoupled.
+
+    Provides a warning if diagonalization of dapming matrix fails worse than
+    relative error of `damp_diag`.
 
     Parameters
     ----------
