@@ -204,14 +204,9 @@ def sos_frf(M, C, K, Bt, Cd, Cv, Ca, omega_low, omega_high,
 
     Parameters
     ----------
-    M, C, K, Bt, Cd, Cv, Cd: float arrays
+    M, C, K, Bt, Cd, Cv, Cd : float arrays
         Mass , damping, stiffness, input, displacement sensor, velocimeter,
         and accelerometer matrices
-
-    Returns
-    -------
-    A, B, C, D: float arrays
-        State matrices
 
     Returns
     -------
@@ -266,13 +261,13 @@ def so2ss(M, C, K, Bt, Cd, Cv, Ca):
 
     Parameters
     ----------
-    M, C, K, Bt, Cd, Cv, Cd: float arrays
+    M, C, K, Bt, Cd, Cv, Cd : float arrays
         Mass , damping, stiffness, input, displacement sensor, velocimeter,
         and accelerometer matrices
 
     Returns
     -------
-    A, B, C, D: float arrays
+    A, B, C, D : float arrays
         State matrices
 
     Examples
