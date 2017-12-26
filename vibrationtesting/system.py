@@ -147,7 +147,7 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
     ----------
     A, B, C, D : float arrays
                  state system matrices
-    omega_low, omega_high: floats
+    omega_low, omega_high : floats
                  low and high frequencies for evaluation
     in_index, out_index : ints
                 input and output numbers (starting at 1)
@@ -341,7 +341,7 @@ def sos_modal(M, K, C=False, damp_diag=0.03, shift=1):
 
     If provided, obtain damping ratios presuming :math:`C` can be decoupled.
 
-    Provides a warning if diagonalization of dapming matrix fails worse than
+    Provides a warning if diagonalization of damping matrix fails worse than
     relative error of `damp_diag`.
 
     Parameters
@@ -403,7 +403,7 @@ def sos_modal(M, K, C=False, damp_diag=0.03, shift=1):
     >>> C[0,0] = 2 * C[0,0]
     >>> omega, zeta, Psi = vt.sos_modal(M, K2, C)
     Damping matrix cannot be completely diagonalized.
-    Off diagonal error of 2208%.
+    Off diagonal error of 22%.
     >>> print(omega)
     [ 0.      1.1649  1.7461]
     >>> print(zeta)
