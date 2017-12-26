@@ -177,13 +177,16 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
 
     """
     # A, B, C, D = ctrl.ssdata(sys)
-    sa = A.shape[0]
-    omega = np.linspace(omega_low, omega_high, 1000)
-    H = omega * 1j
-    i = 0
-    for i, w in enumerate(omega):
-        H[i] = (C@la.solve(w * 1j * np.eye(sa) - A, B) + D)[out_index - 1,
-                                                            in_index - 1]
+    if 0 < in_index < (B.shape[1]+1) and 0 < out_index < (C.shape[0] + 1):
+        sa = A.shape[0]
+        omega = np.linspace(omega_low, omega_high, 1000)
+        H = omega * 1j
+        i = 0
+        for i, w in enumerate(omega):
+            H[i] = (C@la.solve(w * 1j * np.eye(sa) - A, B) + D)[out_index - 1,
+                                                                in_index - 1]
+    else:
+        raise ValueError('Input {} or output {} infeasible.'.format(in_index, out_index))
     return omega.reshape(1, -1), H.reshape(1, -1)
 
 
@@ -201,7 +204,7 @@ def sos_frf(M, C, K, Bt, Cd, Cv, Ca, omega_low, omega_high,
     Parameters
     ----------
     M, C, K, Bt, Cd, Cv, Cd : float arrays
-        Mass , damping, stiffness, input, displacement sensor, velocimeter,
+        Mass, damping, stiffness, input, displacement sensor, velocimeter,
         and accelerometer matrices
 
     Returns
