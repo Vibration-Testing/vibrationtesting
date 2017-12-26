@@ -222,10 +222,6 @@ def sos_frf(M, C, K, Bt, Cd, Cv, Ca, omega_low, omega_high,
     Examples
     --------
     >>> import vibrationtesting as vt
-    >>> A1 = np.array([[ 0.,   0. ,  1.    ,  0.    ]])
-    >>> A2 = np.array([[ 0.,   0. ,  0.    ,  1.    ]])
-    >>> A3 = np.array([[-1.4,  1.2, -0.0058,  0.0014]])
-    >>> A4 = np.array([[ 0.8, -1.4,  0.0016, -0.0038]])
     >>> A = np.array([[ 0.,   0. ,  1.    ,  0.    ],
     ...               [ 0.,   0. ,  0.    ,  1.    ],
     ...               [-1.4,  1.2, -0.0058,  0.0014],
