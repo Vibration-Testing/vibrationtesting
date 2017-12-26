@@ -5,3 +5,4 @@ sphinx
 ipython
 control
 vibration_toolbox
+xarray
