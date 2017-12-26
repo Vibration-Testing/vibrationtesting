@@ -78,3 +78,4 @@ docs/_build/
 target/
 vibrationtesting/.DS_Store
 .DS_Store
+*.lock
