@@ -333,7 +333,7 @@ def damp(A):
                                                 float(f0)))
 
 
-def sos_modal(M, K, C=False, damp_diag=0.01, shift=1):
+def sos_modal(M, K, C=False, damp_diag=0.03, shift=1):
     r'''Eigen analysis of proportionally damped system.
 
     Optimally find mass normalized mode shapes and natural frequencies
@@ -450,7 +450,7 @@ def sos_modal(M, K, C=False, damp_diag=0.01, shift=1):
 
         if damp_error > damp_diag:
             print('Damping matrix cannot be completely diagonalized.')
-            print('Off diagonal error of {:4.0%}.'.format(damp_error * 100))
+            print('Off diagonal error of {:4.0%}.'.format(damp_error))
 
     return omega, zeta, Psi
 
