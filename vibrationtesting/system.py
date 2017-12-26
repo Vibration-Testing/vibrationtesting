@@ -399,10 +399,8 @@ def sos_modal(M, K, C=False, damp_diag=0.01, shift=1):
     [[-0.164   0.3685 -0.2955]
      [-0.2955  0.164   0.3685]
      [-0.3685 -0.2955 -0.164 ]]
-    >>> print(Psi.T@K2@Psi)
-    [[ 0.      0.     -0.    ]
-     [-0.      1.3569  0.    ]
-     [-0.      0.      3.0489]]
+    >>> print(np.diag(Psi.T@K2@Psi))
+    [ 0.      1.3569  3.0489]
 
     How about non-proportional damping
 
