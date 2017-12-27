@@ -371,7 +371,7 @@ def cmif(freq, H, freq_min=None, freq_max=None, plot = True):
     ...            omega, H_all[i-1,:,j-1] = vt.sos_frf(M, Damping/10, K, Bt,
     ...                                                 Cd, Cv, Ca, 0, 3, i,
     ...                                                 j, num_freqs = 1000)
-    >>> vt.cmif(omega, H_all)
+    >>> _ = vt.cmif(omega, H_all)
 
     Notes
     -----
@@ -394,7 +394,7 @@ def cmif(freq, H, freq_min=None, freq_max=None, plot = True):
         raise ValueError('freq_min must be less than freq_max.')
 
     # print(str(np.amin(freq)))
-    lenF = freq.shape[1]
+    # lenF = freq.shape[1]
     '''
     inlow = int(lenF * (freq_min - np.amin(freq)
                         ) // (np.amax(freq) - np.amin(freq)))
