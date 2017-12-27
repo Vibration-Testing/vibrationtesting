@@ -9,15 +9,10 @@ __docformat__ = 'reStructuredText'
 import warnings
 
 import numpy as np
-import control as ctrl
-# from numpy import ma
 import scipy as sp
-# import scipy.signal as sig
 import scipy.fftpack as fftpack
 import scipy.linalg as la
-import matplotlib
 import matplotlib.pyplot as plt
-# rcParams = matplotlib.rcParams
 
 
 """
@@ -131,7 +126,7 @@ def window(x, windowname='hanning', normalize=False):
         elif len(x.shape) == 3:
 
             if x.shape[0] > x.shape[1]:
-                x = sp.swapaxes(x, 0, 1)
+                x = np.swapaxes(x, 0, 1)
                 swap = 1
                 print('You shouldn\'t do that.')
                 print('The 1 dimension is the time (or frequency) \
@@ -144,14 +139,14 @@ def window(x, windowname='hanning', normalize=False):
             f, _, _ = np.meshgrid(f, np.arange(
                 x.shape[0]), np.arange(x.shape[2]))
             if swap == 1:
-                f = sp.swapaxes(f, 0, 1)
+                f = np.swapaxes(f, 0, 1)
 
         elif len(x.shape) == 2:
             # f,_=np.meshgrid(f[0,:],np.arange(x.shape[0]))
             # print('b')
 
             if x.shape[0] > x.shape[1]:
-                x = sp.swapaxes(x, 0, 1)
+                x = np.swapaxes(x, 0, 1)
                 swap = 1
                 print('You shouldn\'t do that.')
                 print('The 1 dimension is the time (or frequency) ' +
@@ -163,7 +158,7 @@ def window(x, windowname='hanning', normalize=False):
             f = window(x.shape[1], windowname=windowname)
             f, _ = np.meshgrid(f, np.arange(x.shape[0]))
             if swap == 1:
-                f = sp.swapaxes(f, 0, 1)
+                f = np.swapaxes(f, 0, 1)
 
     else:
         # print(x)
@@ -274,7 +269,7 @@ def hanning(x, normalize=False):
             # print(f.shape)
 
             if x.shape[0] > x.shape[1]:
-                x = sp.swapaxes(x, 0, 1)
+                x = np.swapaxes(x, 0, 1)
                 swap = 1
                 print('Swapping axes temporarily to be compliant with \
                       expectations. I\'ll fix them in your result')
@@ -283,7 +278,7 @@ def hanning(x, normalize=False):
             f, _, _ = np.meshgrid(f, np.arange(
                 x.shape[0]), np.arange(x.shape[2]))
             if swap == 1:
-                f = sp.swapaxes(f, 0, 1)
+                f = np.swapaxes(f, 0, 1)
 
         elif len(x.shape) == 2:
             # f,_=np.meshgrid(f[0,:],np.arange(x.shape[0]))
@@ -291,14 +286,14 @@ def hanning(x, normalize=False):
             # print('length = 2')
             # print(x.shape)
             if x.shape[0] > x.shape[1]:
-                x = sp.swapaxes(x, 0, 1)
+                x = np.swapaxes(x, 0, 1)
                 swap = 1
                 print('Swapping axes temporarily to be compliant with \
                       expectations. I\'ll fix them in your result')
             f = hanning(x.shape[1])
             f, _ = np.meshgrid(f, np.arange(x.shape[0]))
             if swap == 1:
-                f = sp.swapaxes(f, 0, 1)
+                f = np.swapaxes(f, 0, 1)
     else:
         # print(x)
         # Create hanning window of length x
@@ -608,10 +603,10 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
               Please check your inputs.')
 
     if len(x.shape) == 1:
-        x = sp.expand_dims(x, axis=0)
-        x = sp.expand_dims(x, axis=2)
-        y = sp.expand_dims(y, axis=0)
-        y = sp.expand_dims(y, axis=2)
+        x = np.expand_dims(x, axis=0)
+        x = np.expand_dims(x, axis=2)
+        y = np.expand_dims(y, axis=0)
+        y = np.expand_dims(y, axis=2)
     n = x.shape[1]
 
     # No clue what this does, and I wrote it. Comment your code, you fool!
@@ -658,19 +653,17 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
         y = y * win
         x = x * win
         del win
-    # print(y.shape)
-    ffty = np.fft.rfft(y, axis=1) * dt
-    # print(ffty.shape)
-    # print(x.shape)
+
+    ffty = np.fft.rfft(y, n, axis=1) * dt
     fftx = np.fft.rfft(x, n, axis=1) * dt
-    # print(fftx.shape)
+
     Pxy = np.conj(fftx) * ffty / (n * dt) * 2
 
     if len(Pxy.shape) == 3 and Pxy.shape[2] > 1 and ave:
         Pxy = np.mean(Pxy, 2)
 
     nfreq = 1 / dt / 2
-    f = np.linspace(0, nfreq, Pxy.shape[1])  # /2./sp.pi
+    f = np.linspace(0, nfreq, Pxy.shape[1])  # /2./np.pi
 
     return f, Pxy
 
@@ -796,35 +789,26 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
         for i in np.arange(Pxx.shape[1]):
             frfm = np.array(
                 [[Pff[0, i], np.conj(Pxf[0, i])], [Pxf[0, i], Pxx[0, i]]])
-            # print('index number ' + str(i))
-            # print(frfm)
+
             alpha = 1  # np.sqrt(Pff[0,i]/Pxx[0,i])
-            # print(alpha)
+
             frfm = np.array([[Pff[0, i], alpha * np.conj(Pxf[0, i])],
                              [alpha * Pxf[0, i], alpha**2 * Pxx[0, i]]])
-            # print('new frfm')
-            # print(frfm)
+
             lam, vecs = la.eigh(frfm)
-            # print(lam)
-            # print(vecs)
+
             index = lam.argsort()
-            # print(index)
+
             lam = lam[index]
-            # print(lam)
+
             vecs = vecs[:, index]
-            # print(vecs)
-            # print(np.array([Txf1[0,i], -(vecs[0,0]/vecs[1,0]), -(vecs[1,0]/vecs[1,1]), Txf2[0,i]]))
+
             Txfv[0, i] = -(vecs[0, 0] / vecs[1, 0]) / alpha  # *np.sqrt(alpha)
             a = 1
             b = -Pxx[0, i] - Pff[0, i]
             c = Pxx[0, i] * Pff[0, i] - abs(Pxf[0, i])**2
-            # lambda1=((Pxx[0,i]+Pff[0,i])-np.sqrt((Pxx[0,i]+Pff[0,i])*2+4*((Pxx[0,i]*Pff[0,i]-abs(Pxf[0,i])**2))))/2
-            lambda1 = (-b - np.sqrt(b**2 - 4 * a * c)) / 2 / a
-            # Txfv[0,i]=np.conj(Pxf[0,i])/(Pff[0,i]-lambda1)*alpha
-            # print(Txfv[0,i])
-            # person = input('Next point: ')
-            # print(np.dot(frfm, vecs[:, 0]) - lam[0] * vecs[:, 0])
-            # print(np.dot(frfm, vecs[:, 1]) - lam[1] * vecs[:, 1])
+
+    #        lambda1 = (-b - np.sqrt(b**2 - 4 * a * c)) / 2 / a
 
     return freq, Txf1, Txf2, coh, Txfv
 
@@ -976,7 +960,7 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
     # return lags, c, a, b'''
 
 
-def frfplot(freq, H, freq_min=0, freq_max=0, type=1, legend=[]):
+def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
     """Frequency Response function pretty plotting.
 
     Plots frequency response functions in a variety of formats
@@ -1061,12 +1045,14 @@ def frfplot(freq, H, freq_min=0, freq_max=0, type=1, legend=[]):
     if H.shape[0] > H.shape[1]:
         H = H.T
 
-    #    if lenF==1;
-    #    F=(0:length(Xfer)-1)'*F;
-    #    end
-    if freq_max == 0:
+    if freq_max is None:
         freq_max = np.max(freq)
-        # print(str(freq_max))
+
+    if freq_min is None:
+        freq_min = np.min(freq)
+
+    if freq_min < np.min(freq):
+        freq_min = np.min(freq)
 
     if freq_min > freq_max:
         raise ValueError('freq_min must be less than freq_max.')
@@ -1310,9 +1296,9 @@ def xcorr(t, x, y, zeropad=True):
         Xn = np.fft.rfft(x)
         Yn = np.conj(np.fft.rfft(y))
 
-    xcor = sp.real(fftpack.fftshift(sp.ifft(Xn * Yn)))
+    xcor = np.real(fftpack.fftshift(sp.ifft(Xn * Yn)))
     dt = t[1] - t[0]
 
-    tau = sp.linspace(-len(xcor) / 2 * dt - dt / 2,
+    tau = np.linspace(-len(xcor) / 2 * dt - dt / 2,
                       len(xcor) / 2 * dt - dt / 2, len(xcor))
     return tau, xcor
