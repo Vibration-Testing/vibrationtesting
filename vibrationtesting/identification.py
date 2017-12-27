@@ -334,29 +334,81 @@ def mdof_cf(f, TF, Fmin=None, Fmax=None):
     return z, nf, u
 
 
-def cmif(f, H, Fmin = None, Fmax = None):
+def cmif(freq, H, freq_min=None, freq_max=None):
     '''Complex mode indicator function
 
     Plots the complex mode indicator function
 
     Parameters
     ----------
-    f: array
+    freq: array
         The frequency vector in Hz. Does not have to start at 0 Hz.
     H: array
         The complex frequency response function
-    Fmin: int
-        The minimum frequency to be plotted (not live yet)
-    Fmax: int
-        The maximum frequency to be plotted (not live yet)
+    freq_min: float, optional
+        The minimum frequency to be plotted
+    freq_max: float, optional
+        The maximum frequency to be plotted
 
     Returns
     -------
 
     Examples
     --------
-    >>>
+    >>> M = np.diag([1,1,1])
+    >>> K = K = np.array([[3.03, -1, -1],[-1, 2.98, -1],[-1, -1, 3]])
+    >>> Damping = K/100
+    >>> Cd = np.eye(3)
+    >>> Cv = Ca = np.zeros_like(Cd)
+    >>> Bt = np.eye(3)
+    >>> H_all = np.zeros((3,1000,3), dtype = 'complex128')
+    >>> for i in np.arange(1, 4):
+    ...        for j in np.arange(1, 4):
+    ...            omega, H_all[i-1,:,j-1] = vt.sos_frf(M, Damping/10, K, Bt,
+    ...                                                 Cd, Cv, Ca, 0, 3, i,
+    ...                                                 j, num_freqs = 1000)
+    >>> vt.cmif(omega, H_all)
+
+    Notes
+    -----
+    .. note:: Allemang, R. and Brown, D., “A Complete Review of the Complex
+    Mode Indicator Function (CMIF) With Applications,” Proceedings of ISMA
+    International Conference on Noise and Vibration Engineering, Katholieke
+    Universiteit Leuven, Belgium, 2006.
 
     '''
+    if freq_max is None:
+        freq_max = np.max(freq)
+        # print(str(freq_max))
 
+    if freq_min is None:
+        freq_min = 0
 
+    if freq_min < np.min(freq):
+        freq_min = np.min(freq)
+
+    if freq_min > freq_max:
+        raise ValueError('freq_min must be less than freq_max.')
+
+    # print(str(np.amin(freq)))
+    lenF = freq.shape[1]
+    '''
+    inlow = int(lenF * (freq_min - np.amin(freq)
+                        ) // (np.amax(freq) - np.amin(freq)))
+
+    inhigh = int(lenF * (freq_max - np.amin(freq)
+                         ) // (np.amax(freq) - np.amin(freq)) - 1)
+    '''
+
+    cmifs = np.zeros((max([H.shape[0], H.shape[2]]), max(freq.shape)))
+    for i, freq_i in enumerate(freq.reshape(-1)):
+        _, vals, _ = np.linalg.svd(H[:, i, :])
+        cmifs[:, i] = np.sort(vals).T
+
+    fig, ax = plt.subplots(1, 1)
+    ax.plot(freq.T, np.log10(cmifs.T))
+    ax.grid('on')
+    ax.set_ylabel('Maginitudes')
+    plt.title('Complex Mode Indicator Functions')
+    ax.set_xlabel('Frequency')
+    ax.set_xlim(xmax=freq_max, xmin=freq_min)
