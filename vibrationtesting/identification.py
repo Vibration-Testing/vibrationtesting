@@ -355,6 +355,7 @@ def cmif(freq, H, freq_min=None, freq_max=None):
 
     Examples
     --------
+    >>> import vibrationtesting as vt
     >>> M = np.diag([1,1,1])
     >>> K = K = np.array([[3.03, -1, -1],[-1, 2.98, -1],[-1, -1, 3]])
     >>> Damping = K/100
