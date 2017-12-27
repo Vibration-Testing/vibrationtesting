@@ -137,7 +137,8 @@ def c2d(A, B, C, D, dt):
     return Ad, Bd, C, D
 
 
-def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
+def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index,
+          num_freqs = 1000):
     """FRF of state space system
 
     Obtains the computed FRF of a state space system between selected input
@@ -151,6 +152,8 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
                  low and high frequencies for evaluation
     in_index, out_index : ints
                 input and output numbers (starting at 1)
+    num_freqs : int
+                number of frequencies at which to return FRF
 
     Returns
     -------
@@ -179,7 +182,7 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
     # A, B, C, D = ctrl.ssdata(sys)
     if 0 < in_index < (B.shape[1]+1) and 0 < out_index < (C.shape[0] + 1):
         sa = A.shape[0]
-        omega = np.linspace(omega_low, omega_high, 1000)
+        omega = np.linspace(omega_low, omega_high, num_freqs)
         H = omega * 1j
         i = 0
         for i, w in enumerate(omega):
@@ -191,7 +194,7 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index):
 
 
 def sos_frf(M, C, K, Bt, Cd, Cv, Ca, omega_low, omega_high,
-            in_index, out_index):
+            in_index, out_index, num_freqs = 1000):
     """FRF of second order system
 
     Given second order linear matrix equation of the form
@@ -206,6 +209,13 @@ def sos_frf(M, C, K, Bt, Cd, Cv, Ca, omega_low, omega_high,
     M, C, K, Bt, Cd, Cv, Cd : float arrays
         Mass, damping, stiffness, input, displacement sensor, velocimeter,
         and accelerometer matrices
+        omega_low, omega_high : floats
+                 low and high frequencies for evaluation
+    in_index, out_index : ints
+                input and output numbers (starting at 1)
+    num_freqs : int
+                number of frequencies at which to return FRF
+
 
     Returns
     -------
@@ -238,7 +248,8 @@ def sos_frf(M, C, K, Bt, Cd, Cv, Ca, omega_low, omega_high,
 
     A, B, C, D = so2ss(M, C, K, Bt, Cd, Cv, Ca)
 
-    omega, H = ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index)
+    omega, H = ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index,
+                     num_freqs)
 
     return omega, H
 
