@@ -334,24 +334,27 @@ def mdof_cf(f, TF, Fmin=None, Fmax=None):
     return z, nf, u
 
 
-def cmif(freq, H, freq_min=None, freq_max=None):
+def cmif(freq, H, freq_min=None, freq_max=None, plot = True):
     '''Complex mode indicator function
 
     Plots the complex mode indicator function
 
     Parameters
     ----------
-    freq: array
+    freq : array
         The frequency vector in Hz. Does not have to start at 0 Hz.
-    H: array
+    H : array
         The complex frequency response function
-    freq_min: float, optional
+    freq_min : float, optional
         The minimum frequency to be plotted
-    freq_max: float, optional
+    freq_max : float, optional
         The maximum frequency to be plotted
+    plot : boolean, optional (True)
+        Whether to also plot mode indicator functions
 
     Returns
     -------
+    cmifs : complex mode indicator functions
 
     Examples
     --------
@@ -376,7 +379,6 @@ def cmif(freq, H, freq_min=None, freq_max=None):
     Mode Indicator Function (CMIF) With Applications,” Proceedings of ISMA
     International Conference on Noise and Vibration Engineering, Katholieke
     Universiteit Leuven, Belgium, 2006.
-
     '''
     if freq_max is None:
         freq_max = np.max(freq)
@@ -406,10 +408,12 @@ def cmif(freq, H, freq_min=None, freq_max=None):
         _, vals, _ = np.linalg.svd(H[:, i, :])
         cmifs[:, i] = np.sort(vals).T
 
-    fig, ax = plt.subplots(1, 1)
-    ax.plot(freq.T, np.log10(cmifs.T))
-    ax.grid('on')
-    ax.set_ylabel('Maginitudes')
-    plt.title('Complex Mode Indicator Functions')
-    ax.set_xlabel('Frequency')
-    ax.set_xlim(xmax=freq_max, xmin=freq_min)
+    if plot is True:
+        fig, ax = plt.subplots(1, 1)
+        ax.plot(freq.T, np.log10(cmifs.T))
+        ax.grid('on')
+        ax.set_ylabel('Maginitudes')
+        ax.set_title('Complex Mode Indicator Functions')
+        ax.set_xlabel('Frequency')
+        ax.set_xlim(xmax=freq_max, xmin=freq_min)
+    return cmifs
