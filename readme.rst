@@ -30,7 +30,7 @@ Installation is made easy with ``pip`` (or ``pip3``), with releases as we have t
 to create a full first release. Much of it works already, but I certainly need
 issue reports (on `github <http://github.com/Vibration-Testing/vibrationtesting>`_) when something is not working as it should.
 
-To install as ``vibrationtesting``)::
+To install::
 
   pip install --user vibrationtesting
 
@@ -49,7 +49,7 @@ The usage documentation is far behind the current code, while the reference is w
 
 If you wish to install the current version of the software, read the instructions in `Contributing.rst  <https://github.com/Vibration-Testing/vibrationtesting/blob/master/CONTRIBUTING.rst>`_
 
-That should be it. Please note issues on the `issues tab  <https://github.com/Vibration-Testing/vibrationtesting/issues>`_ on github.
+That should be it. Please note issues on the `issues tab  <https://github.com/Vibration-Testing/vibrationtesting/issues>`_ on GitHub.
 
 Quick notes:
 -------------
