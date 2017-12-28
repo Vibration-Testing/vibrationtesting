@@ -376,11 +376,11 @@ def cmif(freq, H, freq_min=None, freq_max=None, plot=True):
     Notes
     -----
     .. note:: Allemang, R. and Brown, D., “A Complete Review of the Complex
-    Mode Indicator Function (CMIF) With Applications,” Proceedings of ISMA
-    International Conference on Noise and Vibration Engineering, Katholieke
-    Universiteit Leuven, Belgium, 2006.
+      Mode Indicator Function (CMIF) With Applications,” Proceedings of ISMA
+      International Conference on Noise and Vibration Engineering, Katholieke
+      Universiteit Leuven, Belgium, 2006.
     '''
-    
+
     if freq_max is None:
         freq_max = np.max(freq)
         # print(str(freq_max))
@@ -396,13 +396,6 @@ def cmif(freq, H, freq_min=None, freq_max=None, plot=True):
 
     # print(str(np.amin(freq)))
     # lenF = freq.shape[1]
-    '''
-    inlow = int(lenF * (freq_min - np.amin(freq)
-                        ) // (np.amax(freq) - np.amin(freq)))
-
-    inhigh = int(lenF * (freq_max - np.amin(freq)
-                         ) // (np.amax(freq) - np.amin(freq)) - 1)
-    '''
 
     cmifs = np.zeros((max([H.shape[0], H.shape[2]]), max(freq.shape)))
     for i, freq_i in enumerate(freq.reshape(-1)):
