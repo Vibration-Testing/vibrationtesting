@@ -13,7 +13,7 @@ import scipy as sp
 import scipy.fftpack as fftpack
 import scipy.linalg as la
 import matplotlib.pyplot as plt
-
+import scipy.integrate as spi
 
 """
 Notes:
@@ -804,9 +804,9 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
             vecs = vecs[:, index]
 
             Txfv[0, i] = -(vecs[0, 0] / vecs[1, 0]) / alpha  # *np.sqrt(alpha)
-            a = 1
-            b = -Pxx[0, i] - Pff[0, i]
-            c = Pxx[0, i] * Pff[0, i] - abs(Pxf[0, i])**2
+            # a = 1
+            # b = -Pxx[0, i] - Pff[0, i]
+            # c = Pxx[0, i] * Pff[0, i] - abs(Pxf[0, i])**2
 
     #        lambda1 = (-b - np.sqrt(b**2 - 4 * a * c)) / 2 / a
 
@@ -1302,3 +1302,69 @@ def xcorr(t, x, y, zeropad=True):
     tau = np.linspace(-len(xcor) / 2 * dt - dt / 2,
                       len(xcor) / 2 * dt - dt / 2, len(xcor))
     return tau, xcor
+
+
+def hammer_impulse(time, imp_time=None, imp_duration=None, doublehit=False,
+                   dh_delta=None):
+    '''Generate simulated hammer hit (half sin)
+
+    Parameters
+    ----------
+    time : float array
+        1 x N time array. Suggest using `np.linspace(0,10,1000).reshape(1,-1)`
+        for example
+    imp_time : float (optional)
+        Time of onset of impulse. Default is 0.1 time end time- which
+        traditionally works well for impact testing
+    imp_duration : float (optional)
+        Duration of impulse. Default is 0.01 of total record
+    doublehit : Boolean (optional)
+        Allows repeat of hit to emulate a bad strike. Default is False
+    dh_delta : float (optional)
+        Time difference between primary strike and accidental second strike
+        Default is 0.02 of record.
+
+    Returns
+    -------
+    force : float array
+
+    Examples
+    --------
+    >>> import vibrationtesting as vt
+    >>> time = np.linspace(0,10,1024).reshape(1,-1)
+    >>> force = vt.hammer_impulse(time, doublehit=True)
+    >>> plt.plot(time.T, force.T)
+    [<matplotlib.lines.Line2D object...
+    '''
+    time_max = np.max(time)
+    if imp_time is None:
+        imp_time = 0.1 * time_max
+
+    if imp_duration is None:
+        imp_duration = 0.01 * time_max
+
+    if dh_delta is None:
+        dh_delta = 0.02
+
+    dh_delta = dh_delta * time_max
+
+    imp_onset_index = int(time.shape[1] * imp_time / time_max)
+    imp_offset_index = int((time.shape[1]) *
+                           (imp_time + imp_duration) / time_max)
+    imp_length = imp_offset_index - imp_onset_index
+
+    T = imp_duration * 2
+    omega = 2 * np.pi / T
+
+    impulse = np.sin(omega * time[0, :imp_length])
+
+    force = np.zeros_like(time)
+    force[0, imp_onset_index:imp_onset_index + imp_length] = impulse
+
+    if doublehit is True:
+        doub_onset_index = int(time.shape[1]
+                               * (imp_time + dh_delta) / time_max)
+        force[0, doub_onset_index:doub_onset_index + imp_length] = impulse
+
+    force = force / spi.simps(force.reshape(-1), dx=time[0, 1])
+    return force
