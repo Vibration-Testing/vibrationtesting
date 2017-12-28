@@ -255,7 +255,7 @@ unslected yet.
 
 <dl class="function">
 <dt id="signals.frfplot">
-<code class="descclassname">signals.</code><code class="descname">frfplot</code><span class="sig-paren">(</span><em>freq</em>, <em>H</em>, <em>freq_min=0</em>, <em>freq_max=0</em>, <em>type=1</em>, <em>legend=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#frfplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.frfplot" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">signals.</code><code class="descname">frfplot</code><span class="sig-paren">(</span><em>freq</em>, <em>H</em>, <em>freq_min=0</em>, <em>freq_max=None</em>, <em>type=1</em>, <em>legend=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#frfplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.frfplot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Frequency Response function pretty plotting.</p>
 <p>Plots frequency response functions in a variety of formats</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -360,6 +360,54 @@ Ported to Python, July 1, 2015</p>
 <p>(<a class="reference external" href="../reference/signal-4.py">Source code</a>, <a class="reference external" href="../reference/signal-4.png">png</a>, <a class="reference external" href="../reference/signal-4.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-4.pdf">pdf</a>)</p>
 <div class="figure">
 <img alt="../_images/signal-4.png" src="../_images/signal-4.png" />
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="signals.hammer_impulse">
+<code class="descclassname">signals.</code><code class="descname">hammer_impulse</code><span class="sig-paren">(</span><em>time</em>, <em>imp_time=None</em>, <em>imp_duration=None</em>, <em>doublehit=False</em>, <em>dh_delta=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#hammer_impulse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.hammer_impulse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate simulated hammer hit (half sin)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>time</strong> : float array</p>
+<blockquote>
+<div><p>1 x N time array. Suggest using <cite>np.linspace(0,10,1000).reshape(1,-1)</cite>
+for example</p>
+</div></blockquote>
+<p><strong>imp_time</strong> : float (optional)</p>
+<blockquote>
+<div><p>Time of onset of impulse. Default is 0.1 time end time- which
+traditionally works well for impact testing</p>
+</div></blockquote>
+<p><strong>imp_duration</strong> : float (optional)</p>
+<blockquote>
+<div><p>Duration of impulse. Default is 0.01 of total record</p>
+</div></blockquote>
+<p><strong>doublehit</strong> : Boolean (optional)</p>
+<blockquote>
+<div><p>Allows repeat of hit to emulate a bad strike. Default is False</p>
+</div></blockquote>
+<p><strong>dh_delta</strong> : float (optional)</p>
+<blockquote>
+<div><p>Time difference between primary strike and accidental second strike
+Default is 0.02 of record.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>force</strong> : float array</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">1024</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">force</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">hammer_impulse</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">doublehit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">force</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<span class="go">[&lt;matplotlib.lines.Line2D object...</span>
+</pre></div>
 </div>
 </dd></dl>
 

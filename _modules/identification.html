@@ -50,7 +50,37 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="k">as</span> <span class="nn">la</span>
-<span class="kn">import</span> <span class="nn">vibration_toolbox</span> <span class="k">as</span> <span class="nn">vtb</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">======================</span>
+<span class="sd">System Identification</span>
+<span class="sd">======================</span>
+
+
+<span class="sd">Array convention for data/FRFs:</span>
+
+<span class="sd">Frequency Response Functions</span>
+<span class="sd">----------------------------</span>
+<span class="sd">| 0 dimension is the output</span>
+<span class="sd">| 1 dimension is the frequency index</span>
+<span class="sd">| 2 dimension is the input</span>
+
+<span class="sd">Time Histories</span>
+<span class="sd">--------------</span>
+<span class="sd">| 0 dimension is the output</span>
+<span class="sd">| 1 dimension is the time</span>
+<span class="sd">| 2 dimension is the instance index</span>
+<span class="sd">| 3 dimension is the input</span>
+
+<span class="sd">Spectrum Densities</span>
+<span class="sd">------------------</span>
+<span class="sd">| 0 dimension is the output (Cross Spectrum) or channel (Auto Spectrums)</span>
+<span class="sd">| 1 dimension is the frequency index</span>
+<span class="sd">| 2 dimension is the instance index</span>
+<span class="sd">| 3 dimension is the input (Cross Spectrum Densities)</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
 
 
 <div class="viewcode-block" id="sdof_cf"><a class="viewcode-back" href="../reference/identification.html#identification.sdof_cf">[docs]</a><span class="k">def</span> <span class="nf">sdof_cf</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">TF</span><span class="p">,</span> <span class="n">Fmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Fmax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -88,15 +118,15 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; # First we need to load the sampled data which is in a .mat file</span>
-<span class="sd">    &gt;&gt;&gt; import vibration_toolbox as vtb</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
 <span class="sd">    &gt;&gt;&gt; import scipy.io as sio</span>
-<span class="sd">    &gt;&gt;&gt; data = sio.loadmat(vtb.__path__[0] + &#39;/data/case1.mat&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; data = sio.loadmat(vt.__path__[0] + &#39;/data/case1.mat&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; #print(data)</span>
 <span class="sd">    &gt;&gt;&gt; # Data is imported as arrays. Modify then to fit our function.</span>
 <span class="sd">    &gt;&gt;&gt; TF = data[&#39;Hf_chan_2&#39;]</span>
 <span class="sd">    &gt;&gt;&gt; f = data[&#39;Freq_domain&#39;]</span>
 <span class="sd">    &gt;&gt;&gt; # Now we are able to call the function</span>
-<span class="sd">    &gt;&gt;&gt; z, nf, a = vtb.sdof_cf(f,TF,500,1000)</span>
+<span class="sd">    &gt;&gt;&gt; z, nf, a = vt.sdof_cf(f,TF,500,1000)</span>
 <span class="sd">    &gt;&gt;&gt; nf</span>
 <span class="sd">    212.092530551...</span>
 
@@ -249,19 +279,18 @@
 
 <span class="sd">    Author: Original Joseph C. Slater. Python version, Gabriel Loranger</span>
 
-
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; # First we need to load the sampled data which is in a .mat file</span>
-<span class="sd">    &gt;&gt;&gt; import vibration_toolbox as vtb</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
 <span class="sd">    &gt;&gt;&gt; import scipy.io as sio</span>
-<span class="sd">    &gt;&gt;&gt; data = sio.loadmat(vtb.__path__[0] + &#39;/data/case2.mat&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; data = sio.loadmat(vt.__path__[0] + &#39;/data/case2.mat&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; #print(data)</span>
 <span class="sd">    &gt;&gt;&gt; # Data is imported as arrays. Modify then to fit our function</span>
 <span class="sd">    &gt;&gt;&gt; TF = data[&#39;Hf_chan_2&#39;]</span>
 <span class="sd">    &gt;&gt;&gt; f = data[&#39;Freq_domain&#39;]</span>
 <span class="sd">    &gt;&gt;&gt; # Now we are able to call the function</span>
-<span class="sd">    &gt;&gt;&gt; z, nf, a = vtb.mdof_cf(f,TF,500,1000)</span>
+<span class="sd">    &gt;&gt;&gt; z, nf, a = vt.mdof_cf(f,TF,500,1000)</span>
 <span class="sd">    &gt;&gt;&gt; nf</span>
 <span class="sd">    192.59382330...</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -326,8 +355,6 @@
                             <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                             <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]]))</span>
 
-    <span class="c1"># irs = np.argsort(np.abs(np.imag(rs))) # necessary?</span>
-
     <span class="n">omega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">rs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">z</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">rs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">rs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">nf</span> <span class="o">=</span> <span class="n">omega</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
@@ -347,6 +374,91 @@
     <span class="n">u</span> <span class="o">=</span> <span class="n">u</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
 
     <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">nf</span><span class="p">,</span> <span class="n">u</span></div>
+
+
+<div class="viewcode-block" id="cmif"><a class="viewcode-back" href="../reference/identification.html#identification.cmif">[docs]</a><span class="k">def</span> <span class="nf">cmif</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">freq_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">freq_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Complex mode indicator function</span>
+
+<span class="sd">    Plots the complex mode indicator function</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    freq : array</span>
+<span class="sd">        The frequency vector in Hz. Does not have to start at 0 Hz.</span>
+<span class="sd">    H : array</span>
+<span class="sd">        The complex frequency response function</span>
+<span class="sd">    freq_min : float, optional</span>
+<span class="sd">        The minimum frequency to be plotted</span>
+<span class="sd">    freq_max : float, optional</span>
+<span class="sd">        The maximum frequency to be plotted</span>
+<span class="sd">    plot : boolean, optional (True)</span>
+<span class="sd">        Whether to also plot mode indicator functions</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cmifs : complex mode indicator functions</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
+<span class="sd">    &gt;&gt;&gt; M = np.diag([1,1,1])</span>
+<span class="sd">    &gt;&gt;&gt; K = K = np.array([[3.03, -1, -1],[-1, 2.98, -1],[-1, -1, 3]])</span>
+<span class="sd">    &gt;&gt;&gt; Damping = K/100</span>
+<span class="sd">    &gt;&gt;&gt; Cd = np.eye(3)</span>
+<span class="sd">    &gt;&gt;&gt; Cv = Ca = np.zeros_like(Cd)</span>
+<span class="sd">    &gt;&gt;&gt; Bt = np.eye(3)</span>
+<span class="sd">    &gt;&gt;&gt; H_all = np.zeros((3,1000,3), dtype = &#39;complex128&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; for i in np.arange(1, 4):</span>
+<span class="sd">    ...        for j in np.arange(1, 4):</span>
+<span class="sd">    ...            omega, H_all[i-1,:,j-1] = vt.sos_frf(M, Damping/10, K, Bt,</span>
+<span class="sd">    ...                                                 Cd, Cv, Ca, 0, 3, i,</span>
+<span class="sd">    ...                                                 j, num_freqs = 1000)</span>
+<span class="sd">    &gt;&gt;&gt; _ = vt.cmif(omega, H_all)</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    .. note:: Allemang, R. and Brown, D., “A Complete Review of the Complex</span>
+<span class="sd">    Mode Indicator Function (CMIF) With Applications,” Proceedings of ISMA</span>
+<span class="sd">    International Conference on Noise and Vibration Engineering, Katholieke</span>
+<span class="sd">    Universiteit Leuven, Belgium, 2006.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">freq_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">freq_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+        <span class="c1"># print(str(freq_max))</span>
+
+    <span class="k">if</span> <span class="n">freq_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">freq_min</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="n">freq_min</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">freq</span><span class="p">):</span>
+        <span class="n">freq_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">freq_min</span> <span class="o">&gt;</span> <span class="n">freq_max</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;freq_min must be less than freq_max.&#39;</span><span class="p">)</span>
+
+    <span class="c1"># print(str(np.amin(freq)))</span>
+    <span class="c1"># lenF = freq.shape[1]</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    inlow = int(lenF * (freq_min - np.amin(freq)</span>
+<span class="sd">                        ) // (np.amax(freq) - np.amin(freq)))</span>
+
+<span class="sd">    inhigh = int(lenF * (freq_max - np.amin(freq)</span>
+<span class="sd">                         ) // (np.amax(freq) - np.amin(freq)) - 1)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">cmifs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">max</span><span class="p">([</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">freq</span><span class="o">.</span><span class="n">shape</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">freq_i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">freq</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)):</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">vals</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">H</span><span class="p">[:,</span> <span class="n">i</span><span class="p">,</span> <span class="p">:])</span>
+        <span class="n">cmifs</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">if</span> <span class="n">plot</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">cmifs</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="s1">&#39;on&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Maginitudes&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Complex Mode Indicator Functions&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Frequency&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xmax</span><span class="o">=</span><span class="n">freq_max</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="n">freq_min</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cmifs</span></div>
 </pre></div>
 
           </div>

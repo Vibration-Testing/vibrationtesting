@@ -45,6 +45,69 @@
 <p>Created on Nov. 26, 2017
 &#64;author: Joseph C. Slater</p>
 <dl class="function">
+<dt id="identification.cmif">
+<code class="descclassname">identification.</code><code class="descname">cmif</code><span class="sig-paren">(</span><em>freq</em>, <em>H</em>, <em>freq_min=None</em>, <em>freq_max=None</em>, <em>plot=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/identification.html#cmif"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#identification.cmif" title="Permalink to this definition">¶</a></dt>
+<dd><p>Complex mode indicator function</p>
+<p>Plots the complex mode indicator function</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>freq</strong> : array</p>
+<blockquote>
+<div><p>The frequency vector in Hz. Does not have to start at 0 Hz.</p>
+</div></blockquote>
+<p><strong>H</strong> : array</p>
+<blockquote>
+<div><p>The complex frequency response function</p>
+</div></blockquote>
+<p><strong>freq_min</strong> : float, optional</p>
+<blockquote>
+<div><p>The minimum frequency to be plotted</p>
+</div></blockquote>
+<p><strong>freq_max</strong> : float, optional</p>
+<blockquote>
+<div><p>The maximum frequency to be plotted</p>
+</div></blockquote>
+<p><strong>plot</strong> : boolean, optional (True)</p>
+<blockquote>
+<div><p>Whether to also plot mode indicator functions</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>cmifs</strong> : complex mode indicator functions</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Allemang, R. and Brown, D., “A Complete Review of the Complex</p>
+</div>
+<p>Mode Indicator Function (CMIF) With Applications,” Proceedings of ISMA
+International Conference on Noise and Vibration Engineering, Katholieke
+Universiteit Leuven, Belgium, 2006.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">K</span> <span class="o">=</span> <span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">3.03</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.98</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Damping</span> <span class="o">=</span> <span class="n">K</span><span class="o">/</span><span class="mi">100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Cd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Cv</span> <span class="o">=</span> <span class="n">Ca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">Cd</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">1000</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;complex128&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+<span class="gp">... </span>       <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+<span class="gp">... </span>           <span class="n">omega</span><span class="p">,</span> <span class="n">H_all</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,:,</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">sos_frf</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">Damping</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">Bt</span><span class="p">,</span>
+<span class="gp">... </span>                                                <span class="n">Cd</span><span class="p">,</span> <span class="n">Cv</span><span class="p">,</span> <span class="n">Ca</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span>
+<span class="gp">... </span>                                                <span class="n">j</span><span class="p">,</span> <span class="n">num_freqs</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">cmif</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="n">H_all</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
 <dt id="identification.mdof_cf">
 <code class="descclassname">identification.</code><code class="descname">mdof_cf</code><span class="sig-paren">(</span><em>f</em>, <em>TF</em>, <em>Fmin=None</em>, <em>Fmax=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/identification.html#mdof_cf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#identification.mdof_cf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Curve fit to multiple degree of freedom FRF</p>
@@ -101,15 +164,15 @@ becomes unreliable.</p>
 <p>Author: Original Joseph C. Slater. Python version, Gabriel Loranger</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># First we need to load the sampled data which is in a .mat file</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibration_toolbox</span> <span class="k">as</span> <span class="nn">vtb</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">scipy.io</span> <span class="k">as</span> <span class="nn">sio</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">sio</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">vtb</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/data/case2.mat&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">sio</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">vt</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/data/case2.mat&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1">#print(data)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Data is imported as arrays. Modify then to fit our function</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">TF</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Hf_chan_2&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Freq_domain&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Now we are able to call the function</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span><span class="p">,</span> <span class="n">nf</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">vtb</span><span class="o">.</span><span class="n">mdof_cf</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">TF</span><span class="p">,</span><span class="mi">500</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span><span class="p">,</span> <span class="n">nf</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">mdof_cf</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">TF</span><span class="p">,</span><span class="mi">500</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nf</span>
 <span class="go">192.59382330...</span>
 </pre></div>
@@ -168,15 +231,15 @@ used.</p>
 <p>Author: Original Joseph C. Slater. Python version, Gabriel Loranger</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># First we need to load the sampled data which is in a .mat file</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibration_toolbox</span> <span class="k">as</span> <span class="nn">vtb</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">scipy.io</span> <span class="k">as</span> <span class="nn">sio</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">sio</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">vtb</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/data/case1.mat&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">sio</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">vt</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/data/case1.mat&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1">#print(data)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Data is imported as arrays. Modify then to fit our function.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">TF</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Hf_chan_2&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Freq_domain&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Now we are able to call the function</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span><span class="p">,</span> <span class="n">nf</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">vtb</span><span class="o">.</span><span class="n">sdof_cf</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">TF</span><span class="p">,</span><span class="mi">500</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span><span class="p">,</span> <span class="n">nf</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">sdof_cf</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">TF</span><span class="p">,</span><span class="mi">500</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nf</span>
 <span class="go">212.092530551...</span>
 </pre></div>

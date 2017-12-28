@@ -48,21 +48,14 @@
 
 <span class="n">__docformat__</span> <span class="o">=</span> <span class="s1">&#39;reStructuredText&#39;</span>
 
-
-<span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">control</span> <span class="k">as</span> <span class="nn">ctrl</span>
-<span class="c1"># from numpy import ma</span>
 <span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
-<span class="c1"># import scipy.signal as sig</span>
 <span class="kn">import</span> <span class="nn">scipy.fftpack</span> <span class="k">as</span> <span class="nn">fftpack</span>
 <span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="k">as</span> <span class="nn">la</span>
-<span class="kn">import</span> <span class="nn">matplotlib</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="c1"># rcParams = matplotlib.rcParams</span>
-
+<span class="kn">import</span> <span class="nn">scipy.integrate</span> <span class="k">as</span> <span class="nn">spi</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Notes:</span>
@@ -175,7 +168,7 @@
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
 
             <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="n">x</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="n">swap</span> <span class="o">=</span> <span class="mi">1</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;You shouldn</span><span class="se">\&#39;</span><span class="s1">t do that.&#39;</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The 1 dimension is the time (or frequency) </span><span class="se">\</span>
@@ -188,14 +181,14 @@
             <span class="n">f</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
                 <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
             <span class="k">if</span> <span class="n">swap</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">f</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="c1"># f,_=np.meshgrid(f[0,:],np.arange(x.shape[0]))</span>
             <span class="c1"># print(&#39;b&#39;)</span>
 
             <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="n">x</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="n">swap</span> <span class="o">=</span> <span class="mi">1</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;You shouldn</span><span class="se">\&#39;</span><span class="s1">t do that.&#39;</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The 1 dimension is the time (or frequency) &#39;</span> <span class="o">+</span>
@@ -207,7 +200,7 @@
             <span class="n">f</span> <span class="o">=</span> <span class="n">window</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">windowname</span><span class="o">=</span><span class="n">windowname</span><span class="p">)</span>
             <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
             <span class="k">if</span> <span class="n">swap</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">f</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># print(x)</span>
@@ -318,7 +311,7 @@
             <span class="c1"># print(f.shape)</span>
 
             <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="n">x</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="n">swap</span> <span class="o">=</span> <span class="mi">1</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Swapping axes temporarily to be compliant with </span><span class="se">\</span>
 <span class="s1">                      expectations. I</span><span class="se">\&#39;</span><span class="s1">ll fix them in your result&#39;</span><span class="p">)</span>
@@ -327,7 +320,7 @@
             <span class="n">f</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
                 <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
             <span class="k">if</span> <span class="n">swap</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">f</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="c1"># f,_=np.meshgrid(f[0,:],np.arange(x.shape[0]))</span>
@@ -335,14 +328,14 @@
             <span class="c1"># print(&#39;length = 2&#39;)</span>
             <span class="c1"># print(x.shape)</span>
             <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="n">x</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="n">swap</span> <span class="o">=</span> <span class="mi">1</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Swapping axes temporarily to be compliant with </span><span class="se">\</span>
 <span class="s1">                      expectations. I</span><span class="se">\&#39;</span><span class="s1">ll fix them in your result&#39;</span><span class="p">)</span>
             <span class="n">f</span> <span class="o">=</span> <span class="n">hanning</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
             <span class="k">if</span> <span class="n">swap</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">f</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># print(x)</span>
         <span class="c1"># Create hanning window of length x</span>
@@ -458,11 +451,11 @@
 
         <span class="n">n</span> <span class="o">=</span> <span class="n">x</span>
         <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
-                <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1.933</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
-                 <span class="o">+</span> <span class="mf">1.286</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1.933</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+             <span class="o">+</span> <span class="mf">1.286</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
                  <span class="o">-</span> <span class="mf">0.338</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">6</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
-                 <span class="o">+</span> <span class="mf">0.032</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))),</span>
-                <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+             <span class="o">+</span> <span class="mf">0.032</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))),</span>
+            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
         <span class="n">f</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="n">la</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">f</span></div>
@@ -652,10 +645,10 @@
 <span class="s1">              Please check your inputs.&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">n</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="c1"># No clue what this does, and I wrote it. Comment your code, you fool!</span>
@@ -702,19 +695,17 @@
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">*</span> <span class="n">win</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">win</span>
         <span class="k">del</span> <span class="n">win</span>
-    <span class="c1"># print(y.shape)</span>
-    <span class="n">ffty</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span>
-    <span class="c1"># print(ffty.shape)</span>
-    <span class="c1"># print(x.shape)</span>
+
+    <span class="n">ffty</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span>
     <span class="n">fftx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span>
-    <span class="c1"># print(fftx.shape)</span>
+
     <span class="n">Pxy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">fftx</span><span class="p">)</span> <span class="o">*</span> <span class="n">ffty</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">dt</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">Pxy</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">Pxy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">ave</span><span class="p">:</span>
         <span class="n">Pxy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">Pxy</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
     <span class="n">nfreq</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dt</span> <span class="o">/</span> <span class="mi">2</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nfreq</span><span class="p">,</span> <span class="n">Pxy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># /2./sp.pi</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nfreq</span><span class="p">,</span> <span class="n">Pxy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># /2./np.pi</span>
 
     <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">Pxy</span></div>
 
@@ -840,38 +831,28 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">Pxx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
             <span class="n">frfm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
                 <span class="p">[[</span><span class="n">Pff</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">Pxf</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">])],</span> <span class="p">[</span><span class="n">Pxf</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="n">Pxx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]]])</span>
-            <span class="c1"># print(&#39;index number &#39; + str(i))</span>
-            <span class="c1"># print(frfm)</span>
+
             <span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># np.sqrt(Pff[0,i]/Pxx[0,i])</span>
-            <span class="c1"># print(alpha)</span>
+
             <span class="n">frfm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">Pff</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">Pxf</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">])],</span>
                              <span class="p">[</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">Pxf</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="n">alpha</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">Pxx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]]])</span>
-            <span class="c1"># print(&#39;new frfm&#39;)</span>
-            <span class="c1"># print(frfm)</span>
+
             <span class="n">lam</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">frfm</span><span class="p">)</span>
-            <span class="c1"># print(lam)</span>
-            <span class="c1"># print(vecs)</span>
+
             <span class="n">index</span> <span class="o">=</span> <span class="n">lam</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
-            <span class="c1"># print(index)</span>
+
             <span class="n">lam</span> <span class="o">=</span> <span class="n">lam</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-            <span class="c1"># print(lam)</span>
+
             <span class="n">vecs</span> <span class="o">=</span> <span class="n">vecs</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span>
-            <span class="c1"># print(vecs)</span>
-            <span class="c1"># print(np.array([Txf1[0,i], -(vecs[0,0]/vecs[1,0]), -(vecs[1,0]/vecs[1,1]), Txf2[0,i]]))</span>
+
             <span class="n">Txfv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">vecs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">vecs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">alpha</span>  <span class="c1"># *np.sqrt(alpha)</span>
-            <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">b</span> <span class="o">=</span> <span class="o">-</span><span class="n">Pxx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">Pff</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
-            <span class="n">c</span> <span class="o">=</span> <span class="n">Pxx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">Pff</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">Pxf</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
-            <span class="c1"># lambda1=((Pxx[0,i]+Pff[0,i])-np.sqrt((Pxx[0,i]+Pff[0,i])*2+4*((Pxx[0,i]*Pff[0,i]-abs(Pxf[0,i])**2))))/2</span>
-            <span class="n">lambda1</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">b</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">b</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">c</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">a</span>
-            <span class="c1"># Txfv[0,i]=np.conj(Pxf[0,i])/(Pff[0,i]-lambda1)*alpha</span>
-            <span class="c1"># print(Txfv[0,i])</span>
-            <span class="c1"># person = input(&#39;Next point: &#39;)</span>
-            <span class="c1"># print(np.dot(frfm, vecs[:, 0]) - lam[0] * vecs[:, 0])</span>
-            <span class="c1"># print(np.dot(frfm, vecs[:, 1]) - lam[1] * vecs[:, 1])</span>
+            <span class="c1"># a = 1</span>
+            <span class="c1"># b = -Pxx[0, i] - Pff[0, i]</span>
+            <span class="c1"># c = Pxx[0, i] * Pff[0, i] - abs(Pxf[0, i])**2</span>
+
+    <span class="c1">#        lambda1 = (-b - np.sqrt(b**2 - 4 * a * c)) / 2 / a</span>
 
     <span class="k">return</span> <span class="n">freq</span><span class="p">,</span> <span class="n">Txf1</span><span class="p">,</span> <span class="n">Txf2</span><span class="p">,</span> <span class="n">coh</span><span class="p">,</span> <span class="n">Txfv</span>
-
 
     <span class="sd">&#39;&#39;&#39;# def acorr(self, x, **kwargs):</span>
 <span class="sd">    # &quot;&quot;&quot;</span>
@@ -1021,7 +1002,7 @@
 <span class="sd">    # return lags, c, a, b&#39;&#39;&#39;</span></div>
 
 
-<div class="viewcode-block" id="frfplot"><a class="viewcode-back" href="../reference/signal.html#signals.frfplot">[docs]</a><span class="k">def</span> <span class="nf">frfplot</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">freq_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">freq_max</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="p">[]):</span>
+<div class="viewcode-block" id="frfplot"><a class="viewcode-back" href="../reference/signal.html#signals.frfplot">[docs]</a><span class="k">def</span> <span class="nf">frfplot</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">freq_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">freq_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="p">[]):</span>
     <span class="sd">&quot;&quot;&quot;Frequency Response function pretty plotting.</span>
 
 <span class="sd">    Plots frequency response functions in a variety of formats</span>
@@ -1106,12 +1087,14 @@
     <span class="k">if</span> <span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
         <span class="n">H</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">T</span>
 
-    <span class="c1">#    if lenF==1;</span>
-    <span class="c1">#    F=(0:length(Xfer)-1)&#39;*F;</span>
-    <span class="c1">#    end</span>
-    <span class="k">if</span> <span class="n">freq_max</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">freq_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">freq_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
-        <span class="c1"># print(str(freq_max))</span>
+
+    <span class="k">if</span> <span class="n">freq_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">freq_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">freq_min</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">freq</span><span class="p">):</span>
+        <span class="n">freq_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">freq_min</span> <span class="o">&gt;</span> <span class="n">freq_max</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;freq_min must be less than freq_max.&#39;</span><span class="p">)</span>
@@ -1165,7 +1148,6 @@
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">legend</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">legend</span><span class="p">)</span>
-
 
     <span class="k">else</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sorry, that option isn&#39;t supported yet&quot;</span><span class="p">)</span>
@@ -1356,12 +1338,78 @@
         <span class="n">Xn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">Yn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
 
-    <span class="n">xcor</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fftpack</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">Xn</span> <span class="o">*</span> <span class="n">Yn</span><span class="p">)))</span>
+    <span class="n">xcor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fftpack</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">Xn</span> <span class="o">*</span> <span class="n">Yn</span><span class="p">)))</span>
     <span class="n">dt</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="n">tau</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">xcor</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">tau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">xcor</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
                       <span class="nb">len</span><span class="p">(</span><span class="n">xcor</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">xcor</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">tau</span><span class="p">,</span> <span class="n">xcor</span></div>
+
+
+<div class="viewcode-block" id="hammer_impulse"><a class="viewcode-back" href="../reference/signal.html#signals.hammer_impulse">[docs]</a><span class="k">def</span> <span class="nf">hammer_impulse</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">imp_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">imp_duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">doublehit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                   <span class="n">dh_delta</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Generate simulated hammer hit (half sin)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time : float array</span>
+<span class="sd">        1 x N time array. Suggest using `np.linspace(0,10,1000).reshape(1,-1)`</span>
+<span class="sd">        for example</span>
+<span class="sd">    imp_time : float (optional)</span>
+<span class="sd">        Time of onset of impulse. Default is 0.1 time end time- which</span>
+<span class="sd">        traditionally works well for impact testing</span>
+<span class="sd">    imp_duration : float (optional)</span>
+<span class="sd">        Duration of impulse. Default is 0.01 of total record</span>
+<span class="sd">    doublehit : Boolean (optional)</span>
+<span class="sd">        Allows repeat of hit to emulate a bad strike. Default is False</span>
+<span class="sd">    dh_delta : float (optional)</span>
+<span class="sd">        Time difference between primary strike and accidental second strike</span>
+<span class="sd">        Default is 0.02 of record.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    force : float array</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
+<span class="sd">    &gt;&gt;&gt; time = np.linspace(0,10,1024).reshape(1,-1)</span>
+<span class="sd">    &gt;&gt;&gt; force = vt.hammer_impulse(time, doublehit=True)</span>
+<span class="sd">    &gt;&gt;&gt; plt.plot(time.T, force.T)</span>
+<span class="sd">    [&lt;matplotlib.lines.Line2D object...</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">time_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">imp_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">imp_time</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">time_max</span>
+
+    <span class="k">if</span> <span class="n">imp_duration</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">imp_duration</span> <span class="o">=</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="n">time_max</span>
+
+    <span class="k">if</span> <span class="n">dh_delta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dh_delta</span> <span class="o">=</span> <span class="mf">0.02</span>
+
+    <span class="n">dh_delta</span> <span class="o">=</span> <span class="n">dh_delta</span> <span class="o">*</span> <span class="n">time_max</span>
+
+    <span class="n">imp_onset_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">imp_time</span> <span class="o">/</span> <span class="n">time_max</span><span class="p">)</span>
+    <span class="n">imp_offset_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">time</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span>
+                           <span class="p">(</span><span class="n">imp_time</span> <span class="o">+</span> <span class="n">imp_duration</span><span class="p">)</span> <span class="o">/</span> <span class="n">time_max</span><span class="p">)</span>
+    <span class="n">imp_length</span> <span class="o">=</span> <span class="n">imp_offset_index</span> <span class="o">-</span> <span class="n">imp_onset_index</span>
+
+    <span class="n">T</span> <span class="o">=</span> <span class="n">imp_duration</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="n">omega</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">T</span>
+
+    <span class="n">impulse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">omega</span> <span class="o">*</span> <span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="n">imp_length</span><span class="p">])</span>
+
+    <span class="n">force</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+    <span class="n">force</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">imp_onset_index</span><span class="p">:</span><span class="n">imp_onset_index</span> <span class="o">+</span> <span class="n">imp_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">impulse</span>
+
+    <span class="k">if</span> <span class="n">doublehit</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">doub_onset_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                               <span class="o">*</span> <span class="p">(</span><span class="n">imp_time</span> <span class="o">+</span> <span class="n">dh_delta</span><span class="p">)</span> <span class="o">/</span> <span class="n">time_max</span><span class="p">)</span>
+        <span class="n">force</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">doub_onset_index</span><span class="p">:</span><span class="n">doub_onset_index</span> <span class="o">+</span> <span class="n">imp_length</span><span class="p">]</span> <span class="o">=</span> <span class="n">impulse</span>
+
+    <span class="n">force</span> <span class="o">=</span> <span class="n">force</span> <span class="o">/</span> <span class="n">spi</span><span class="o">.</span><span class="n">simps</span><span class="p">(</span><span class="n">force</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">dx</span><span class="o">=</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">force</span></div>
 </pre></div>
 
           </div>
