@@ -380,6 +380,7 @@ def cmif(freq, H, freq_min=None, freq_max=None, plot=True):
     International Conference on Noise and Vibration Engineering, Katholieke
     Universiteit Leuven, Belgium, 2006.
     '''
+    
     if freq_max is None:
         freq_max = np.max(freq)
         # print(str(freq_max))

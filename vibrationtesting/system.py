@@ -209,18 +209,18 @@ def sos_frf(M, C, K, Bt, Cd, Cv, Ca, omega_low, omega_high,
     M, C, K, Bt, Cd, Cv, Cd : float arrays
         Mass, damping, stiffness, input, displacement sensor, velocimeter,
         and accelerometer matrices
-        omega_low, omega_high : floats
-                 low and high frequencies for evaluation
+    omega_low, omega_high : floats
+        low and high frequencies for evaluation
     in_index, out_index : ints
-                input and output numbers (starting at 1)
+        input and output numbers (starting at 1)
     num_freqs : int
-                number of frequencies at which to return FRF
+        number of frequencies at which to return FRF
 
 
     Returns
     -------
     omega : float array
-            frequency vector
+        frequency vector
     H : float array
         frequency response function
 
@@ -243,7 +243,6 @@ def sos_frf(M, C, K, Bt, Cd, Cv, Ca, omega_low, omega_high,
     >>> D = np.array([[-0.2]])
     >>> omega, H = vt.ssfrf(A, B, C, D, 0, 3.5, 1, 1)
     >>> vt.frfplot(omega, H) # doctest: +SKIP
-
     """
 
     A, B, C, D = so2ss(M, C, K, Bt, Cd, Cv, Ca)
