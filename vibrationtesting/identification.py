@@ -334,7 +334,7 @@ def mdof_cf(f, TF, Fmin=None, Fmax=None):
     return z, nf, u
 
 
-def cmif(freq, H, freq_min=None, freq_max=None, plot = True):
+def cmif(freq, H, freq_min=None, freq_max=None, plot=True):
     '''Complex mode indicator function
 
     Plots the complex mode indicator function
