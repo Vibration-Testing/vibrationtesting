@@ -251,18 +251,18 @@
 <span class="sd">    M, C, K, Bt, Cd, Cv, Cd : float arrays</span>
 <span class="sd">        Mass, damping, stiffness, input, displacement sensor, velocimeter,</span>
 <span class="sd">        and accelerometer matrices</span>
-<span class="sd">        omega_low, omega_high : floats</span>
-<span class="sd">                 low and high frequencies for evaluation</span>
+<span class="sd">    omega_low, omega_high : floats</span>
+<span class="sd">        low and high frequencies for evaluation</span>
 <span class="sd">    in_index, out_index : ints</span>
-<span class="sd">                input and output numbers (starting at 1)</span>
+<span class="sd">        input and output numbers (starting at 1)</span>
 <span class="sd">    num_freqs : int</span>
-<span class="sd">                number of frequencies at which to return FRF</span>
+<span class="sd">        number of frequencies at which to return FRF</span>
 
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    omega : float array</span>
-<span class="sd">            frequency vector</span>
+<span class="sd">        frequency vector</span>
 <span class="sd">    H : float array</span>
 <span class="sd">        frequency response function</span>
 
@@ -285,7 +285,6 @@
 <span class="sd">    &gt;&gt;&gt; D = np.array([[-0.2]])</span>
 <span class="sd">    &gt;&gt;&gt; omega, H = vt.ssfrf(A, B, C, D, 0, 3.5, 1, 1)</span>
 <span class="sd">    &gt;&gt;&gt; vt.frfplot(omega, H) # doctest: +SKIP</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="n">so2ss</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">Bt</span><span class="p">,</span> <span class="n">Cd</span><span class="p">,</span> <span class="n">Cv</span><span class="p">,</span> <span class="n">Ca</span><span class="p">)</span>
