@@ -1,6 +1,6 @@
 """
-Created on 14 May 2015
-@author: Joseph C. Slater
+Signal processing and creation for processing vibration testing data and
+generating simulated experiments. 
 """
 __license__ = "Joseph C. Slater"
 
