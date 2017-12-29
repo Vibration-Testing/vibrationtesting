@@ -1,6 +1,6 @@
 """
 Signal processing and creation for processing vibration testing data and
-generating simulated experiments. 
+generating simulated experiments.
 """
 __license__ = "Joseph C. Slater"
 
@@ -27,7 +27,9 @@ Applying should be a relatively simple code obviating much of any need for the
 code here.
 
 The cross spectrum analysis formerly lacking is now available, periodogram
-is often the best option, however not with impulse excitations.
+is usually the best option, however not with impulse excitations. See
+`scipy.signal` for this. Unfortunately, the conventions in this module are not
+consistent with `scipy.signal`. They follow those of `python-control`
 
 FRF calculation is typically trivial, Hv being an expected gap long term
 MIMO FRF calculation is an open question. Pretty printing of FRFs is always
@@ -36,15 +38,22 @@ a welcome tool.
 System ID is likely the remaining missing aspect at this time.
 
 In order to be consistent with the Control Systems Library, increasing time
-or increasing frequency steps positively with increased column number (second
-dimension). Rows (first dimension- 0 dimension)
-correspond to appropriate degress of freedom, output numbers, etc. The
-third dimension (2) indexes each data instance (experiment).
+or increasing frequency steps positively with increased column number (one
+dimension). Rows (0 dimension)
+correspond to appropriate channels, output numbers, etc.
+
+For cross spectrum data (cross spectrum density, frequency response function)
+the 2 dimension represents the input channel.
+
+The last dimension (2 or 3) indexes each data instance (experiment). That means
+that an unaveraged cross spectrum density has dimension 4. If there is only a
+single input channel, it is imperative to insist the dimention exist, even if
+only length 1. This is analagous to a vector being Nx1 versus simply a
+1-D array of length 1. 
 
 http://python-control.readthedocs.io/en/latest/conventions.html#time-series-data
 
 Problem: This hasn't been fully implemented.
-I don't know which standard the package is following now- a bit of both!
 """
 
 
