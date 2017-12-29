@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>system &#8212; Vibration Testing 0.2 documentation</title>
+    <title>system &#8212; Vibration Testing 0.21 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2',
+        VERSION:     '0.21',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -413,10 +413,11 @@
 <span class="sd">    -------</span>
 <span class="sd">    omega : float array (1xN)</span>
 <span class="sd">        Vector of natural frequencies (rad/sec)</span>
-<span class="sd">    Psi : float array (NxN)</span>
-<span class="sd">        Matrix of mass normalized mode shapes by column</span>
 <span class="sd">    zeta : float array (1xN)</span>
 <span class="sd">        Vector of damping ratios</span>
+<span class="sd">    Psi : float array (NxN)</span>
+<span class="sd">        Matrix of mass normalized mode shapes by column</span>
+
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -570,10 +571,104 @@
     <span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ndof</span><span class="p">,</span> <span class="n">nm</span><span class="p">))</span>
     <span class="n">T</span><span class="p">[</span><span class="n">master</span><span class="p">,</span> <span class="p">:</span><span class="n">nm</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">nm</span><span class="p">)</span>
     <span class="n">T</span><span class="p">[</span><span class="n">truncated_dofs</span><span class="p">,</span> <span class="p">:</span><span class="n">nm</span><span class="p">]</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">Psi_rr</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">Psi_tr</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-    <span class="n">Mred</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">M</span> <span class="nd">@T</span>
+<div class="viewcode-block" id="mode_expansion_from_model"><a class="viewcode-back" href="../reference/system.html#system.mode_expansion_from_model">[docs]</a>    <span class="n">Mred</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">M</span> <span class="nd">@T</span>
     <span class="n">Kred</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">K</span> <span class="nd">@T</span>
 
     <span class="k">return</span> <span class="n">Mred</span><span class="p">,</span> <span class="n">Kred</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">truncated_dofs</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span></div>
+
+
+<span class="k">def</span> <span class="nf">mode_expansion_from_model</span><span class="p">(</span><span class="n">Psi</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">measured</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Deflection extrapolation to full FEM model coordinates, matrix method</span>
+
+<span class="sd">    Provided an equation  of the form:</span>
+
+<span class="sd">    :math:`\begin{pmatrix}-\begin{bmatrix}M_{mm}&amp;M_{mu}\\ M_{um}&amp;M_{uu}</span>
+<span class="sd">    \end{bmatrix} \omega_i^2</span>
+<span class="sd">    +\begin{bmatrix}K_{mm}&amp;K_{mu}\\ K_{um}&amp;K_{uu}\end{bmatrix}\end{pmatrix}`</span>
+<span class="sd">    :math:`\begin{bmatrix}\Psi_{i_m}\\ \Psi_{i_u}\end{bmatrix}= 0`</span>
+
+<span class="sd">    Where:</span>
+
+<span class="sd">    - :math:`M` and :math:`K` are the mass and stiffness matrices, likely from</span>
+<span class="sd">      a finite element model</span>
+<span class="sd">    - :math:`\Psi_i` and :math:`\omega_i` represent a mode/frequency pair</span>
+<span class="sd">    - subscripts :math:`m` and :math:`u` represent measure and unmeasured</span>
+<span class="sd">      of the mode</span>
+
+<span class="sd">    Determines the unknown portion of the mode (or operational deflection)</span>
+<span class="sd">    shape, :math:`\Psi_{i_u}` by</span>
+<span class="sd">    direct algebraic solution, aka</span>
+
+<span class="sd">    :math:`\Psi_{i_u} = - (K_{uu}- M_{ss} \omega_i^2) ^{-1}</span>
+<span class="sd">    (K_{um}-M_{um}\omega_i^2)\Psi_{i_m}`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Psi : float array</span>
+<span class="sd">        mode shape, 2-D array</span>
+<span class="sd">    omega : float</span>
+<span class="sd">        natural (or driving) frequency</span>
+<span class="sd">    M, K : float arrays</span>
+<span class="sd">        Mass and Stiffness matrices</span>
+<span class="sd">    measured : float or integer array or list</span>
+<span class="sd">        List of measured degrees of freedom</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Psi_full: float array</span>
+<span class="sd">        Complete mode shape</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
+<span class="sd">    &gt;&gt;&gt; M = np.array([[4, 0, 0],</span>
+<span class="sd">    ...               [0, 4, 0],</span>
+<span class="sd">    ...               [0, 0, 4]])</span>
+<span class="sd">    &gt;&gt;&gt; K = np.array([[8, -4, 0],</span>
+<span class="sd">    ...               [-4, 8, -4],</span>
+<span class="sd">    ...               [0, -4, 4]])</span>
+<span class="sd">    &gt;&gt;&gt; measured = np.array([[1, 3]])</span>
+<span class="sd">    &gt;&gt;&gt; omega, zeta, Psi = vt.sos_modal(M, K)</span>
+<span class="sd">    &gt;&gt;&gt; Psi_measured = np.array([[-0.15], [-0.37]])</span>
+<span class="sd">    &gt;&gt;&gt; Psi_full = vt.mode_expansion_from_model(Psi_measured, omega[0], M, K, measured)</span>
+<span class="sd">    &gt;&gt;&gt; print(np.hstack((Psi[:,0].reshape(-1,1), Psi_full)))</span>
+<span class="sd">    [[-0.164  -0.15  ]</span>
+<span class="sd">     [-0.2955  0.2886]</span>
+<span class="sd">     [-0.3685 -0.37  ]]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Reduced coordinate system forces can be obtained by</span>
+<span class="sd">    `Fr = T.T @ F`</span>
+
+<span class="sd">    Reduced damping matrix can be obtained using `Cr = T.T*@ C @ T`.</span>
+
+<span class="sd">    If mode shapes are obtained for the reduced system, full system mode shapes</span>
+<span class="sd">    are `phi = T @ phi_r`</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">measured</span> <span class="o">=</span> <span class="p">(</span><span class="n">measured</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># retained dofs</span>
+    <span class="n">num_measured</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">measured</span><span class="p">)</span>
+    <span class="n">ndof</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># length(M);</span>
+    <span class="n">unmeasured_dofs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ndof</span><span class="p">))</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">measured</span><span class="p">))</span>
+    <span class="n">num_unmeasured</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unmeasured_dofs</span><span class="p">)</span>
+
+    <span class="n">Muu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">M</span><span class="p">[</span><span class="n">unmeasured_dofs</span><span class="p">,</span> <span class="n">unmeasured_dofs</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_unmeasured</span><span class="p">,</span>
+                                                                <span class="n">num_unmeasured</span><span class="p">)</span>
+
+    <span class="n">Kuu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">K</span><span class="p">[</span><span class="n">unmeasured_dofs</span><span class="p">,</span> <span class="n">unmeasured_dofs</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_unmeasured</span><span class="p">,</span>
+                                                                <span class="n">num_unmeasured</span><span class="p">)</span>
+    <span class="n">Mum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">M</span><span class="p">[</span><span class="n">unmeasured_dofs</span><span class="p">,</span> <span class="n">measured</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_unmeasured</span><span class="p">,</span>
+                                                         <span class="n">num_measured</span><span class="p">)</span>
+    <span class="n">Kum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">K</span><span class="p">[</span><span class="n">unmeasured_dofs</span><span class="p">,</span> <span class="n">measured</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_unmeasured</span><span class="p">,</span>
+                                                         <span class="n">num_measured</span><span class="p">)</span>
+
+    <span class="n">Psi_unmeasured</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">((</span><span class="n">Kuu</span><span class="o">-</span><span class="n">Muu</span><span class="o">*</span><span class="n">omega</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="n">Kum</span><span class="o">-</span><span class="n">Mum</span><span class="o">*</span><span class="n">omega</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="nd">@Psi</span><span class="p">)</span>
+    <span class="n">Psi_full</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_measured</span><span class="o">+</span><span class="n">num_unmeasured</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">Psi_full</span><span class="p">[</span><span class="n">measured</span><span class="p">]</span> <span class="o">=</span> <span class="n">Psi</span>
+    <span class="n">Psi_full</span><span class="p">[</span><span class="n">unmeasured_dofs</span><span class="p">]</span> <span class="o">=</span> <span class="n">Psi_unmeasured</span>
+    <span class="n">Psi_full</span> <span class="o">=</span> <span class="n">Psi_full</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Psi_full</span></div>
 </pre></div>
 
           </div>

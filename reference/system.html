@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>System Manipulation (system) &#8212; Vibration Testing 0.2 documentation</title>
+    <title>System Manipulation (system) &#8212; Vibration Testing 0.21 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2',
+        VERSION:     '0.21',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -182,6 +182,84 @@ continuous counterpart.</p>
 <dt id="system.damp">
 <code class="descclassname">system.</code><code class="descname">damp</code><span class="sig-paren">(</span><em>A</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#damp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.damp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display natural frequencies and damping ratios of state matrix.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="system.mode_expansion_from_model">
+<code class="descclassname">system.</code><code class="descname">mode_expansion_from_model</code><span class="sig-paren">(</span><em>Psi</em>, <em>omega</em>, <em>M</em>, <em>K</em>, <em>measured</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#mode_expansion_from_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.mode_expansion_from_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deflection extrapolation to full FEM model coordinates, matrix method</p>
+<p>Provided an equation  of the form:</p>
+<p><span class="math">\(\begin{pmatrix}-\begin{bmatrix}M_{mm}&amp;M_{mu}\\ M_{um}&amp;M_{uu}
+\end{bmatrix} \omega_i^2
++\begin{bmatrix}K_{mm}&amp;K_{mu}\\ K_{um}&amp;K_{uu}\end{bmatrix}\end{pmatrix}\)</span>
+<span class="math">\(\begin{bmatrix}\Psi_{i_m}\\ \Psi_{i_u}\end{bmatrix}= 0\)</span></p>
+<p>Where:</p>
+<ul class="simple">
+<li><span class="math">\(M\)</span> and <span class="math">\(K\)</span> are the mass and stiffness matrices, likely from
+a finite element model</li>
+<li><span class="math">\(\Psi_i\)</span> and <span class="math">\(\omega_i\)</span> represent a mode/frequency pair</li>
+<li>subscripts <span class="math">\(m\)</span> and <span class="math">\(u\)</span> represent measure and unmeasured
+of the mode</li>
+</ul>
+<p>Determines the unknown portion of the mode (or operational deflection)
+shape, <span class="math">\(\Psi_{i_u}\)</span> by
+direct algebraic solution, aka</p>
+<p><span class="math">\(\Psi_{i_u} = - (K_{uu}- M_{ss} \omega_i^2) ^{-1}
+(K_{um}-M_{um}\omega_i^2)\Psi_{i_m}\)</span></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>Psi</strong> : float array</p>
+<blockquote>
+<div><p>mode shape, 2-D array</p>
+</div></blockquote>
+<p><strong>omega</strong> : float</p>
+<blockquote>
+<div><p>natural (or driving) frequency</p>
+</div></blockquote>
+<p><strong>M, K</strong> : float arrays</p>
+<blockquote>
+<div><p>Mass and Stiffness matrices</p>
+</div></blockquote>
+<p><strong>measured</strong> : float or integer array or list</p>
+<blockquote>
+<div><p>List of measured degrees of freedom</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Psi_full: float array</p>
+<blockquote class="last">
+<div><p>Complete mode shape</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Reduced coordinate system forces can be obtained by
+<cite>Fr = T.T &#64; F</cite></p>
+<p>Reduced damping matrix can be obtained using <cite>Cr = T.T*&#64; C &#64; T</cite>.</p>
+<p>If mode shapes are obtained for the reduced system, full system mode shapes
+are <cite>phi = T &#64; phi_r</cite></p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">measured</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">omega</span><span class="p">,</span> <span class="n">zeta</span><span class="p">,</span> <span class="n">Psi</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">sos_modal</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Psi_measured</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.15</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.37</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Psi_full</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">mode_expansion_from_model</span><span class="p">(</span><span class="n">Psi_measured</span><span class="p">,</span> <span class="n">omega</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">measured</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">Psi</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">Psi_full</span><span class="p">)))</span>
+<span class="go">[[-0.164  -0.15  ]</span>
+<span class="go"> [-0.2955  0.2886]</span>
+<span class="go"> [-0.3685 -0.37  ]]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="function">
@@ -403,13 +481,13 @@ non-zero eigenvalue.</p>
 <blockquote>
 <div><p>Vector of natural frequencies (rad/sec)</p>
 </div></blockquote>
-<p><strong>Psi</strong> : float array (NxN)</p>
-<blockquote>
-<div><p>Matrix of mass normalized mode shapes by column</p>
-</div></blockquote>
 <p><strong>zeta</strong> : float array (1xN)</p>
-<blockquote class="last">
+<blockquote>
 <div><p>Vector of damping ratios</p>
+</div></blockquote>
+<p><strong>Psi</strong> : float array (NxN)</p>
+<blockquote class="last">
+<div><p>Matrix of mass normalized mode shapes by column</p>
 </div></blockquote>
 </td>
 </tr>

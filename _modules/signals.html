@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>signals &#8212; Vibration Testing 0.2 documentation</title>
+    <title>signals &#8212; Vibration Testing 0.21 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.2',
+        VERSION:     '0.21',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -42,7 +42,7 @@
   <h1>Source code for signals</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Signal processing and creation for processing vibration testing data and</span>
-<span class="sd">generating simulated experiments. </span>
+<span class="sd">generating simulated experiments.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Joseph C. Slater&quot;</span>
 
@@ -69,7 +69,9 @@
 <span class="sd">code here.</span>
 
 <span class="sd">The cross spectrum analysis formerly lacking is now available, periodogram</span>
-<span class="sd">is often the best option, however not with impulse excitations.</span>
+<span class="sd">is usually the best option, however not with impulse excitations. See</span>
+<span class="sd">`scipy.signal` for this. Unfortunately, the conventions in this module are not</span>
+<span class="sd">consistent with `scipy.signal`. They follow those of `python-control`</span>
 
 <span class="sd">FRF calculation is typically trivial, Hv being an expected gap long term</span>
 <span class="sd">MIMO FRF calculation is an open question. Pretty printing of FRFs is always</span>
@@ -78,15 +80,22 @@
 <span class="sd">System ID is likely the remaining missing aspect at this time.</span>
 
 <span class="sd">In order to be consistent with the Control Systems Library, increasing time</span>
-<span class="sd">or increasing frequency steps positively with increased column number (second</span>
-<span class="sd">dimension). Rows (first dimension- 0 dimension)</span>
-<span class="sd">correspond to appropriate degress of freedom, output numbers, etc. The</span>
-<span class="sd">third dimension (2) indexes each data instance (experiment).</span>
+<span class="sd">or increasing frequency steps positively with increased column number (one</span>
+<span class="sd">dimension). Rows (0 dimension)</span>
+<span class="sd">correspond to appropriate channels, output numbers, etc.</span>
+
+<span class="sd">For cross spectrum data (cross spectrum density, frequency response function)</span>
+<span class="sd">the 2 dimension represents the input channel.</span>
+
+<span class="sd">The last dimension (2 or 3) indexes each data instance (experiment). That means</span>
+<span class="sd">that an unaveraged cross spectrum density has dimension 4. If there is only a</span>
+<span class="sd">single input channel, it is imperative to insist the dimention exist, even if</span>
+<span class="sd">only length 1. This is analagous to a vector being Nx1 versus simply a</span>
+<span class="sd">1-D array of length 1. </span>
 
 <span class="sd">http://python-control.readthedocs.io/en/latest/conventions.html#time-series-data</span>
 
 <span class="sd">Problem: This hasn&#39;t been fully implemented.</span>
-<span class="sd">I don&#39;t know which standard the package is following now- a bit of both!</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 
