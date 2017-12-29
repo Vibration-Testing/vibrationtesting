@@ -371,10 +371,11 @@ def sos_modal(M, K, C=False, damp_diag=0.03, shift=1):
     -------
     omega : float array (1xN)
         Vector of natural frequencies (rad/sec)
-    Psi : float array (NxN)
-        Matrix of mass normalized mode shapes by column
     zeta : float array (1xN)
         Vector of damping ratios
+    Psi : float array (NxN)
+        Matrix of mass normalized mode shapes by column
+
 
     Examples
     --------
@@ -532,3 +533,97 @@ def serep(M, K, master):
     Kred = T.T @ K @T
 
     return Mred, Kred, T, np.array(truncated_dofs) + 1
+
+
+def mode_expansion_from_model(Psi, omega, M, K, measured):
+    r'''Deflection extrapolation to full FEM model coordinates, matrix method
+
+    Provided an equation  of the form:
+
+    :math:`\begin{pmatrix}-\begin{bmatrix}M_{mm}&M_{mu}\\ M_{um}&M_{uu}
+    \end{bmatrix} \omega_i^2
+    +\begin{bmatrix}K_{mm}&K_{mu}\\ K_{um}&K_{uu}\end{bmatrix}\end{pmatrix}`
+    :math:`\begin{bmatrix}\Psi_{i_m}\\ \Psi_{i_u}\end{bmatrix}= 0`
+
+    Where:
+
+    - :math:`M` and :math:`K` are the mass and stiffness matrices, likely from
+      a finite element model
+    - :math:`\Psi_i` and :math:`\omega_i` represent a mode/frequency pair
+    - subscripts :math:`m` and :math:`u` represent measure and unmeasured
+      of the mode
+
+    Determines the unknown portion of the mode (or operational deflection)
+    shape, :math:`\Psi_{i_u}` by
+    direct algebraic solution, aka
+
+    :math:`\Psi_{i_u} = - (K_{uu}- M_{ss} \omega_i^2) ^{-1}
+    (K_{um}-M_{um}\omega_i^2)\Psi_{i_m}`
+
+    Parameters
+    ----------
+    Psi : float array
+        mode shape, 2-D array
+    omega : float
+        natural (or driving) frequency
+    M, K : float arrays
+        Mass and Stiffness matrices
+    measured : float or integer array or list
+        List of measured degrees of freedom
+
+    Returns
+    -------
+    Psi_full: float array
+        Complete mode shape
+
+    Examples
+    --------
+    >>> import vibrationtesting as vt
+    >>> M = np.array([[4, 0, 0],
+    ...               [0, 4, 0],
+    ...               [0, 0, 4]])
+    >>> K = np.array([[8, -4, 0],
+    ...               [-4, 8, -4],
+    ...               [0, -4, 4]])
+    >>> measured = np.array([[1, 3]])
+    >>> omega, zeta, Psi = vt.sos_modal(M, K)
+    >>> Psi_measured = np.array([[-0.15], [-0.37]])
+    >>> Psi_full = vt.mode_expansion_from_model(Psi_measured, omega[0], M, K, measured)
+    >>> print(np.hstack((Psi[:,0].reshape(-1,1), Psi_full)))
+    [[-0.164  -0.15  ]
+     [-0.2955  0.2886]
+     [-0.3685 -0.37  ]]
+
+    Notes
+    -----
+    Reduced coordinate system forces can be obtained by
+    `Fr = T.T @ F`
+
+    Reduced damping matrix can be obtained using `Cr = T.T*@ C @ T`.
+
+    If mode shapes are obtained for the reduced system, full system mode shapes
+    are `phi = T @ phi_r`
+    '''
+
+    measured = (measured.reshape(-1) - 1)  # retained dofs
+    num_measured = len(measured)
+    ndof = int(M.shape[0])  # length(M);
+    unmeasured_dofs = list(set(np.arange(ndof)) - set(measured))
+    num_unmeasured = len(unmeasured_dofs)
+
+    Muu = np.array(M[unmeasured_dofs, unmeasured_dofs]).reshape(num_unmeasured,
+                                                                num_unmeasured)
+
+    Kuu = np.array(K[unmeasured_dofs, unmeasured_dofs]).reshape(num_unmeasured,
+                                                                num_unmeasured)
+    Mum = np.array(M[unmeasured_dofs, measured]).reshape(num_unmeasured,
+                                                         num_measured)
+    Kum = np.array(K[unmeasured_dofs, measured]).reshape(num_unmeasured,
+                                                         num_measured)
+
+    Psi_unmeasured = la.solve((Kuu-Muu*omega**2), (Kum-Mum*omega**2)@Psi)
+    Psi_full = np.zeros((num_measured+num_unmeasured, 1))
+    Psi_full[measured] = Psi
+    Psi_full[unmeasured_dofs] = Psi_unmeasured
+    Psi_full = Psi_full.reshape(-1, 1)
+    return Psi_full
