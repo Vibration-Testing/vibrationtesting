@@ -138,7 +138,7 @@ def c2d(A, B, C, D, dt):
 
 
 def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index,
-          num_freqs = 1000):
+          num_freqs=1000):
     """FRF of state space system
 
     Obtains the computed FRF of a state space system between selected input
@@ -180,7 +180,7 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index,
 
     """
     # A, B, C, D = ctrl.ssdata(sys)
-    if 0 < in_index < (B.shape[1]+1) and 0 < out_index < (C.shape[0] + 1):
+    if 0 < in_index < (B.shape[1] + 1) and 0 < out_index < (C.shape[0] + 1):
         sa = A.shape[0]
         omega = np.linspace(omega_low, omega_high, num_freqs)
         H = omega * 1j
@@ -189,12 +189,13 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index,
             H[i] = (C@la.solve(w * 1j * np.eye(sa) - A, B) + D)[out_index - 1,
                                                                 in_index - 1]
     else:
-        raise ValueError('Input {} or output {} infeasible.'.format(in_index, out_index))
+        raise ValueError(
+            'Input {} or output {} infeasible.'.format(in_index, out_index))
     return omega.reshape(1, -1), H.reshape(1, -1)
 
 
 def sos_frf(M, C, K, Bt, Cd, Cv, Ca, omega_low, omega_high,
-            in_index, out_index, num_freqs = 1000):
+            in_index, out_index, num_freqs=1000):
     """FRF of second order system
 
     Given second order linear matrix equation of the form
@@ -621,8 +622,9 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
     Kum = np.array(K[unmeasured_dofs, measured]).reshape(num_unmeasured,
                                                          num_measured)
 
-    Psi_unmeasured = la.solve((Kuu-Muu*omega**2), (Kum-Mum*omega**2)@Psi)
-    Psi_full = np.zeros((num_measured+num_unmeasured, 1))
+    Psi_unmeasured = la.solve((Kuu - Muu * omega**2),
+                              (Kum - Mum * omega**2)@Psi)
+    Psi_full = np.zeros((num_measured + num_unmeasured, 1))
     Psi_full[measured] = Psi
     Psi_full[unmeasured_dofs] = Psi_unmeasured
     Psi_full = Psi_full.reshape(-1, 1)
