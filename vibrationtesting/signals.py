@@ -49,7 +49,7 @@ The last dimension (2 or 3) indexes each data instance (experiment). That means
 that an unaveraged cross spectrum density has dimension 4. If there is only a
 single input channel, it is imperative to insist the dimention exist, even if
 only length 1. This is analagous to a vector being Nx1 versus simply a
-1-D array of length 1. 
+1-D array of length 1.
 
 http://python-control.readthedocs.io/en/latest/conventions.html#time-series-data
 
@@ -758,11 +758,10 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
 
     Notes
     -----
-    4/13/15: Converted to Python
     .. note:: Not compatible with scipy.signal functions
     .. seealso:: :func:`asd`, :func:`crsd`, :func:`frfplot`.
     .. warning:: hanning window cannot be selected yet. Averaging cannot be
-    unslected yet.
+       unslected yet.
     .. todo:: Fix averaging, windowing, multiple input.
     """
 
