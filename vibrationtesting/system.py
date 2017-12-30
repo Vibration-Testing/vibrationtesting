@@ -597,13 +597,8 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
 
     Notes
     -----
-    Reduced coordinate system forces can be obtained by
-    `Fr = T.T @ F`
-
-    Reduced damping matrix can be obtained using `Cr = T.T*@ C @ T`.
-
-    If mode shapes are obtained for the reduced system, full system mode shapes
-    are `phi = T @ phi_r`
+    .. note:: Must be applied a single mode at a time.
+    .. seealso:: incomplete multi-mode update
     '''
 
     measured = (measured.reshape(-1) - 1)  # retained dofs
