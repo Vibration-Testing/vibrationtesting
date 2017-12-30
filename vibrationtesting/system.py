@@ -564,9 +564,9 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
     Parameters
     ----------
     Psi : float array
-        mode shape, 2-D array
-    omega : float
-        natural (or driving) frequency
+        mode shape or shapes, 2-D array columns of which are mode shapes
+    omega : float or 1-D float array
+        natural (or driving) frequencies
     M, K : float arrays
         Mass and Stiffness matrices
     measured : float or integer array or list
@@ -616,11 +616,16 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
                                                          num_measured)
     Kum = np.array(K[unmeasured_dofs, measured]).reshape(num_unmeasured,
                                                          num_measured)
+    if isinstance(omega, float):
+        omega = np.array(omega).reshape(1)
 
-    Psi_unmeasured = la.solve((Kuu - Muu * omega**2),
-                              (Kum - Mum * omega**2)@Psi)
-    Psi_full = np.zeros((num_measured + num_unmeasured, 1))
+    Psi_full = np.zeros((num_measured + num_unmeasured, Psi.shape[1]))
     Psi_full[measured] = Psi
-    Psi_full[unmeasured_dofs] = Psi_unmeasured
-    Psi_full = Psi_full.reshape(-1, 1)
+
+    for i, omega_n in enumerate(omega):
+        Psi_i = Psi[:,i].reshape(-1,1)
+        Psi_unmeasured = la.solve((Kuu - Muu * omega_n**2),
+                                  (Kum - Mum * omega_n**2)@Psi_i)
+        Psi_full[unmeasured_dofs, i] = Psi_unmeasured
+        #Psi_full = Psi_full.reshape(-1, 1)
     return Psi_full
