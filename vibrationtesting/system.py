@@ -468,7 +468,7 @@ def sos_modal(M, K, C=False, damp_diag=0.03, shift=1):
 
 
 def serep(M, K, master):
-    r'''System Equivalent Reduction reduced model
+    r'''System Equivalent Reduction Expansion Process reduced model
 
     Reduce size of second order system of equations by SEREP processs while
     returning expansion matrix
@@ -491,7 +491,7 @@ def serep(M, K, master):
     Mred, Kred, T : float arrays
         Reduced Mass matric, reduced stiffness matrix, Transformation matrix
     truncated_dofs : int list
-        List of truncated degrees of freedom
+        List of truncated degrees of freedom, zero indexed
 
     Examples
     --------
@@ -514,6 +514,8 @@ def serep(M, K, master):
 
     If mode shapes are obtained for the reduced system, full system mode shapes
     are `phi = T @ phi_r`
+
+    .. seealso:: :func:`guyan`
     '''
 
     nm = int(max(master.shape))  # number of modes to keep;
@@ -533,7 +535,102 @@ def serep(M, K, master):
     Mred = T.T @ M @T
     Kred = T.T @ K @T
 
-    return Mred, Kred, T, np.array(truncated_dofs) + 1
+    return Mred, Kred, T, np.array(truncated_dofs)
+
+
+def guyan(M, K, master=None, fraction=None):
+    r'''Guyan reduced model
+
+    Reduce size of second order system of equations by Guyan processs
+
+    Equation of the form:
+    :math:`M \ddot{x} + K x = 0`
+    is reduced to the form
+    :math:`M_r \ddot{x}_m + Kr x_m = 0`
+    where :math:`x = T x_m`, :math:`M_r= T^T M T`, :math:`K_r= T^T K T`
+
+    Parameters
+    ----------
+    M, K : float arrays
+        Mass and Stiffness matrices
+    master : float array or list, optional
+        List of retained degrees of freedom (0 indexing)
+    fraction : float, optional
+        Fraction of degrees of freedom (0<`fraction`<1.0) to retain in model.
+        If both master and
+        fraction or neglected, fraction is set to 0.25.
+
+    Returns
+    -------
+    Mred, Kred, T : float arrays
+        Reduced Mass matric, reduced stiffness matrix, Transformation matrix
+    master_dofs : int list
+        List of master degrees of freedom (0 indexing)
+    truncated_dofs : int list
+        List of truncated degrees of freedom (0 indexing)
+
+    Examples
+    --------
+    >>> import vibrationtesting as vt
+    >>> M = np.array([[4, 0, 0],
+    ...               [0, 4, 0],
+    ...               [0, 0, 4]])
+    >>> K = np.array([[8, -4, 0],
+    ...               [-4, 8, -4],
+    ...               [0, -4, 4]])
+    >>> Mred, Kred, T, master, truncated_dofs = vt.guyan(M, K, fraction = 0.5)
+    untested
+
+    Notes
+    -----
+    Reduced coordinate system forces can be obtained by
+    `Fr = T.T @ F`
+
+    Reduced damping matrix can be obtained using `Cr = T.T*@ C @ T`.
+
+    If mode shapes are obtained for the reduced system, full system mode shapes
+    are `phi = T @ phi_r`
+    '''
+
+    if master is None:
+        if fraction is None:
+            fraction = 0.25
+
+        ratios = np.diag(M) / np.diag(K)
+        ranked = [i[0] for i in sorted(enumerate(ratios), key=lambda x:x[1])]
+        thresh = int(fraction * ratios.size)
+        master = ranked[-thresh:]
+
+    master = np.array(master)
+    nm = master.size  # number of dofs to keep;
+    master = master.reshape(-1)   # retained dofs
+
+    ndof = int(M.shape[0])  # length(M);
+
+    truncated_dofs = list(set(np.arange(ndof)) - set(master))
+#    truncated_dofs = np.array(set(np.arange(ndof)) - set(master))
+    '''
+    Mmm = M[master].T[master].T
+    Kmm = K[master].T[master].T
+    Mtm = M[truncated_dofs].T[master].T
+    Ktm = K[truncated_dofs].T[master].T
+    Mtt = M[truncated_dofs].T[truncated_dofs].T
+    Ktt = K[truncated_dofs].T[truncated_dofs].T'''
+
+    Mmm = slice(M, master, master)
+    Kmm = slice(K, master, master)
+    Mtm = slice(M, truncated_dofs, master)
+    Ktm = slice(K, truncated_dofs, master)
+    Mtt = slice(M, truncated_dofs, truncated_dofs)
+    Ktt = slice(K, truncated_dofs, truncated_dofs)
+
+    T = np.zeros((ndof, nm))
+    T[master, :nm] = np.eye(nm)
+    T[truncated_dofs, :nm] = la.solve(-Ktt, Ktm)
+    Mred = T.T @ M @ T
+    Kred = T.T @ K @ T
+    print('untested')
+    return Mred, Kred, T, master, truncated_dofs
 
 
 def mode_expansion_from_model(Psi, omega, M, K, measured):
@@ -570,7 +667,7 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
     M, K : float arrays
         Mass and Stiffness matrices
     measured : float or integer array or list
-        List of measured degrees of freedom
+        List of measured degrees of freedom (0 indexed)
 
     Returns
     -------
@@ -586,7 +683,7 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
     >>> K = np.array([[8, -4, 0],
     ...               [-4, 8, -4],
     ...               [0, -4, 4]])
-    >>> measured = np.array([[1, 3]])
+    >>> measured = np.array([[0, 2]])
     >>> omega, zeta, Psi = vt.sos_modal(M, K)
     >>> Psi_measured = np.array([[-0.15], [-0.37]])
     >>> Psi_full = vt.mode_expansion_from_model(Psi_measured, omega[0], M, K, measured)
@@ -601,21 +698,30 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
     .. seealso:: incomplete multi-mode update
     '''
 
-    measured = (measured.reshape(-1) - 1)  # retained dofs
+    measured = measured.reshape(-1)  # retained dofs
     num_measured = len(measured)
     ndof = int(M.shape[0])  # length(M);
     unmeasured_dofs = list(set(np.arange(ndof)) - set(measured))
     num_unmeasured = len(unmeasured_dofs)
 
-    Muu = np.array(M[unmeasured_dofs, unmeasured_dofs]).reshape(num_unmeasured,
+    # Code from before my slicing code
+    '''
+    Muu = np.array(M[unmeasured_dofs].T[unmeasured_dofs].T).reshape(num_unmeasured,
                                                                 num_unmeasured)
 
-    Kuu = np.array(K[unmeasured_dofs, unmeasured_dofs]).reshape(num_unmeasured,
+    Kuu = np.array(K[unmeasured_dofs].T[unmeasured_dofs].T).reshape(num_unmeasured,
                                                                 num_unmeasured)
-    Mum = np.array(M[unmeasured_dofs, measured]).reshape(num_unmeasured,
+    Mum = np.array(M[unmeasured_dofs].T[measured].T).reshape(num_unmeasured,
                                                          num_measured)
-    Kum = np.array(K[unmeasured_dofs, measured]).reshape(num_unmeasured,
+    Kum = np.array(K[unmeasured_dofs].T[measured].T).reshape(num_unmeasured,
                                                          num_measured)
+    '''
+
+    Muu = slice(M, unmeasured_dofs, unmeasured_dofs)
+    Kuu = slice(K, unmeasured_dofs, unmeasured_dofs)
+    Mum = slice(M, unmeasured_dofs, measured)
+    Kum = slice(K, unmeasured_dofs, measured)
+
     if isinstance(omega, float):
         omega = np.array(omega).reshape(1)
 
@@ -623,9 +729,34 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
     Psi_full[measured] = Psi
 
     for i, omega_n in enumerate(omega):
-        Psi_i = Psi[:,i].reshape(-1,1)
+        Psi_i = Psi[:, i].reshape(-1, 1)
         Psi_unmeasured = la.solve((Kuu - Muu * omega_n**2),
                                   (Kum - Mum * omega_n**2)@Psi_i)
         Psi_full[unmeasured_dofs, i] = Psi_unmeasured
         #Psi_full = Psi_full.reshape(-1, 1)
     return Psi_full
+
+
+def slice(Matrix, a, b):
+    '''slice a matrix properly- like Octave
+
+    Addresses the confounding inconsistency that `M[a,b]` acts differently if
+    `a` and `b` are the same length or different lengths.
+
+    Parameters
+    ----------
+    Matrix : float array
+        Arbitrary array
+    a, b : int lists or arrays
+        list of rows and columns to be selected from `Matrix`
+
+    Returns
+    -------
+    Matrix : float array
+        Properly sliced matrix- no casting allowed.
+
+    '''
+    #a = a.reshape(-1)
+    #b = b.reshape(-1)
+
+    return Matrix[np.array(a).reshape(-1, 1), b].reshape(np.array(a).shape[0], np.array(b).shape[0])
