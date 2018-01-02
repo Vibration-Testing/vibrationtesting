@@ -538,13 +538,23 @@ def serep(M, K, master):
 def guyan(M, K, master=None, fraction=None):
     r"""Guyan reduced model.
 
-    Reduce size of second order system of equations by Guyan processs
+    Applies Guyan Reductions to second order system of equations of the form
 
-    Equation of the form:
-    :math:`M \ddot{x} + K x = 0`
-    is reduced to the form
-    :math:`M_r \ddot{x}_m + Kr x_m = 0`
-    where :math:`x = T x_m`, :math:`M_r= T^T M T`, :math:`K_r= T^T K T`
+    .. math:: M \ddot{x} + K x = 0
+
+    which are reduced to the form
+
+    .. math:: M_r \ddot{x}_m + K_r x_m = 0
+
+    where
+
+    .. math::
+
+        x = T x_m
+
+        M_r= T^T M T
+
+        K_r= T^T K T
 
     Parameters
     ----------
@@ -553,14 +563,14 @@ def guyan(M, K, master=None, fraction=None):
     master : float array or list, optional
         List of retained degrees of freedom (0 indexing)
     fraction : float, optional
-        Fraction of degrees of freedom (0<`fraction`<1.0) to retain in model.
+        Fraction of degrees of freedom (0< `fraction` <1.0) to retain in model.
         If both master and
         fraction or neglected, fraction is set to 0.25.
 
     Returns
     -------
     Mred, Kred, T : float arrays
-        Reduced Mass matric, reduced stiffness matrix, Transformation matrix
+        Reduced Mass matric, Reduced Stiffness matrix, Transformation matrix
     master_dofs : int list
         List of master degrees of freedom (0 indexing)
     truncated_dofs : int list
@@ -580,13 +590,12 @@ def guyan(M, K, master=None, fraction=None):
 
     Notes
     -----
-    Reduced coordinate system forces can be obtained by
-    `Fr = T.T @ F`
+    Reduced coordinate system forces can be obtained by `Fr = T.T @ F`.
 
     Reduced damping matrix can be obtained using `Cr = T.T @ C @ T`.
 
     If mode shapes are obtained for the reduced system, full system mode shapes
-    are `phi = T @ phi_r`
+    are `phi = T @ phi_r`.
 
     """
     if master is None:
@@ -605,7 +614,7 @@ def guyan(M, K, master=None, fraction=None):
     ndof = int(M.shape[0])  # length(M);
 
     truncated_dofs = list(set(np.arange(ndof)) - set(master))
-#    truncated_dofs = np.array(set(np.arange(ndof)) - set(master))
+    # truncated_dofs = np.array(set(np.arange(ndof)) - set(master))
     """
     Mmm = M[master].T[master].T
     Kmm = K[master].T[master].T
