@@ -5,7 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>System Manipulation (system) &#8212; Vibration Testing 0.21 documentation</title>
+    <title>System Manipulation, Reduction, and Correction (system) &#8212; Vibration Testing 0.21 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -42,13 +42,13 @@
           <div class="body" role="main">
             
   <div class="section" id="module-system">
-<span id="system-manipulation-system"></span><h1>System Manipulation (<a class="reference internal" href="#module-system" title="system"><code class="xref py py-mod docutils literal"><span class="pre">system</span></code></a>)<a class="headerlink" href="#module-system" title="Permalink to this headline">¶</a></h1>
-<p>Created on 14 May 2015
-&#64;author: Joseph C. Slater</p>
+<span id="system-manipulation-reduction-and-correction-system"></span><h1>System Manipulation, Reduction, and Correction (<a class="reference internal" href="#module-system" title="system"><code class="xref py py-mod docutils literal"><span class="pre">system</span></code></a>)<a class="headerlink" href="#module-system" title="Permalink to this headline">¶</a></h1>
+<p>System manipulation, reduction, and corrections functions.</p>
+<p>&#64;author: Joseph C. Slater</p>
 <dl class="function">
 <dt id="system.c2d">
 <code class="descclassname">system.</code><code class="descname">c2d</code><span class="sig-paren">(</span><em>A</em>, <em>B</em>, <em>C</em>, <em>D</em>, <em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#c2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.c2d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert continuous state system to discrete time</p>
+<dd><p>Convert continuous state system to discrete time.</p>
 <p>Converts a set of continuous state space system matrices to their
 discrete counterpart.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -118,7 +118,7 @@ discrete counterpart.</p>
 <dl class="function">
 <dt id="system.d2c">
 <code class="descclassname">system.</code><code class="descname">d2c</code><span class="sig-paren">(</span><em>Ad</em>, <em>Bd</em>, <em>C</em>, <em>D</em>, <em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#d2c"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.d2c" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns continuous A, B, C, D from discrete</p>
+<dd><p>Return continuous A, B, C, D from discrete form.</p>
 <p>Converts a set of digital state space system matrices to their
 continuous counterpart.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -150,12 +150,10 @@ continuous counterpart.</p>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">discrepancies between <a class="reference internal" href="#system.c2d" title="system.c2d"><code class="xref py py-func docutils literal"><span class="pre">c2d()</span></code></a> and <a class="reference internal" href="#system.d2c" title="system.d2c"><code class="xref py py-func docutils literal"><span class="pre">d2c()</span></code></a> are due to     typing truncation errors.</p>
+<p class="last">discrepancies between <a class="reference internal" href="#system.c2d" title="system.c2d"><code class="xref py py-func docutils literal"><span class="pre">c2d()</span></code></a> and <a class="reference internal" href="#system.d2c" title="system.d2c"><code class="xref py py-func docutils literal"><span class="pre">d2c()</span></code></a> are due to </p>
 </div>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#system.c2d" title="system.c2d"><code class="xref py py-func docutils literal"><span class="pre">c2d()</span></code></a>.</p>
-</div>
+<p>typing truncation errors.
+.. seealso:: <a class="reference internal" href="#system.c2d" title="system.c2d"><code class="xref py py-func docutils literal"><span class="pre">c2d()</span></code></a>.</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Ad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.9999</span><span class="p">,</span><span class="mf">0.0001</span><span class="p">,</span><span class="mf">0.01</span><span class="p">,</span><span class="mf">0.</span><span class="p">],</span>
@@ -185,9 +183,82 @@ continuous counterpart.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="system.guyan">
+<code class="descclassname">system.</code><code class="descname">guyan</code><span class="sig-paren">(</span><em>M</em>, <em>K</em>, <em>master=None</em>, <em>fraction=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#guyan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.guyan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Guyan reduced model.</p>
+<p>Reduce size of second order system of equations by Guyan processs</p>
+<p>Equation of the form:
+<span class="math">\(M \ddot{x} + K x = 0\)</span>
+is reduced to the form
+<span class="math">\(M_r \ddot{x}_m + Kr x_m = 0\)</span>
+where <span class="math">\(x = T x_m\)</span>, <span class="math">\(M_r= T^T M T\)</span>, <span class="math">\(K_r= T^T K T\)</span></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>M, K</strong> : float arrays</p>
+<blockquote>
+<div><p>Mass and Stiffness matrices</p>
+</div></blockquote>
+<p><strong>master</strong> : float array or list, optional</p>
+<blockquote>
+<div><p>List of retained degrees of freedom (0 indexing)</p>
+</div></blockquote>
+<p><strong>fraction</strong> : float, optional</p>
+<blockquote>
+<div><p>Fraction of degrees of freedom (0&lt;<a href="#id1"><span class="problematic" id="id2">`</span></a>fraction`&lt;1.0) to retain in model.
+If both master and
+fraction or neglected, fraction is set to 0.25.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>Mred, Kred, T</strong> : float arrays</p>
+<blockquote>
+<div><p>Reduced Mass matric, reduced stiffness matrix, Transformation matrix</p>
+</div></blockquote>
+<p><strong>master_dofs</strong> : int list</p>
+<blockquote>
+<div><p>List of master degrees of freedom (0 indexing)</p>
+</div></blockquote>
+<p><strong>truncated_dofs</strong> : int list</p>
+<blockquote class="last">
+<div><p>List of truncated degrees of freedom (0 indexing)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Reduced coordinate system forces can be obtained by
+<cite>Fr = T.T &#64; F</cite></p>
+<p>Reduced damping matrix can be obtained using <cite>Cr = T.T*&#64; C &#64; T</cite>.</p>
+<p>If mode shapes are obtained for the reduced system, full system mode shapes
+are <cite>phi = T &#64; phi_r</cite></p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Mred</span><span class="p">,</span> <span class="n">Kred</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">master</span><span class="p">,</span> <span class="n">truncated_dofs</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">guyan</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">fraction</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="go">untested</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="system.improved_reduction">
+<code class="descclassname">system.</code><code class="descname">improved_reduction</code><span class="sig-paren">(</span><em>M</em>, <em>K</em>, <em>master=None</em>, <em>fraction=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#improved_reduction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.improved_reduction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Incomplete.</p>
+<p>4.14 Friswell</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="system.mode_expansion_from_model">
 <code class="descclassname">system.</code><code class="descname">mode_expansion_from_model</code><span class="sig-paren">(</span><em>Psi</em>, <em>omega</em>, <em>M</em>, <em>K</em>, <em>measured</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#mode_expansion_from_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.mode_expansion_from_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deflection extrapolation to full FEM model coordinates, matrix method</p>
+<dd><p>Deflection extrapolation to full FEM model coordinates, matrix method.</p>
 <p>Provided an equation  of the form:</p>
 <p><span class="math">\(\begin{pmatrix}-\begin{bmatrix}M_{mm}&amp;M_{mu}\\ M_{um}&amp;M_{uu}
 \end{bmatrix} \omega_i^2
@@ -212,11 +283,11 @@ direct algebraic solution, aka</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>Psi</strong> : float array</p>
 <blockquote>
-<div><p>mode shape, 2-D array</p>
+<div><p>mode shape or shapes, 2-D array columns of which are mode shapes</p>
 </div></blockquote>
-<p><strong>omega</strong> : float</p>
+<p><strong>omega</strong> : float or 1-D float array</p>
 <blockquote>
-<div><p>natural (or driving) frequency</p>
+<div><p>natural (or driving) frequencies</p>
 </div></blockquote>
 <p><strong>M, K</strong> : float arrays</p>
 <blockquote>
@@ -224,7 +295,7 @@ direct algebraic solution, aka</p>
 </div></blockquote>
 <p><strong>measured</strong> : float or integer array or list</p>
 <blockquote>
-<div><p>List of measured degrees of freedom</p>
+<div><p>List of measured degrees of freedom (0 indexed)</p>
 </div></blockquote>
 </td>
 </tr>
@@ -237,11 +308,14 @@ direct algebraic solution, aka</p>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>Reduced coordinate system forces can be obtained by
-<cite>Fr = T.T &#64; F</cite></p>
-<p>Reduced damping matrix can be obtained using <cite>Cr = T.T*&#64; C &#64; T</cite>.</p>
-<p>If mode shapes are obtained for the reduced system, full system mode shapes
-are <cite>phi = T &#64; phi_r</cite></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Must be applied a single mode at a time.</p>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">incomplete multi-mode update</p>
+</div>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
@@ -250,10 +324,11 @@ are <cite>phi = T &#64; phi_r</cite></p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
 <span class="gp">... </span>              <span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">],</span>
 <span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">measured</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">measured</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">omega</span><span class="p">,</span> <span class="n">zeta</span><span class="p">,</span> <span class="n">Psi</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">sos_modal</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Psi_measured</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.15</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.37</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Psi_full</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">mode_expansion_from_model</span><span class="p">(</span><span class="n">Psi_measured</span><span class="p">,</span> <span class="n">omega</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">measured</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Psi_full</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">mode_expansion_from_model</span><span class="p">(</span><span class="n">Psi_measured</span><span class="p">,</span> <span class="n">omega</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span>
+<span class="gp">... </span><span class="n">measured</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">Psi</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">Psi_full</span><span class="p">)))</span>
 <span class="go">[[-0.164  -0.15  ]</span>
 <span class="go"> [-0.2955  0.2886]</span>
@@ -263,9 +338,97 @@ are <cite>phi = T &#64; phi_r</cite></p>
 </dd></dl>
 
 <dl class="function">
+<dt id="system.model_correction_direct">
+<code class="descclassname">system.</code><code class="descname">model_correction_direct</code><span class="sig-paren">(</span><em>Psi</em>, <em>omega</em>, <em>M</em>, <em>K</em>, <em>method='Baruch'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#model_correction_direct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.model_correction_direct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Direct model updating using model data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>Psi</strong> : float array</p>
+<blockquote>
+<div><p>Expanded mode shapes from experimental measurements. Must be
+real-valued. See <cite>mode_expansion_from_model</cite>.</p>
+</div></blockquote>
+<p><strong>omega</strong> : float array</p>
+<blockquote>
+<div><p>Natural frequencies identified from modal analysis (diagonal matrix or
+vector).</p>
+</div></blockquote>
+<p><strong>M, K</strong> : float arrays</p>
+<blockquote>
+<div><p>Analytical mass and stiffness matrices</p>
+</div></blockquote>
+<p><strong>method</strong> : string, optional</p>
+<blockquote>
+<div><p><cite>Baruch</cite> and Bar-Itzhack <a class="reference internal" href="#r12" id="id3">[R12]</a> or <cite>Berman</cite> and Nagy <a class="reference internal" href="#r22" id="id4">[R22]</a>
+(default Baruch)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>Mc, Kc</strong> : float arrays</p>
+<blockquote class="last">
+<div><p>Corrected mass and stiffness matrices.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<table class="docutils citation" frame="void" id="r12" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[R12]</a></td><td>Baruch, M. and Bar-Itzhack, I.Y., “Optimal Weighted
+Orthogonalization of Measured Modes,” <em>AIAA Journal</em>, 16(4), 1978, pp.
+346-351.</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="r22" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[R22]</a></td><td>Berman, A. and Nagy, E.J., 1983, “Improvements of a Large Analytical
+Model using Test Data,” <em>AIAA Journal</em>, 21(8), 1983, pp. 1168-1173.</td></tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="system.rsolve">
+<code class="descclassname">system.</code><code class="descname">rsolve</code><span class="sig-paren">(</span><em>B</em>, <em>C</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#rsolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.rsolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solve right Gauss elimination equation.</p>
+<p>Given <span class="math">\(A B  = C\)</span> return <span class="math">\(A = C B^{-1}\)</span></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>B, C</strong> : float arrays</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>A</strong> : float array</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span>  <span class="mi">4</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mi">32</span><span class="p">,</span> <span class="o">-</span><span class="mi">16</span><span class="p">,</span>   <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>           <span class="p">[</span><span class="o">-</span><span class="mi">16</span><span class="p">,</span>  <span class="mi">36</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">],</span>
+<span class="gp">... </span>           <span class="p">[</span>  <span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">24</span><span class="p">,</span>  <span class="mi">20</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">rsolve</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">rsolve</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">)))</span>
+<span class="go">[[ 4.  0.  0.]</span>
+<span class="go"> [-0.  4. -1.]</span>
+<span class="go"> [ 0. -1.  4.]]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
 <dt id="system.serep">
 <code class="descclassname">system.</code><code class="descname">serep</code><span class="sig-paren">(</span><em>M</em>, <em>K</em>, <em>master</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#serep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.serep" title="Permalink to this definition">¶</a></dt>
-<dd><p>System Equivalent Reduction reduced model</p>
+<dd><p>System Equivalent Reduction Expansion Process reduced model.</p>
 <p>Reduce size of second order system of equations by SEREP processs while
 returning expansion matrix</p>
 <p>Equation of the form:
@@ -293,7 +456,7 @@ where <span class="math">\(x = T x_m\)</span>, <span class="math">\(M_r= T^T M T
 </div></blockquote>
 <p><strong>truncated_dofs</strong> : int list</p>
 <blockquote class="last">
-<div><p>List of truncated degrees of freedom</p>
+<div><p>List of truncated degrees of freedom, zero indexed</p>
 </div></blockquote>
 </td>
 </tr>
@@ -305,6 +468,10 @@ where <span class="math">\(x = T x_m\)</span>, <span class="math">\(M_r= T^T M T
 <p>Reduced damping matrix can be obtained using <cite>Cr = T.T*&#64; C &#64; T</cite>.</p>
 <p>If mode shapes are obtained for the reduced system, full system mode shapes
 are <cite>phi = T &#64; phi_r</cite></p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#system.guyan" title="system.guyan"><code class="xref py py-func docutils literal"><span class="pre">guyan()</span></code></a></p>
+</div>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
@@ -320,15 +487,45 @@ are <cite>phi = T &#64; phi_r</cite></p>
 </dd></dl>
 
 <dl class="function">
+<dt id="system.slice">
+<code class="descclassname">system.</code><code class="descname">slice</code><span class="sig-paren">(</span><em>Matrix</em>, <em>a</em>, <em>b</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#slice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.slice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Slice a matrix properly- like Octave.</p>
+<p>Addresses the confounding inconsistency that <cite>M[a,b]</cite> acts differently if
+<cite>a</cite> and <cite>b</cite> are the same length or different lengths.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>Matrix</strong> : float array</p>
+<blockquote>
+<div><p>Arbitrary array</p>
+</div></blockquote>
+<p><strong>a, b</strong> : int lists or arrays</p>
+<blockquote>
+<div><p>list of rows and columns to be selected from <cite>Matrix</cite></p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>Matrix</strong> : float array</p>
+<blockquote class="last">
+<div><p>Properly sliced matrix- no casting allowed.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="system.so2ss">
 <code class="descclassname">system.</code><code class="descname">so2ss</code><span class="sig-paren">(</span><em>M</em>, <em>C</em>, <em>K</em>, <em>Bt</em>, <em>Cd</em>, <em>Cv</em>, <em>Ca</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#so2ss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.so2ss" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert second order system to state space</p>
+<dd><p>Convert second order system to state space.</p>
 <p>Given second order linear matrix equation of the form
-<span class="math">\(M\ddot{x} + C \dot{x} + K x= \tilde{B} u\)</span>
+<span class="math">\(M\\ddot{x} + C \\dot{x} + K x= \\tilde{B} u\)</span>
 and
-<span class="math">\(y = C_d x + C_v \dot{x} + C_a\ddot{x}\)</span>
+<span class="math">\(y = C_d x + C_v \\dot{x} + C_a\\ddot{x}\)</span>
 returns the state space form equations
-<span class="math">\(\dot{z} = A z + B u\)</span>,
+<span class="math">\(\\dot{z} = A z + B u\)</span>,
 <span class="math">\(y = C z + D u\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -382,11 +579,11 @@ and accelerometer matrices</p>
 <dl class="function">
 <dt id="system.sos_frf">
 <code class="descclassname">system.</code><code class="descname">sos_frf</code><span class="sig-paren">(</span><em>M</em>, <em>C</em>, <em>K</em>, <em>Bt</em>, <em>Cd</em>, <em>Cv</em>, <em>Ca</em>, <em>omega_low</em>, <em>omega_high</em>, <em>in_index</em>, <em>out_index</em>, <em>num_freqs=1000</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#sos_frf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.sos_frf" title="Permalink to this definition">¶</a></dt>
-<dd><p>FRF of second order system</p>
+<dd><p>Return FRF of second order system.</p>
 <p>Given second order linear matrix equation of the form
-<span class="math">\(M\ddot{x} + C \dot{x} + K x= \tilde{B} u\)</span>
+<span class="math">\(M\\ddot{x} + C \\dot{x} + K x= \\tilde{B} u\)</span>
 and
-<span class="math">\(y = C_d x + C_v \dot{x} + C_a\ddot{x}\)</span>
+<span class="math">\(y = C_d x + C_v \\dot{x} + C_a\\ddot{x}\)</span>
 converts to state space form and returns the requested frequency response
 function</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -545,7 +742,7 @@ non-zero eigenvalue.</p>
 <dl class="function">
 <dt id="system.ssfrf">
 <code class="descclassname">system.</code><code class="descname">ssfrf</code><span class="sig-paren">(</span><em>A</em>, <em>B</em>, <em>C</em>, <em>D</em>, <em>omega_low</em>, <em>omega_high</em>, <em>in_index</em>, <em>out_index</em>, <em>num_freqs=1000</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#ssfrf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.ssfrf" title="Permalink to this definition">¶</a></dt>
-<dd><p>FRF of state space system</p>
+<dd><p>Return FRF of state space system.</p>
 <p>Obtains the computed FRF of a state space system between selected input
 and output over frequency range of interest.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -625,7 +822,7 @@ and output over frequency range of interest.</p>
 <li class="toctree-l1"><a class="reference internal" href="../tutorial/index.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="signal.html">Signal Processing and Generation (<code class="docutils literal"><span class="pre">signals</span></code>)</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">System Manipulation (<code class="docutils literal"><span class="pre">system</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">System Manipulation, Reduction, and Correction (<code class="docutils literal"><span class="pre">system</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="identification.html">Modal Analysis and System Identification (<code class="docutils literal"><span class="pre">identification</span></code>)</a></li>
 </ul>
 </li>

@@ -41,7 +41,8 @@
             
   <h1>Source code for system</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Created on 14 May 2015</span>
+<span class="sd">System manipulation, reduction, and corrections functions.</span>
+
 <span class="sd">@author: Joseph C. Slater</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Joseph C. Slater&quot;</span>
@@ -50,7 +51,7 @@
 
 
 <span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># import warnings</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="c1"># import control as ctrl</span>
@@ -60,7 +61,7 @@
 
 
 <div class="viewcode-block" id="d2c"><a class="viewcode-back" href="../reference/system.html#system.d2c">[docs]</a><span class="k">def</span> <span class="nf">d2c</span><span class="p">(</span><span class="n">Ad</span><span class="p">,</span> <span class="n">Bd</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns continuous A, B, C, D from discrete</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return continuous A, B, C, D from discrete form.</span>
 
 <span class="sd">    Converts a set of digital state space system matrices to their</span>
 <span class="sd">    continuous counterpart.</span>
@@ -103,8 +104,8 @@
 <span class="sd">    .. note:: discrepancies between :func:`c2d` and :func:`d2c` are due to \</span>
 <span class="sd">    typing truncation errors.</span>
 <span class="sd">    .. seealso:: :func:`c2d`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
 
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Old school (very old)</span>
     <span class="c1"># A = la.logm(Ad) / dt</span>
     <span class="c1"># B = la.solve((Ad - np.eye(A.shape[0])), A) @ Bd</span>
@@ -119,7 +120,7 @@
 
 
 <div class="viewcode-block" id="c2d"><a class="viewcode-back" href="../reference/system.html#system.c2d">[docs]</a><span class="k">def</span> <span class="nf">c2d</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert continuous state system to discrete time</span>
+    <span class="sd">&quot;&quot;&quot;Convert continuous state system to discrete time.</span>
 
 <span class="sd">    Converts a set of continuous state space system matrices to their</span>
 <span class="sd">    discrete counterpart.</span>
@@ -171,8 +172,8 @@
 <span class="sd">    -----</span>
 <span class="sd">    .. note:: Zero-order hold solution</span>
 <span class="sd">    .. seealso:: :func:`d2c`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
 
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">Ad</span><span class="p">,</span> <span class="n">Bd</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">cont2discrete</span><span class="p">((</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">),</span> <span class="n">dt</span><span class="p">)</span>
     <span class="c1"># Ad = la.expm(A * dt)</span>
     <span class="c1"># Bd = la.solve(A, (Ad - np.eye(A.shape[0]))) @ B</span>
@@ -181,7 +182,7 @@
 
 <div class="viewcode-block" id="ssfrf"><a class="viewcode-back" href="../reference/system.html#system.ssfrf">[docs]</a><span class="k">def</span> <span class="nf">ssfrf</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">omega_low</span><span class="p">,</span> <span class="n">omega_high</span><span class="p">,</span> <span class="n">in_index</span><span class="p">,</span> <span class="n">out_index</span><span class="p">,</span>
           <span class="n">num_freqs</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;FRF of state space system</span>
+    <span class="sd">&quot;&quot;&quot;Return FRF of state space system.</span>
 
 <span class="sd">    Obtains the computed FRF of a state space system between selected input</span>
 <span class="sd">    and output over frequency range of interest.</span>
@@ -238,7 +239,7 @@
 
 <span class="k">def</span> <span class="nf">sos_frf</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">Bt</span><span class="p">,</span> <span class="n">Cd</span><span class="p">,</span> <span class="n">Cv</span><span class="p">,</span> <span class="n">Ca</span><span class="p">,</span> <span class="n">omega_low</span><span class="p">,</span> <span class="n">omega_high</span><span class="p">,</span>
             <span class="n">in_index</span><span class="p">,</span> <span class="n">out_index</span><span class="p">,</span> <span class="n">num_freqs</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;FRF of second order system</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return FRF of second order system.</span>
 
 <span class="sd">    Given second order linear matrix equation of the form</span>
 <span class="sd">    :math:`M\\ddot{x} + C \\dot{x} + K x= \\tilde{B} u`</span>
@@ -258,7 +259,6 @@
 <span class="sd">        input and output numbers (starting at 1)</span>
 <span class="sd">    num_freqs : int</span>
 <span class="sd">        number of frequencies at which to return FRF</span>
-
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -286,8 +286,8 @@
 <span class="sd">    &gt;&gt;&gt; D = np.array([[-0.2]])</span>
 <span class="sd">    &gt;&gt;&gt; omega, H = vt.ssfrf(A, B, C, D, 0, 3.5, 1, 1)</span>
 <span class="sd">    &gt;&gt;&gt; vt.frfplot(omega, H) # doctest: +SKIP</span>
-<span class="sd">    &quot;&quot;&quot;</span>
 
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="n">so2ss</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">Bt</span><span class="p">,</span> <span class="n">Cd</span><span class="p">,</span> <span class="n">Cv</span><span class="p">,</span> <span class="n">Ca</span><span class="p">)</span>
 
     <span class="n">omega</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">ssfrf</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">omega_low</span><span class="p">,</span> <span class="n">omega_high</span><span class="p">,</span> <span class="n">in_index</span><span class="p">,</span> <span class="n">out_index</span><span class="p">,</span>
@@ -297,7 +297,7 @@
 
 
 <div class="viewcode-block" id="so2ss"><a class="viewcode-back" href="../reference/system.html#system.so2ss">[docs]</a><span class="k">def</span> <span class="nf">so2ss</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">Bt</span><span class="p">,</span> <span class="n">Cd</span><span class="p">,</span> <span class="n">Cv</span><span class="p">,</span> <span class="n">Ca</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert second order system to state space</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert second order system to state space.</span>
 
 <span class="sd">    Given second order linear matrix equation of the form</span>
 <span class="sd">    :math:`M\\ddot{x} + C \\dot{x} + K x= \\tilde{B} u`</span>
@@ -345,8 +345,8 @@
 <span class="sd">    C:  [[-1.4     1.2    -0.0058  0.0014]]</span>
 <span class="sd">    &gt;&gt;&gt; print(&#39;D: &#39;, D)</span>
 <span class="sd">    D:  [[-0.2]]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
 
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">M</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))),</span>
                    <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="o">-</span><span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">),</span> <span class="o">-</span><span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">C</span><span class="p">)))))</span>
     <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">Bt</span><span class="p">),</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">Bt</span><span class="p">)))</span>
@@ -357,9 +357,7 @@
 
 
 <span class="k">def</span> <span class="nf">damp</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Display natural frequencies and damping ratios of state matrix.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-
+    <span class="sd">&quot;&quot;&quot;Display natural frequencies and damping ratios of state matrix.&quot;&quot;&quot;</span>
     <span class="c1"># Original Author: Kai P. Mueller &lt;mueller@ifr.ing.tu-bs.de&gt; for Octave</span>
     <span class="c1"># Created: September 29, 1997.</span>
 
@@ -387,7 +385,7 @@
 
 
 <div class="viewcode-block" id="sos_modal"><a class="viewcode-back" href="../reference/system.html#system.sos_modal">[docs]</a><span class="k">def</span> <span class="nf">sos_modal</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">C</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">damp_diag</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Eigen analysis of proportionally damped system.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Eigen analysis of proportionally damped system.</span>
 
 <span class="sd">    Optimally find mass normalized mode shapes and natural frequencies</span>
 <span class="sd">    of a system modelled by :math:`M\ddot{x}+Kx=0`.</span>
@@ -467,8 +465,7 @@
 <span class="sd">     [-0.0483  0.2641 -0.0871]</span>
 <span class="sd">     [ 0.0388 -0.0871  0.3946]]</span>
 
-<span class="sd">    &#39;&#39;&#39;</span>
-
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">K</span> <span class="o">=</span> <span class="n">K</span> <span class="o">+</span> <span class="n">M</span> <span class="o">*</span> <span class="n">shift</span>
 
     <span class="n">lam</span><span class="p">,</span> <span class="n">Psi</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
@@ -510,7 +507,7 @@
 
 
 <span class="k">def</span> <span class="nf">serep</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">master</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;System Equivalent Reduction reduced model</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;System Equivalent Reduction Expansion Process reduced model.</span>
 
 <span class="sd">    Reduce size of second order system of equations by SEREP processs while</span>
 <span class="sd">    returning expansion matrix</span>
@@ -533,7 +530,7 @@
 <span class="sd">    Mred, Kred, T : float arrays</span>
 <span class="sd">        Reduced Mass matric, reduced stiffness matrix, Transformation matrix</span>
 <span class="sd">    truncated_dofs : int list</span>
-<span class="sd">        List of truncated degrees of freedom</span>
+<span class="sd">        List of truncated degrees of freedom, zero indexed</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -556,8 +553,10 @@
 
 <span class="sd">    If mode shapes are obtained for the reduced system, full system mode shapes</span>
 <span class="sd">    are `phi = T @ phi_r`</span>
-<span class="sd">    &#39;&#39;&#39;</span>
 
+<span class="sd">    .. seealso:: :func:`guyan`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">nm</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">master</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>  <span class="c1"># number of modes to keep;</span>
     <span class="n">master</span> <span class="o">=</span> <span class="n">master</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># retained dofs</span>
 
@@ -572,14 +571,109 @@
     <span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ndof</span><span class="p">,</span> <span class="n">nm</span><span class="p">))</span>
     <span class="n">T</span><span class="p">[</span><span class="n">master</span><span class="p">,</span> <span class="p">:</span><span class="n">nm</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">nm</span><span class="p">)</span>
     <span class="n">T</span><span class="p">[</span><span class="n">truncated_dofs</span><span class="p">,</span> <span class="p">:</span><span class="n">nm</span><span class="p">]</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">Psi_rr</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">Psi_tr</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-<div class="viewcode-block" id="mode_expansion_from_model"><a class="viewcode-back" href="../reference/system.html#system.mode_expansion_from_model">[docs]</a>    <span class="n">Mred</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">M</span> <span class="nd">@T</span>
+<div class="viewcode-block" id="guyan"><a class="viewcode-back" href="../reference/system.html#system.guyan">[docs]</a>    <span class="n">Mred</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">M</span> <span class="nd">@T</span>
     <span class="n">Kred</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">K</span> <span class="nd">@T</span>
 
-    <span class="k">return</span> <span class="n">Mred</span><span class="p">,</span> <span class="n">Kred</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">truncated_dofs</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span></div>
+    <span class="k">return</span> <span class="n">Mred</span><span class="p">,</span> <span class="n">Kred</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">truncated_dofs</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">guyan</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">master</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Guyan reduced model.</span>
+
+<span class="sd">    Reduce size of second order system of equations by Guyan processs</span>
+
+<span class="sd">    Equation of the form:</span>
+<span class="sd">    :math:`M \ddot{x} + K x = 0`</span>
+<span class="sd">    is reduced to the form</span>
+<span class="sd">    :math:`M_r \ddot{x}_m + Kr x_m = 0`</span>
+<span class="sd">    where :math:`x = T x_m`, :math:`M_r= T^T M T`, :math:`K_r= T^T K T`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    M, K : float arrays</span>
+<span class="sd">        Mass and Stiffness matrices</span>
+<span class="sd">    master : float array or list, optional</span>
+<span class="sd">        List of retained degrees of freedom (0 indexing)</span>
+<span class="sd">    fraction : float, optional</span>
+<span class="sd">        Fraction of degrees of freedom (0&lt;`fraction`&lt;1.0) to retain in model.</span>
+<span class="sd">        If both master and</span>
+<span class="sd">        fraction or neglected, fraction is set to 0.25.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Mred, Kred, T : float arrays</span>
+<span class="sd">        Reduced Mass matric, reduced stiffness matrix, Transformation matrix</span>
+<span class="sd">    master_dofs : int list</span>
+<span class="sd">        List of master degrees of freedom (0 indexing)</span>
+<span class="sd">    truncated_dofs : int list</span>
+<span class="sd">        List of truncated degrees of freedom (0 indexing)</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
+<span class="sd">    &gt;&gt;&gt; M = np.array([[4, 0, 0],</span>
+<span class="sd">    ...               [0, 4, 0],</span>
+<span class="sd">    ...               [0, 0, 4]])</span>
+<span class="sd">    &gt;&gt;&gt; K = np.array([[8, -4, 0],</span>
+<span class="sd">    ...               [-4, 8, -4],</span>
+<span class="sd">    ...               [0, -4, 4]])</span>
+<span class="sd">    &gt;&gt;&gt; Mred, Kred, T, master, truncated_dofs = vt.guyan(M, K, fraction = 0.5)</span>
+<span class="sd">    untested</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Reduced coordinate system forces can be obtained by</span>
+<span class="sd">    `Fr = T.T @ F`</span>
+
+<span class="sd">    Reduced damping matrix can be obtained using `Cr = T.T*@ C @ T`.</span>
+
+<span class="sd">    If mode shapes are obtained for the reduced system, full system mode shapes</span>
+<span class="sd">    are `phi = T @ phi_r`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">master</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">fraction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fraction</span> <span class="o">=</span> <span class="mf">0.25</span>
+
+        <span class="n">ratios</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">M</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">K</span><span class="p">)</span>
+        <span class="n">ranked</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">ratios</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+        <span class="n">thresh</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fraction</span> <span class="o">*</span> <span class="n">ratios</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="n">master</span> <span class="o">=</span> <span class="n">ranked</span><span class="p">[</span><span class="o">-</span><span class="n">thresh</span><span class="p">:]</span>
+
+    <span class="n">master</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">master</span><span class="p">)</span>
+    <span class="n">nm</span> <span class="o">=</span> <span class="n">master</span><span class="o">.</span><span class="n">size</span>  <span class="c1"># number of dofs to keep;</span>
+    <span class="n">master</span> <span class="o">=</span> <span class="n">master</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># retained dofs</span>
+
+    <span class="n">ndof</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># length(M);</span>
+
+    <span class="n">truncated_dofs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ndof</span><span class="p">))</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">master</span><span class="p">))</span>
+<span class="c1">#    truncated_dofs = np.array(set(np.arange(ndof)) - set(master))</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mmm = M[master].T[master].T</span>
+<span class="sd">    Kmm = K[master].T[master].T</span>
+<span class="sd">    Mtm = M[truncated_dofs].T[master].T</span>
+<span class="sd">    Ktm = K[truncated_dofs].T[master].T</span>
+<span class="sd">    Mtt = M[truncated_dofs].T[truncated_dofs].T</span>
+<span class="sd">    Ktt = K[truncated_dofs].T[truncated_dofs].T&quot;&quot;&quot;</span>
+
+    <span class="c1"># Mmm = slice(M, master, master)</span>
+    <span class="c1"># Kmm = slice(K, master, master)</span>
+    <span class="c1"># Mtm = slice(M, truncated_dofs, master)</span>
+    <span class="n">Ktm</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">truncated_dofs</span><span class="p">,</span> <span class="n">master</span><span class="p">)</span>
+    <span class="c1"># Mtt = slice(M, truncated_dofs, truncated_dofs)</span>
+    <span class="n">Ktt</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">truncated_dofs</span><span class="p">,</span> <span class="n">truncated_dofs</span><span class="p">)</span>
+
+    <span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ndof</span><span class="p">,</span> <span class="n">nm</span><span class="p">))</span>
+    <span class="n">T</span><span class="p">[</span><span class="n">master</span><span class="p">,</span> <span class="p">:</span><span class="n">nm</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">nm</span><span class="p">)</span>
+    <span class="n">T</span><span class="p">[</span><span class="n">truncated_dofs</span><span class="p">,</span> <span class="p">:</span><span class="n">nm</span><span class="p">]</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="o">-</span><span class="n">Ktt</span><span class="p">,</span> <span class="n">Ktm</span><span class="p">)</span>
+<div class="viewcode-block" id="mode_expansion_from_model"><a class="viewcode-back" href="../reference/system.html#system.mode_expansion_from_model">[docs]</a>    <span class="n">Mred</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">M</span> <span class="o">@</span> <span class="n">T</span>
+    <span class="n">Kred</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">K</span> <span class="o">@</span> <span class="n">T</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;untested&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Mred</span><span class="p">,</span> <span class="n">Kred</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">master</span><span class="p">,</span> <span class="n">truncated_dofs</span></div>
 
 
 <span class="k">def</span> <span class="nf">mode_expansion_from_model</span><span class="p">(</span><span class="n">Psi</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">measured</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Deflection extrapolation to full FEM model coordinates, matrix method</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deflection extrapolation to full FEM model coordinates, matrix method.</span>
 
 <span class="sd">    Provided an equation  of the form:</span>
 
@@ -606,13 +700,13 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    Psi : float array</span>
-<span class="sd">        mode shape, 2-D array</span>
-<span class="sd">    omega : float</span>
-<span class="sd">        natural (or driving) frequency</span>
+<span class="sd">        mode shape or shapes, 2-D array columns of which are mode shapes</span>
+<span class="sd">    omega : float or 1-D float array</span>
+<span class="sd">        natural (or driving) frequencies</span>
 <span class="sd">    M, K : float arrays</span>
 <span class="sd">        Mass and Stiffness matrices</span>
 <span class="sd">    measured : float or integer array or list</span>
-<span class="sd">        List of measured degrees of freedom</span>
+<span class="sd">        List of measured degrees of freedom (0 indexed)</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -628,10 +722,11 @@
 <span class="sd">    &gt;&gt;&gt; K = np.array([[8, -4, 0],</span>
 <span class="sd">    ...               [-4, 8, -4],</span>
 <span class="sd">    ...               [0, -4, 4]])</span>
-<span class="sd">    &gt;&gt;&gt; measured = np.array([[1, 3]])</span>
+<span class="sd">    &gt;&gt;&gt; measured = np.array([[0, 2]])</span>
 <span class="sd">    &gt;&gt;&gt; omega, zeta, Psi = vt.sos_modal(M, K)</span>
 <span class="sd">    &gt;&gt;&gt; Psi_measured = np.array([[-0.15], [-0.37]])</span>
-<span class="sd">    &gt;&gt;&gt; Psi_full = vt.mode_expansion_from_model(Psi_measured, omega[0], M, K, measured)</span>
+<span class="sd">    &gt;&gt;&gt; Psi_full = vt.mode_expansion_from_model(Psi_measured, omega[0], M, K,</span>
+<span class="sd">    ... measured)</span>
 <span class="sd">    &gt;&gt;&gt; print(np.hstack((Psi[:,0].reshape(-1,1), Psi_full)))</span>
 <span class="sd">    [[-0.164  -0.15  ]</span>
 <span class="sd">     [-0.2955  0.2886]</span>
@@ -639,38 +734,182 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    Reduced coordinate system forces can be obtained by</span>
-<span class="sd">    `Fr = T.T @ F`</span>
+<span class="sd">    .. note:: Must be applied a single mode at a time.</span>
+<span class="sd">    .. seealso:: incomplete multi-mode update</span>
 
-<span class="sd">    Reduced damping matrix can be obtained using `Cr = T.T*@ C @ T`.</span>
-
-<span class="sd">    If mode shapes are obtained for the reduced system, full system mode shapes</span>
-<span class="sd">    are `phi = T @ phi_r`</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-
-    <span class="n">measured</span> <span class="o">=</span> <span class="p">(</span><span class="n">measured</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># retained dofs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">measured</span> <span class="o">=</span> <span class="n">measured</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># retained dofs</span>
     <span class="n">num_measured</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">measured</span><span class="p">)</span>
     <span class="n">ndof</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># length(M);</span>
     <span class="n">unmeasured_dofs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ndof</span><span class="p">))</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">measured</span><span class="p">))</span>
     <span class="n">num_unmeasured</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unmeasured_dofs</span><span class="p">)</span>
 
-    <span class="n">Muu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">M</span><span class="p">[</span><span class="n">unmeasured_dofs</span><span class="p">,</span> <span class="n">unmeasured_dofs</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_unmeasured</span><span class="p">,</span>
-                                                                <span class="n">num_unmeasured</span><span class="p">)</span>
+    <span class="c1"># Code from before my slicing code</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Muu = np.array(M[unmeasured_dofs].T[unmeasured_dofs].T).</span>
+<span class="sd">                   reshape(num_unmeasured, num_unmeasured)</span>
 
-    <span class="n">Kuu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">K</span><span class="p">[</span><span class="n">unmeasured_dofs</span><span class="p">,</span> <span class="n">unmeasured_dofs</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_unmeasured</span><span class="p">,</span>
-                                                                <span class="n">num_unmeasured</span><span class="p">)</span>
-    <span class="n">Mum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">M</span><span class="p">[</span><span class="n">unmeasured_dofs</span><span class="p">,</span> <span class="n">measured</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_unmeasured</span><span class="p">,</span>
-                                                         <span class="n">num_measured</span><span class="p">)</span>
-    <span class="n">Kum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">K</span><span class="p">[</span><span class="n">unmeasured_dofs</span><span class="p">,</span> <span class="n">measured</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_unmeasured</span><span class="p">,</span>
-                                                         <span class="n">num_measured</span><span class="p">)</span>
+<span class="sd">    Kuu = np.array(K[unmeasured_dofs].T[unmeasured_dofs].T)</span>
+<span class="sd">                   .reshape(num_unmeasured, num_unmeasured)</span>
+<span class="sd">    Mum = np.array(M[unmeasured_dofs].T[measured].T).reshape(num_unmeasured,</span>
+<span class="sd">                                                         num_measured)</span>
+<span class="sd">    Kum = np.array(K[unmeasured_dofs].T[measured].T).reshape(num_unmeasured,</span>
+<span class="sd">                                                         num_measured)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">Psi_unmeasured</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">((</span><span class="n">Kuu</span> <span class="o">-</span> <span class="n">Muu</span> <span class="o">*</span> <span class="n">omega</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span>
-                              <span class="p">(</span><span class="n">Kum</span> <span class="o">-</span> <span class="n">Mum</span> <span class="o">*</span> <span class="n">omega</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="nd">@Psi</span><span class="p">)</span>
-    <span class="n">Psi_full</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_measured</span> <span class="o">+</span> <span class="n">num_unmeasured</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">Muu</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">unmeasured_dofs</span><span class="p">,</span> <span class="n">unmeasured_dofs</span><span class="p">)</span>
+    <span class="n">Kuu</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">unmeasured_dofs</span><span class="p">,</span> <span class="n">unmeasured_dofs</span><span class="p">)</span>
+    <span class="n">Mum</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">unmeasured_dofs</span><span class="p">,</span> <span class="n">measured</span><span class="p">)</span>
+    <span class="n">Kum</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">unmeasured_dofs</span><span class="p">,</span> <span class="n">measured</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="n">omega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">omega</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">Psi_full</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_measured</span> <span class="o">+</span> <span class="n">num_unmeasured</span><span class="p">,</span> <span class="n">Psi</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
     <span class="n">Psi_full</span><span class="p">[</span><span class="n">measured</span><span class="p">]</span> <span class="o">=</span> <span class="n">Psi</span>
-    <span class="n">Psi_full</span><span class="p">[</span><span class="n">unmeasured_dofs</span><span class="p">]</span> <span class="o">=</span> <span class="n">Psi_unmeasured</span>
-    <span class="n">Psi_full</span> <span class="o">=</span> <span class="n">Psi_full</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">omega_n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">omega</span><span class="p">):</span>
+        <span class="n">Psi_i</span> <span class="o">=</span> <span class="n">Psi</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">Psi_unmeasured</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">((</span><span class="n">Kuu</span> <span class="o">-</span> <span class="n">Muu</span> <span class="o">*</span> <span class="n">omega_n</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span>
+<div class="viewcode-block" id="improved_reduction"><a class="viewcode-back" href="../reference/system.html#system.improved_reduction">[docs]</a>                                  <span class="p">(</span><span class="n">Kum</span> <span class="o">-</span> <span class="n">Mum</span> <span class="o">*</span> <span class="n">omega_n</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="nd">@Psi_i</span><span class="p">)</span>
+        <span class="n">Psi_full</span><span class="p">[</span><span class="n">unmeasured_dofs</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">Psi_unmeasured</span>
+        <span class="c1"># Psi_full = Psi_full.reshape(-1, 1)</span>
     <span class="k">return</span> <span class="n">Psi_full</span></div>
+
+
+<span class="k">def</span> <span class="nf">improved_reduction</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">master</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Incomplete.</span>
+
+<span class="sd">    4.14 Friswell</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;not written yet&#39;</span><span class="p">)</span>
+    <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="model_correction_direct"><a class="viewcode-back" href="../reference/system.html#system.model_correction_direct">[docs]</a><span class="k">def</span> <span class="nf">model_correction_direct</span><span class="p">(</span><span class="n">Psi</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;Baruch&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Direct model updating using model data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Psi : float array</span>
+<span class="sd">        Expanded mode shapes from experimental measurements. Must be</span>
+<span class="sd">        real-valued. See `mode_expansion_from_model`.</span>
+<span class="sd">    omega : float array</span>
+<span class="sd">        Natural frequencies identified from modal analysis (diagonal matrix or</span>
+<span class="sd">        vector).</span>
+<span class="sd">    M, K : float arrays</span>
+<span class="sd">        Analytical mass and stiffness matrices</span>
+<span class="sd">    method : string, optional</span>
+<span class="sd">        `Baruch` and Bar-Itzhack [1]_ or `Berman` and Nagy [2]_</span>
+<span class="sd">        (default Baruch)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Mc, Kc : float arrays</span>
+<span class="sd">        Corrected mass and stiffness matrices.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    .. [1] Baruch, M. and Bar-Itzhack, I.Y., &quot;Optimal Weighted</span>
+<span class="sd">       Orthogonalization of Measured Modes,&quot; *AIAA Journal*, 16(4), 1978, pp.</span>
+<span class="sd">       346-351.</span>
+<span class="sd">    .. [2] Berman, A. and Nagy, E.J., 1983, &quot;Improvements of a Large Analytical</span>
+<span class="sd">       Model using Test Data,&quot; *AIAA Journal*, 21(8), 1983, pp. 1168-1173.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">omega</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">omega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">omega</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">omega</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">omega</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">omega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">omega</span><span class="p">)</span>
+
+<div class="viewcode-block" id="slice"><a class="viewcode-back" href="../reference/system.html#system.slice">[docs]</a>    <span class="n">lam</span> <span class="o">=</span> <span class="n">omega</span> <span class="o">@</span> <span class="n">omega</span>
+
+    <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="s1">&#39;Berman&#39;</span><span class="p">:</span>
+
+        <span class="n">Mdiag</span> <span class="o">=</span> <span class="n">Psi</span><span class="o">.</span><span class="n">T</span><span class="nd">@M@Psi</span>
+        <span class="n">eye_size</span> <span class="o">=</span> <span class="n">Mdiag</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">Mc</span> <span class="o">=</span> <span class="n">M</span> <span class="o">+</span> <span class="n">M</span> <span class="o">@</span> <span class="n">Psi</span> <span class="o">@</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">Mdiag</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">eye_size</span><span class="p">)</span> <span class="o">-</span> <span class="n">Mdiag</span><span class="p">)</span>\
+            <span class="o">@</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">Mdiag</span><span class="p">,</span> <span class="n">Psi</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">@</span> <span class="n">M</span>
+
+        <span class="n">Kc</span> <span class="o">=</span> <span class="p">(</span><span class="n">K</span> <span class="o">-</span> <span class="n">K</span> <span class="o">@</span> <span class="n">Psi</span> <span class="o">@</span> <span class="n">Psi</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">M</span>
+              <span class="o">-</span> <span class="n">M</span> <span class="o">@</span> <span class="n">Psi</span> <span class="o">@</span> <span class="n">Psi</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">K</span>
+              <span class="o">+</span> <span class="n">M</span> <span class="nd">@Psi</span><span class="o">@</span> <span class="n">Psi</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">K</span> <span class="o">@</span> <span class="n">Psi</span> <span class="o">@</span> <span class="n">Psi</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">M</span>
+              <span class="o">+</span> <span class="n">M</span> <span class="o">@</span> <span class="n">Psi</span> <span class="o">@</span> <span class="n">lam</span> <span class="o">@</span> <span class="n">Psi</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">M</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># Defaults to Baruch method.</span>
+        <span class="n">Phi</span> <span class="o">=</span> <span class="n">rsolve</span><span class="p">(</span><span class="n">la</span><span class="o">.</span><span class="n">sqrtm</span><span class="p">(</span><span class="n">Psi</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">M</span> <span class="o">@</span> <span class="n">Psi</span><span class="p">),</span> <span class="n">Psi</span><span class="p">)</span>
+
+        <span class="n">PhiPhiT</span> <span class="o">=</span> <span class="n">Phi</span><span class="nd">@Phi</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="n">sec_term</span> <span class="o">=</span> <span class="n">K</span> <span class="o">@</span> <span class="n">PhiPhiT</span> <span class="o">@</span> <span class="n">M</span>
+
+        <span class="n">Kc</span> <span class="o">=</span> <span class="n">K</span> <span class="o">-</span> <span class="n">sec_term</span> <span class="o">-</span> <span class="n">sec_term</span><span class="o">.</span><span class="n">T</span> \
+            <span class="o">+</span> <span class="n">M</span> <span class="o">@</span> <span class="n">PhiPhiT</span> <span class="o">@</span> <span class="n">K</span> <span class="o">@</span> <span class="n">PhiPhiT</span> <span class="o">@</span> <span class="n">M</span>\
+            <span class="o">+</span> <span class="n">M</span> <span class="o">@</span> <span class="n">Phi</span> <span class="o">@</span> <span class="n">lam</span> <span class="o">@</span> <span class="n">Phi</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">M</span>
+
+        <span class="n">Mc</span> <span class="o">=</span> <span class="n">M</span>
+
+    <span class="k">return</span> <span class="n">Mc</span><span class="p">,</span> <span class="n">Kc</span></div>
+
+
+<span class="k">def</span> <span class="nf">slice</span><span class="p">(</span><span class="n">Matrix</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Slice a matrix properly- like Octave.</span>
+
+<span class="sd">    Addresses the confounding inconsistency that `M[a,b]` acts differently if</span>
+<span class="sd">    `a` and `b` are the same length or different lengths.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Matrix : float array</span>
+<span class="sd">        Arbitrary array</span>
+<span class="sd">    a, b : int lists or arrays</span>
+<span class="sd">        list of rows and columns to be selected from `Matrix`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Matrix : float array</span>
+<span class="sd">        Properly sliced matrix- no casting allowed.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># a = a.reshape(-1)</span>
+    <span class="c1"># b = b.reshape(-1)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">Matrix</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">b</span><span class="p">]</span>
+            <span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="rsolve"><a class="viewcode-back" href="../reference/system.html#system.rsolve">[docs]</a><span class="k">def</span> <span class="nf">rsolve</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Solve right Gauss elimination equation.</span>
+
+<span class="sd">    Given :math:`A B  = C` return :math:`A = C B^{-1}`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    B, C : float arrays</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A : float array</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
+<span class="sd">    &gt;&gt;&gt; B = np.array([[ 8, -4,  0],</span>
+<span class="sd">    ...               [-4,  8, -4],</span>
+<span class="sd">    ...               [ 0, -4,  4]])</span>
+<span class="sd">    &gt;&gt;&gt; C = np.array([[ 32, -16,   0],</span>
+<span class="sd">    ...            [-16,  36, -20],</span>
+<span class="sd">    ...            [  4, -24,  20]])</span>
+<span class="sd">    &gt;&gt;&gt; A = vt.rsolve(B, C)</span>
+<span class="sd">    &gt;&gt;&gt; print(np.round(rsolve(B, C)))</span>
+<span class="sd">    [[ 4.  0.  0.]</span>
+<span class="sd">     [-0.  4. -1.]</span>
+<span class="sd">     [ 0. -1.  4.]]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span></div>
 </pre></div>
 
           </div>
