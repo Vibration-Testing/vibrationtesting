@@ -829,8 +829,8 @@
 
         <span class="n">Mdiag</span> <span class="o">=</span> <span class="n">Psi</span><span class="o">.</span><span class="n">T</span><span class="nd">@M@Psi</span>
         <span class="n">eye_size</span> <span class="o">=</span> <span class="n">Mdiag</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">Mc</span> <span class="o">=</span> <span class="n">M</span> <span class="o">+</span> <span class="n">M</span> <span class="o">@</span> <span class="n">Psi</span> <span class="o">@</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">Mdiag</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">eye_size</span><span class="p">)</span> <span class="o">-</span> <span class="n">Mdiag</span><span class="p">)</span>\
-            <span class="o">@</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">Mdiag</span><span class="p">,</span> <span class="n">Psi</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">@</span> <span class="n">M</span>
+        <span class="n">Mc</span> <span class="o">=</span> <span class="p">(</span><span class="n">M</span> <span class="o">+</span> <span class="n">M</span> <span class="o">@</span> <span class="n">Psi</span> <span class="o">@</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">Mdiag</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">eye_size</span><span class="p">)</span> <span class="o">-</span> <span class="n">Mdiag</span><span class="p">)</span>
+              <span class="o">@</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">Mdiag</span><span class="p">,</span> <span class="n">Psi</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">@</span> <span class="n">M</span><span class="p">)</span>
 
         <span class="n">Kc</span> <span class="o">=</span> <span class="p">(</span><span class="n">K</span> <span class="o">-</span> <span class="n">K</span> <span class="o">@</span> <span class="n">Psi</span> <span class="o">@</span> <span class="n">Psi</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">M</span>
               <span class="o">-</span> <span class="n">M</span> <span class="o">@</span> <span class="n">Psi</span> <span class="o">@</span> <span class="n">Psi</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">K</span>
@@ -838,7 +838,7 @@
               <span class="o">+</span> <span class="n">M</span> <span class="o">@</span> <span class="n">Psi</span> <span class="o">@</span> <span class="n">lam</span> <span class="o">@</span> <span class="n">Psi</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">M</span><span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span>  <span class="c1"># Defaults to Baruch method.</span>
-        <span class="n">Phi</span> <span class="o">=</span> <span class="n">rsolve</span><span class="p">(</span><span class="n">la</span><span class="o">.</span><span class="n">sqrtm</span><span class="p">(</span><span class="n">Psi</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">M</span> <span class="o">@</span> <span class="n">Psi</span><span class="p">),</span> <span class="n">Psi</span><span class="p">)</span>
+        <span class="n">Phi</span> <span class="o">=</span> <span class="n">rsolve</span><span class="p">(</span><span class="n">la</span><span class="o">.</span><span class="n">sqrtm</span><span class="p">(</span><span class="n">Psi</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">M</span> <span class="o">@</span> <span class="n">Psi</span><span class="p">),</span> <span class="n">Psi</span><span class="p">,</span> <span class="n">assume_a</span><span class="o">=</span><span class="s1">&#39;pos&#39;</span><span class="p">)</span>
 
         <span class="n">PhiPhiT</span> <span class="o">=</span> <span class="n">Phi</span><span class="nd">@Phi</span><span class="o">.</span><span class="n">T</span>
 
@@ -879,10 +879,13 @@
             <span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span></div>
 
 
-<div class="viewcode-block" id="rsolve"><a class="viewcode-back" href="../reference/system.html#system.rsolve">[docs]</a><span class="k">def</span> <span class="nf">rsolve</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">):</span>
+<div class="viewcode-block" id="rsolve"><a class="viewcode-back" href="../reference/system.html#system.rsolve">[docs]</a><span class="k">def</span> <span class="nf">rsolve</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Solve right Gauss elimination equation.</span>
 
 <span class="sd">    Given :math:`A B  = C` return :math:`A = C B^{-1}`</span>
+
+<span class="sd">    This uses `scipy.linalg.solve` with a little matrix manipulation first.</span>
+<span class="sd">    All keyword arguments of `scipy.linalg.solve` may be used.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -908,8 +911,12 @@
 <span class="sd">     [-0.  4. -1.]</span>
 <span class="sd">     [ 0. -1.  4.]]</span>
 
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    .. seealso:: `scipy.linalg.solve`</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span></div>
+    <span class="k">return</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">T</span></div>
 </pre></div>
 
           </div>

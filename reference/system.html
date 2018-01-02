@@ -394,9 +394,11 @@ Model using Test Data,” <em>AIAA Journal</em>, 21(8), 1983, pp. 1168-1173.</td
 
 <dl class="function">
 <dt id="system.rsolve">
-<code class="descclassname">system.</code><code class="descname">rsolve</code><span class="sig-paren">(</span><em>B</em>, <em>C</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#rsolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.rsolve" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">system.</code><code class="descname">rsolve</code><span class="sig-paren">(</span><em>B</em>, <em>C</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#rsolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.rsolve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Solve right Gauss elimination equation.</p>
 <p>Given <span class="math">\(A B  = C\)</span> return <span class="math">\(A = C B^{-1}\)</span></p>
+<p>This uses <cite>scipy.linalg.solve</cite> with a little matrix manipulation first.
+All keyword arguments of <cite>scipy.linalg.solve</cite> may be used.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -407,6 +409,11 @@ Model using Test Data,” <em>AIAA Journal</em>, 21(8), 1983, pp. 1168-1173.</td
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><cite>scipy.linalg.solve</cite></p>
+</div>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
