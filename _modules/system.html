@@ -580,13 +580,23 @@
 <span class="k">def</span> <span class="nf">guyan</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">master</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Guyan reduced model.</span>
 
-<span class="sd">    Reduce size of second order system of equations by Guyan processs</span>
+<span class="sd">    Applies Guyan Reductions to second order system of equations of the form</span>
 
-<span class="sd">    Equation of the form:</span>
-<span class="sd">    :math:`M \ddot{x} + K x = 0`</span>
-<span class="sd">    is reduced to the form</span>
-<span class="sd">    :math:`M_r \ddot{x}_m + Kr x_m = 0`</span>
-<span class="sd">    where :math:`x = T x_m`, :math:`M_r= T^T M T`, :math:`K_r= T^T K T`</span>
+<span class="sd">    .. math:: M \ddot{x} + K x = 0</span>
+
+<span class="sd">    which are reduced to the form</span>
+
+<span class="sd">    .. math:: M_r \ddot{x}_m + K_r x_m = 0</span>
+
+<span class="sd">    where</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        x = T x_m</span>
+
+<span class="sd">        M_r= T^T M T</span>
+
+<span class="sd">        K_r= T^T K T</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -595,14 +605,14 @@
 <span class="sd">    master : float array or list, optional</span>
 <span class="sd">        List of retained degrees of freedom (0 indexing)</span>
 <span class="sd">    fraction : float, optional</span>
-<span class="sd">        Fraction of degrees of freedom (0&lt;`fraction`&lt;1.0) to retain in model.</span>
+<span class="sd">        Fraction of degrees of freedom (0&lt; `fraction` &lt;1.0) to retain in model.</span>
 <span class="sd">        If both master and</span>
 <span class="sd">        fraction or neglected, fraction is set to 0.25.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Mred, Kred, T : float arrays</span>
-<span class="sd">        Reduced Mass matric, reduced stiffness matrix, Transformation matrix</span>
+<span class="sd">        Reduced Mass matric, Reduced Stiffness matrix, Transformation matrix</span>
 <span class="sd">    master_dofs : int list</span>
 <span class="sd">        List of master degrees of freedom (0 indexing)</span>
 <span class="sd">    truncated_dofs : int list</span>
@@ -622,13 +632,12 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    Reduced coordinate system forces can be obtained by</span>
-<span class="sd">    `Fr = T.T @ F`</span>
+<span class="sd">    Reduced coordinate system forces can be obtained by `Fr = T.T @ F`.</span>
 
 <span class="sd">    Reduced damping matrix can be obtained using `Cr = T.T @ C @ T`.</span>
 
 <span class="sd">    If mode shapes are obtained for the reduced system, full system mode shapes</span>
-<span class="sd">    are `phi = T @ phi_r`</span>
+<span class="sd">    are `phi = T @ phi_r`.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">master</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -647,7 +656,7 @@
     <span class="n">ndof</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># length(M);</span>
 
     <span class="n">truncated_dofs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ndof</span><span class="p">))</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">master</span><span class="p">))</span>
-<span class="c1">#    truncated_dofs = np.array(set(np.arange(ndof)) - set(master))</span>
+    <span class="c1"># truncated_dofs = np.array(set(np.arange(ndof)) - set(master))</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mmm = M[master].T[master].T</span>
 <span class="sd">    Kmm = K[master].T[master].T</span>

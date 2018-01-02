@@ -188,12 +188,15 @@ continuous counterpart.</p>
 <dt id="system.guyan">
 <code class="descclassname">system.</code><code class="descname">guyan</code><span class="sig-paren">(</span><em>M</em>, <em>K</em>, <em>master=None</em>, <em>fraction=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#guyan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.guyan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Guyan reduced model.</p>
-<p>Reduce size of second order system of equations by Guyan processs</p>
-<p>Equation of the form:
-<span class="math">\(M \ddot{x} + K x = 0\)</span>
-is reduced to the form
-<span class="math">\(M_r \ddot{x}_m + Kr x_m = 0\)</span>
-where <span class="math">\(x = T x_m\)</span>, <span class="math">\(M_r= T^T M T\)</span>, <span class="math">\(K_r= T^T K T\)</span></p>
+<p>Applies Guyan Reductions to second order system of equations of the form</p>
+<div class="math">
+\[M \ddot{x} + K x = 0\]</div>
+<p>which are reduced to the form</p>
+<div class="math">
+\[M_r \ddot{x}_m + K_r x_m = 0\]</div>
+<p>where</p>
+<div class="math">
+\[ \begin{align}\begin{aligned}x = T x_m\\M_r= T^T M T\\K_r= T^T K T\end{aligned}\end{align} \]</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -208,7 +211,7 @@ where <span class="math">\(x = T x_m\)</span>, <span class="math">\(M_r= T^T M T
 </div></blockquote>
 <p><strong>fraction</strong> : float, optional</p>
 <blockquote>
-<div><p>Fraction of degrees of freedom (0&lt;<a href="#id1"><span class="problematic" id="id2">`</span></a>fraction`&lt;1.0) to retain in model.
+<div><p>Fraction of degrees of freedom (0&lt; <cite>fraction</cite> &lt;1.0) to retain in model.
 If both master and
 fraction or neglected, fraction is set to 0.25.</p>
 </div></blockquote>
@@ -216,7 +219,7 @@ fraction or neglected, fraction is set to 0.25.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>Mred, Kred, T</strong> : float arrays</p>
 <blockquote>
-<div><p>Reduced Mass matric, reduced stiffness matrix, Transformation matrix</p>
+<div><p>Reduced Mass matric, Reduced Stiffness matrix, Transformation matrix</p>
 </div></blockquote>
 <p><strong>master_dofs</strong> : int list</p>
 <blockquote>
@@ -231,11 +234,10 @@ fraction or neglected, fraction is set to 0.25.</p>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>Reduced coordinate system forces can be obtained by
-<cite>Fr = T.T &#64; F</cite></p>
+<p>Reduced coordinate system forces can be obtained by <cite>Fr = T.T &#64; F</cite>.</p>
 <p>Reduced damping matrix can be obtained using <cite>Cr = T.T &#64; C &#64; T</cite>.</p>
 <p>If mode shapes are obtained for the reduced system, full system mode shapes
-are <cite>phi = T &#64; phi_r</cite></p>
+are <cite>phi = T &#64; phi_r</cite>.</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
@@ -363,7 +365,7 @@ vector).</p>
 </div></blockquote>
 <p><strong>method</strong> : string, optional</p>
 <blockquote>
-<div><p><cite>Baruch</cite> and Bar-Itzhack <a class="reference internal" href="#r12" id="id3">[R12]</a> or <cite>Berman</cite> and Nagy <a class="reference internal" href="#r22" id="id4">[R22]</a>
+<div><p><cite>Baruch</cite> and Bar-Itzhack <a class="reference internal" href="#r12" id="id1">[R12]</a> or <cite>Berman</cite> and Nagy <a class="reference internal" href="#r22" id="id2">[R22]</a>
 (default Baruch)</p>
 </div></blockquote>
 </td>
@@ -380,7 +382,7 @@ vector).</p>
 <table class="docutils citation" frame="void" id="r12" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id3">[R12]</a></td><td>Baruch, M. and Bar-Itzhack, I.Y., “Optimal Weighted
+<tr><td class="label"><a class="fn-backref" href="#id1">[R12]</a></td><td>Baruch, M. and Bar-Itzhack, I.Y., “Optimal Weighted
 Orthogonalization of Measured Modes,” <em>AIAA Journal</em>, 16(4), 1978, pp.
 346-351.</td></tr>
 </tbody>
@@ -388,7 +390,7 @@ Orthogonalization of Measured Modes,” <em>AIAA Journal</em>, 16(4), 1978, pp.
 <table class="docutils citation" frame="void" id="r22" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id4">[R22]</a></td><td>Berman, A. and Nagy, E.J., 1983, “Improvements of a Large Analytical
+<tr><td class="label"><a class="fn-backref" href="#id2">[R22]</a></td><td>Berman, A. and Nagy, E.J., 1983, “Improvements of a Large Analytical
 Model using Test Data,” <em>AIAA Journal</em>, 21(8), 1983, pp. 1168-1173.</td></tr>
 </tbody>
 </table>
