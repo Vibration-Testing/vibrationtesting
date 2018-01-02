@@ -1,5 +1,5 @@
-System Manipulation (:mod:`system`)
------------------------------------
+System Manipulation, Reduction, and Correction (:mod:`system`)
+--------------------------------------------------------------
 
 .. sectionauthor:: Joseph C. Slater
 
