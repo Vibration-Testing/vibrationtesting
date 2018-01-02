@@ -709,8 +709,8 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
     Muu = np.array(M[unmeasured_dofs].T[unmeasured_dofs].T).reshape(num_unmeasured,
                                                                 num_unmeasured)
 
-    Kuu = np.array(K[unmeasured_dofs].T[unmeasured_dofs].T).reshape(num_unmeasured,
-                                                                num_unmeasured)
+    Kuu = np.array(K[unmeasured_dofs].T[unmeasured_dofs].T)
+                   .reshape(num_unmeasured, num_unmeasured)
     Mum = np.array(M[unmeasured_dofs].T[measured].T).reshape(num_unmeasured,
                                                          num_measured)
     Kum = np.array(K[unmeasured_dofs].T[measured].T).reshape(num_unmeasured,
@@ -733,8 +733,79 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
         Psi_unmeasured = la.solve((Kuu - Muu * omega_n**2),
                                   (Kum - Mum * omega_n**2)@Psi_i)
         Psi_full[unmeasured_dofs, i] = Psi_unmeasured
-        #Psi_full = Psi_full.reshape(-1, 1)
+        # Psi_full = Psi_full.reshape(-1, 1)
     return Psi_full
+
+
+def improved_reduction(M, K, master=None, fraction=None):
+    ''' incomplete
+    4.14 Friswell'''
+    print('not written yet')
+    return
+
+
+def model_correction_direct(Psi, omega, M, K, method='Baruch'):
+    '''Direct model updating using model data
+
+    Parameters
+    ----------
+    Psi : float array
+        Expanded mode shapes from experimental measurements. Must be real valued. See
+        `mode_expansion_from_model`.
+    omega : float array
+        Natural frequencies identified from modal analysis (diagonal matrix or
+        vector).
+    M, K : float arrays
+        Analytical mass and stiffness matrices
+    method : string, optional
+        `Baruch` and Bar-Itzhack [1]_ or `Berman` and Nagy [2]_ (default Baruch)
+
+    Returns
+    -------
+    Mc, Kc : float arrays
+        Corrected mass and stiffness matrices.
+
+    Notes
+    -----
+    .. [1] Baruch, M. and Bar-Itzhack, I.Y., "Optimal Weighted Orthogonalization
+       of Measured Modes," *AIAA Journal*, 16(4), 1978, pp. 346-351.
+    .. [2] Berman, A. and Nagy, E.J., 1983, "Improvements of a Large Analytical
+       Model using Test Data," *AIAA Journal*, 21(8), 1983, pp. 1168-1173.
+    '''
+
+    if len(omega.shape) == 1:
+        omega = np.diag(omega)
+    elif omega.shape[0] != omega.shape[1]:
+        omega = np.diag(omega)
+
+    lam = omega @ omega
+
+    if method is 'Berman':
+
+        Mdiag = Psi.T@M@Psi
+        eye_size = Mdiag.shape[0]
+        Mc = M + M @ Psi @ la.solve(Mdiag, eye(eye_size) - Mdiag)\
+            @ la.solve(Mdiag, Psi.T)@ M
+
+        Kc = (K - K @ Psi @ Psi.T @ M
+               - M @ Psi @ Psi.T @ K
+               + M @Psi@ Psi.T @ K @ Psi @ Psi.T @ M
+               + M @ Psi @ lam @ Psi.T @ M)
+
+    else: # Defaults to Baruch method.
+        Phi = rsolve(la.sqrtm(Psi.T @ M @ Psi), Psi)
+
+        PhiPhiT = Phi@Phi.T
+
+        sec_term = K @ PhiPhiT @ M
+
+        Kc = K - sec_term - sec_term.T \
+            + M @ PhiPhiT @ K @ PhiPhiT @ M\
+            + M @ Phi @ lam @ Phi.T @ M
+
+        Mc = M
+
+    return Mc, Kc
 
 
 def slice(Matrix, a, b):
@@ -756,7 +827,39 @@ def slice(Matrix, a, b):
         Properly sliced matrix- no casting allowed.
 
     '''
-    #a = a.reshape(-1)
-    #b = b.reshape(-1)
+    # a = a.reshape(-1)
+    # b = b.reshape(-1)
 
     return Matrix[np.array(a).reshape(-1, 1), b].reshape(np.array(a).shape[0], np.array(b).shape[0])
+
+
+def rsolve(B, C):
+    '''Solve right Gauss elimination equation
+
+    Given :math:`A B  = C` return :math:`A = C B^{-1}`
+
+    Parameters
+    ----------
+    B, C : float arrays
+
+    Returns
+    -------
+    A : float array
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import vibrationtesting as vt
+    >>> B = np.array([[ 8, -4,  0],
+    ...               [-4,  8, -4],
+    ...               [ 0, -4,  4]])
+    >>> C = np.array([[ 32, -16,   0],
+    ...            [-16,  36, -20],
+    ...            [  4, -24,  20]])
+    >>> A = vt.rsolve(B, C)
+    >>> print(np.round(rsolve(B, C)))
+    [[ 4.  0.  0.]
+     [-0.  4. -1.]
+     [ 0. -1.  4.]]
+    '''
+    return la.solve(B.T, C.T).T
