@@ -60,7 +60,7 @@ def d2c(Ad, Bd, C, D, dt):
     -----
     .. note:: Zero-order hold solution
     .. note:: discrepancies between :func:`c2d` and :func:`d2c` are due to \
-    typing truncation errors.
+      typing truncation errors.
     .. seealso:: :func:`c2d`.
 
     """
