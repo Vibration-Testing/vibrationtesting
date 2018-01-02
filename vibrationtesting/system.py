@@ -1,5 +1,6 @@
 """
-Created on 14 May 2015
+System manipulation, reduction, and corrections functions.
+
 @author: Joseph C. Slater
 """
 __license__ = "Joseph C. Slater"
@@ -8,7 +9,7 @@ __docformat__ = 'reStructuredText'
 
 
 import math
-import warnings
+# import warnings
 
 import numpy as np
 # import control as ctrl
@@ -18,7 +19,7 @@ import scipy.linalg as la
 
 
 def d2c(Ad, Bd, C, D, dt):
-    """Returns continuous A, B, C, D from discrete
+    r"""Return continuous A, B, C, D from discrete form.
 
     Converts a set of digital state space system matrices to their
     continuous counterpart.
@@ -61,8 +62,8 @@ def d2c(Ad, Bd, C, D, dt):
     .. note:: discrepancies between :func:`c2d` and :func:`d2c` are due to \
     typing truncation errors.
     .. seealso:: :func:`c2d`.
-    """
 
+    """
     # Old school (very old)
     # A = la.logm(Ad) / dt
     # B = la.solve((Ad - np.eye(A.shape[0])), A) @ Bd
@@ -77,7 +78,7 @@ def d2c(Ad, Bd, C, D, dt):
 
 
 def c2d(A, B, C, D, dt):
-    """Convert continuous state system to discrete time
+    """Convert continuous state system to discrete time.
 
     Converts a set of continuous state space system matrices to their
     discrete counterpart.
@@ -129,8 +130,8 @@ def c2d(A, B, C, D, dt):
     -----
     .. note:: Zero-order hold solution
     .. seealso:: :func:`d2c`.
-    """
 
+    """
     Ad, Bd, _, _, _ = sig.cont2discrete((A, B, C, D), dt)
     # Ad = la.expm(A * dt)
     # Bd = la.solve(A, (Ad - np.eye(A.shape[0]))) @ B
@@ -139,7 +140,7 @@ def c2d(A, B, C, D, dt):
 
 def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index,
           num_freqs=1000):
-    """FRF of state space system
+    """Return FRF of state space system.
 
     Obtains the computed FRF of a state space system between selected input
     and output over frequency range of interest.
@@ -196,7 +197,7 @@ def ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index,
 
 def sos_frf(M, C, K, Bt, Cd, Cv, Ca, omega_low, omega_high,
             in_index, out_index, num_freqs=1000):
-    """FRF of second order system
+    r"""Return FRF of second order system.
 
     Given second order linear matrix equation of the form
     :math:`M\\ddot{x} + C \\dot{x} + K x= \\tilde{B} u`
@@ -216,7 +217,6 @@ def sos_frf(M, C, K, Bt, Cd, Cv, Ca, omega_low, omega_high,
         input and output numbers (starting at 1)
     num_freqs : int
         number of frequencies at which to return FRF
-
 
     Returns
     -------
@@ -244,8 +244,8 @@ def sos_frf(M, C, K, Bt, Cd, Cv, Ca, omega_low, omega_high,
     >>> D = np.array([[-0.2]])
     >>> omega, H = vt.ssfrf(A, B, C, D, 0, 3.5, 1, 1)
     >>> vt.frfplot(omega, H) # doctest: +SKIP
-    """
 
+    """
     A, B, C, D = so2ss(M, C, K, Bt, Cd, Cv, Ca)
 
     omega, H = ssfrf(A, B, C, D, omega_low, omega_high, in_index, out_index,
@@ -255,7 +255,7 @@ def sos_frf(M, C, K, Bt, Cd, Cv, Ca, omega_low, omega_high,
 
 
 def so2ss(M, C, K, Bt, Cd, Cv, Ca):
-    """Convert second order system to state space
+    r"""Convert second order system to state space.
 
     Given second order linear matrix equation of the form
     :math:`M\\ddot{x} + C \\dot{x} + K x= \\tilde{B} u`
@@ -303,8 +303,8 @@ def so2ss(M, C, K, Bt, Cd, Cv, Ca):
     C:  [[-1.4     1.2    -0.0058  0.0014]]
     >>> print('D: ', D)
     D:  [[-0.2]]
-    """
 
+    """
     A = np.vstack((np.hstack((np.zeros_like(M), np.eye(M.shape[0]))),
                    np.hstack((-la.solve(M, K), -la.solve(M, C)))))
     B = np.vstack((np.zeros_like(Bt), la.solve(M, Bt)))
@@ -315,9 +315,7 @@ def so2ss(M, C, K, Bt, Cd, Cv, Ca):
 
 
 def damp(A):
-    '''Display natural frequencies and damping ratios of state matrix.
-    '''
-
+    """Display natural frequencies and damping ratios of state matrix."""
     # Original Author: Kai P. Mueller <mueller@ifr.ing.tu-bs.de> for Octave
     # Created: September 29, 1997.
 
@@ -345,7 +343,7 @@ def damp(A):
 
 
 def sos_modal(M, K, C=False, damp_diag=0.03, shift=1):
-    r'''Eigen analysis of proportionally damped system.
+    r"""Eigen analysis of proportionally damped system.
 
     Optimally find mass normalized mode shapes and natural frequencies
     of a system modelled by :math:`M\ddot{x}+Kx=0`.
@@ -425,8 +423,7 @@ def sos_modal(M, K, C=False, damp_diag=0.03, shift=1):
      [-0.0483  0.2641 -0.0871]
      [ 0.0388 -0.0871  0.3946]]
 
-    '''
-
+    """
     K = K + M * shift
 
     lam, Psi = la.eigh(K, M)
@@ -468,7 +465,7 @@ def sos_modal(M, K, C=False, damp_diag=0.03, shift=1):
 
 
 def serep(M, K, master):
-    r'''System Equivalent Reduction Expansion Process reduced model
+    r"""System Equivalent Reduction Expansion Process reduced model.
 
     Reduce size of second order system of equations by SEREP processs while
     returning expansion matrix
@@ -516,8 +513,8 @@ def serep(M, K, master):
     are `phi = T @ phi_r`
 
     .. seealso:: :func:`guyan`
-    '''
 
+    """
     nm = int(max(master.shape))  # number of modes to keep;
     master = master.reshape(-1) - 1  # retained dofs
 
@@ -539,7 +536,7 @@ def serep(M, K, master):
 
 
 def guyan(M, K, master=None, fraction=None):
-    r'''Guyan reduced model
+    r"""Guyan reduced model.
 
     Reduce size of second order system of equations by Guyan processs
 
@@ -590,8 +587,8 @@ def guyan(M, K, master=None, fraction=None):
 
     If mode shapes are obtained for the reduced system, full system mode shapes
     are `phi = T @ phi_r`
-    '''
 
+    """
     if master is None:
         if fraction is None:
             fraction = 0.25
@@ -609,19 +606,19 @@ def guyan(M, K, master=None, fraction=None):
 
     truncated_dofs = list(set(np.arange(ndof)) - set(master))
 #    truncated_dofs = np.array(set(np.arange(ndof)) - set(master))
-    '''
+    """
     Mmm = M[master].T[master].T
     Kmm = K[master].T[master].T
     Mtm = M[truncated_dofs].T[master].T
     Ktm = K[truncated_dofs].T[master].T
     Mtt = M[truncated_dofs].T[truncated_dofs].T
-    Ktt = K[truncated_dofs].T[truncated_dofs].T'''
+    Ktt = K[truncated_dofs].T[truncated_dofs].T"""
 
-    Mmm = slice(M, master, master)
-    Kmm = slice(K, master, master)
-    Mtm = slice(M, truncated_dofs, master)
+    # Mmm = slice(M, master, master)
+    # Kmm = slice(K, master, master)
+    # Mtm = slice(M, truncated_dofs, master)
     Ktm = slice(K, truncated_dofs, master)
-    Mtt = slice(M, truncated_dofs, truncated_dofs)
+    # Mtt = slice(M, truncated_dofs, truncated_dofs)
     Ktt = slice(K, truncated_dofs, truncated_dofs)
 
     T = np.zeros((ndof, nm))
@@ -634,7 +631,7 @@ def guyan(M, K, master=None, fraction=None):
 
 
 def mode_expansion_from_model(Psi, omega, M, K, measured):
-    r'''Deflection extrapolation to full FEM model coordinates, matrix method
+    r"""Deflection extrapolation to full FEM model coordinates, matrix method.
 
     Provided an equation  of the form:
 
@@ -686,7 +683,8 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
     >>> measured = np.array([[0, 2]])
     >>> omega, zeta, Psi = vt.sos_modal(M, K)
     >>> Psi_measured = np.array([[-0.15], [-0.37]])
-    >>> Psi_full = vt.mode_expansion_from_model(Psi_measured, omega[0], M, K, measured)
+    >>> Psi_full = vt.mode_expansion_from_model(Psi_measured, omega[0], M, K,
+    ... measured)
     >>> print(np.hstack((Psi[:,0].reshape(-1,1), Psi_full)))
     [[-0.164  -0.15  ]
      [-0.2955  0.2886]
@@ -696,8 +694,8 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
     -----
     .. note:: Must be applied a single mode at a time.
     .. seealso:: incomplete multi-mode update
-    '''
 
+    """
     measured = measured.reshape(-1)  # retained dofs
     num_measured = len(measured)
     ndof = int(M.shape[0])  # length(M);
@@ -705,9 +703,9 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
     num_unmeasured = len(unmeasured_dofs)
 
     # Code from before my slicing code
-    '''
-    Muu = np.array(M[unmeasured_dofs].T[unmeasured_dofs].T).reshape(num_unmeasured,
-                                                                num_unmeasured)
+    """
+    Muu = np.array(M[unmeasured_dofs].T[unmeasured_dofs].T).
+                   reshape(num_unmeasured, num_unmeasured)
 
     Kuu = np.array(K[unmeasured_dofs].T[unmeasured_dofs].T)
                    .reshape(num_unmeasured, num_unmeasured)
@@ -715,7 +713,7 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
                                                          num_measured)
     Kum = np.array(K[unmeasured_dofs].T[measured].T).reshape(num_unmeasured,
                                                          num_measured)
-    '''
+    """
 
     Muu = slice(M, unmeasured_dofs, unmeasured_dofs)
     Kuu = slice(K, unmeasured_dofs, unmeasured_dofs)
@@ -738,27 +736,31 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
 
 
 def improved_reduction(M, K, master=None, fraction=None):
-    ''' incomplete
-    4.14 Friswell'''
+    """Incomplete.
+
+    4.14 Friswell
+
+    """
     print('not written yet')
     return
 
 
 def model_correction_direct(Psi, omega, M, K, method='Baruch'):
-    '''Direct model updating using model data
+    """Direct model updating using model data.
 
     Parameters
     ----------
     Psi : float array
-        Expanded mode shapes from experimental measurements. Must be real valued. See
-        `mode_expansion_from_model`.
+        Expanded mode shapes from experimental measurements. Must be
+        real-valued. See `mode_expansion_from_model`.
     omega : float array
         Natural frequencies identified from modal analysis (diagonal matrix or
         vector).
     M, K : float arrays
         Analytical mass and stiffness matrices
     method : string, optional
-        `Baruch` and Bar-Itzhack [1]_ or `Berman` and Nagy [2]_ (default Baruch)
+        `Baruch` and Bar-Itzhack [1]_ or `Berman` and Nagy [2]_
+        (default Baruch)
 
     Returns
     -------
@@ -767,12 +769,13 @@ def model_correction_direct(Psi, omega, M, K, method='Baruch'):
 
     Notes
     -----
-    .. [1] Baruch, M. and Bar-Itzhack, I.Y., "Optimal Weighted Orthogonalization
-       of Measured Modes," *AIAA Journal*, 16(4), 1978, pp. 346-351.
+    .. [1] Baruch, M. and Bar-Itzhack, I.Y., "Optimal Weighted
+       Orthogonalization of Measured Modes," *AIAA Journal*, 16(4), 1978, pp.
+       346-351.
     .. [2] Berman, A. and Nagy, E.J., 1983, "Improvements of a Large Analytical
        Model using Test Data," *AIAA Journal*, 21(8), 1983, pp. 1168-1173.
-    '''
 
+    """
     if len(omega.shape) == 1:
         omega = np.diag(omega)
     elif omega.shape[0] != omega.shape[1]:
@@ -784,15 +787,15 @@ def model_correction_direct(Psi, omega, M, K, method='Baruch'):
 
         Mdiag = Psi.T@M@Psi
         eye_size = Mdiag.shape[0]
-        Mc = M + M @ Psi @ la.solve(Mdiag, eye(eye_size) - Mdiag)\
+        Mc = M + M @ Psi @ la.solve(Mdiag, np.eye(eye_size) - Mdiag)\
             @ la.solve(Mdiag, Psi.T)@ M
 
         Kc = (K - K @ Psi @ Psi.T @ M
-               - M @ Psi @ Psi.T @ K
-               + M @Psi@ Psi.T @ K @ Psi @ Psi.T @ M
-               + M @ Psi @ lam @ Psi.T @ M)
+              - M @ Psi @ Psi.T @ K
+              + M @Psi@ Psi.T @ K @ Psi @ Psi.T @ M
+              + M @ Psi @ lam @ Psi.T @ M)
 
-    else: # Defaults to Baruch method.
+    else:  # Defaults to Baruch method.
         Phi = rsolve(la.sqrtm(Psi.T @ M @ Psi), Psi)
 
         PhiPhiT = Phi@Phi.T
@@ -809,7 +812,7 @@ def model_correction_direct(Psi, omega, M, K, method='Baruch'):
 
 
 def slice(Matrix, a, b):
-    '''slice a matrix properly- like Octave
+    """Slice a matrix properly- like Octave.
 
     Addresses the confounding inconsistency that `M[a,b]` acts differently if
     `a` and `b` are the same length or different lengths.
@@ -826,15 +829,16 @@ def slice(Matrix, a, b):
     Matrix : float array
         Properly sliced matrix- no casting allowed.
 
-    '''
+    """
     # a = a.reshape(-1)
     # b = b.reshape(-1)
 
-    return Matrix[np.array(a).reshape(-1, 1), b].reshape(np.array(a).shape[0], np.array(b).shape[0])
+    return (Matrix[np.array(a).reshape(-1, 1), b]
+            .reshape(np.array(a).shape[0], np.array(b).shape[0]))
 
 
 def rsolve(B, C):
-    '''Solve right Gauss elimination equation
+    """Solve right Gauss elimination equation.
 
     Given :math:`A B  = C` return :math:`A = C B^{-1}`
 
@@ -861,5 +865,6 @@ def rsolve(B, C):
     [[ 4.  0.  0.]
      [-0.  4. -1.]
      [ 0. -1.  4.]]
-    '''
+
+    """
     return la.solve(B.T, C.T).T
