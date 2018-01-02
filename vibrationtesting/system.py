@@ -796,7 +796,7 @@ def model_correction_direct(Psi, omega, M, K, method='Baruch'):
               + M @ Psi @ lam @ Psi.T @ M)
 
     else:  # Defaults to Baruch method.
-        Phi = rsolve(la.sqrtm(Psi.T @ M @ Psi), Psi)
+        Phi = rsolve(la.sqrtm(Psi.T @ M @ Psi), Psi, assume_a = ‘pos’)
 
         PhiPhiT = Phi@Phi.T
 
@@ -837,10 +837,13 @@ def slice(Matrix, a, b):
             .reshape(np.array(a).shape[0], np.array(b).shape[0]))
 
 
-def rsolve(B, C):
+def rsolve(B, C, **kwargs):
     """Solve right Gauss elimination equation.
 
     Given :math:`A B  = C` return :math:`A = C B^{-1}`
+
+    This uses `scipy.linalg.solve` with a little matrix manipulation first.
+    All keyword arguments of `scipy.linalg.solve` may be used.
 
     Parameters
     ----------
@@ -866,5 +869,8 @@ def rsolve(B, C):
      [-0.  4. -1.]
      [ 0. -1.  4.]]
 
+    Notes
+    -----
+    .. seealso:: `scipy.linalg.solve`
     """
-    return la.solve(B.T, C.T).T
+    return la.solve(B.T, C.T, **kwargs).T
