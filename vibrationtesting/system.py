@@ -583,7 +583,7 @@ def guyan(M, K, master=None, fraction=None):
     Reduced coordinate system forces can be obtained by
     `Fr = T.T @ F`
 
-    Reduced damping matrix can be obtained using `Cr = T.T*@ C @ T`.
+    Reduced damping matrix can be obtained using `Cr = T.T @ C @ T`.
 
     If mode shapes are obtained for the reduced system, full system mode shapes
     are `phi = T @ phi_r`
