@@ -677,7 +677,7 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
 
     Returns
     -------
-    Psi_full: float array
+    Psi_full : float array
         Complete mode shape
 
     Examples
@@ -701,7 +701,6 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
 
     Notes
     -----
-    .. note:: Must be applied a single mode at a time.
     .. seealso:: incomplete multi-mode update
 
     """
