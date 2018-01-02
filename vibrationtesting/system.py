@@ -787,8 +787,8 @@ def model_correction_direct(Psi, omega, M, K, method='Baruch'):
 
         Mdiag = Psi.T@M@Psi
         eye_size = Mdiag.shape[0]
-        Mc = M + M @ Psi @ la.solve(Mdiag, np.eye(eye_size) - Mdiag)\
-            @ la.solve(Mdiag, Psi.T)@ M
+        Mc = (M + M @ Psi @ la.solve(Mdiag, np.eye(eye_size) - Mdiag)
+              @ la.solve(Mdiag, Psi.T) @ M)
 
         Kc = (K - K @ Psi @ Psi.T @ M
               - M @ Psi @ Psi.T @ K
@@ -796,7 +796,7 @@ def model_correction_direct(Psi, omega, M, K, method='Baruch'):
               + M @ Psi @ lam @ Psi.T @ M)
 
     else:  # Defaults to Baruch method.
-        Phi = rsolve(la.sqrtm(Psi.T @ M @ Psi), Psi, assume_a = ‘pos’)
+        Phi = rsolve(la.sqrtm(Psi.T @ M @ Psi), Psi, assume_a='pos')
 
         PhiPhiT = Phi@Phi.T
 
@@ -872,5 +872,6 @@ def rsolve(B, C, **kwargs):
     Notes
     -----
     .. seealso:: `scipy.linalg.solve`
+
     """
     return la.solve(B.T, C.T, **kwargs).T
