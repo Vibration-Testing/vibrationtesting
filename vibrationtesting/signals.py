@@ -695,7 +695,7 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
         input to system
     dt : float
         time step of samples
-    windowname : string - locked to Hanning
+    windowname : string
         name of leakage window to use
     ave : bool, optional(True)- currently locked
         whether or not to average PSDs and ASDs or calculate raw FRFs
