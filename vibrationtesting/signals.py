@@ -605,7 +605,10 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     """
     # t_shape = t.shape
     t = t.flatten()
-    dt = t[2] - t[1]
+    if len(t) == 1:
+        dt = t
+    else:
+        dt = t[2] - t[1]
 
     if dt <= 0:
         print('You sent in bad data. Delta t is negative. \
@@ -617,7 +620,8 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
         y = np.expand_dims(y, axis=0)
         y = np.expand_dims(y, axis=2)
     n = x.shape[1]
-
+    #print(x.shape)
+    #print(y.shape)
     # No clue what this does, and I wrote it. Comment your code, you fool!
     # What this "should" do is assure that the data is longer in 0 axis than the others.
     # if len(x.shape)==2:
@@ -764,6 +768,11 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
        unslected yet.
     .. todo:: Fix averaging, windowing, multiple input.
     """
+    if len(f.shape) == 1:
+        f = f.reshape(1,-1,1)
+
+    if len(x.shape) == 1:
+        x = x.reshape(1,-1,1)
 
     if len(f.shape) == 2:
         if (f.shape).index(max(f.shape)) == 0:
@@ -778,11 +787,14 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
             x = x.reshape(1, max(x.shape), min(x.shape))
 
     # Note: Two different ways to ignore returned values shown
-    Pff = asd(f, dt)[1]
+    Pff = asd(f, dt, windowname = windowname)[1]
     # print('works until here?')
     # print(x.shape)
     # print(f.shape)
-    freq, Pxf = crsd(x, f, dt)
+    #print('crsd')
+    #print(x.shape)
+    #print(f.shape)
+    freq, Pxf = crsd(x, f, dt, windowname = windowname)
     _, Pxx = asd(x, dt)
 
     # Note Pfx=conj(Pxf) is applied in the H1 FRF estimation
@@ -1355,6 +1367,8 @@ def hammer_impulse(time, imp_time=None, imp_duration=None, doublehit=False,
         dh_delta = 0.02
 
     dh_delta = dh_delta * time_max
+
+    time = time.reshape(1,-1)
 
     imp_onset_index = int(time.shape[1] * imp_time / time_max)
     imp_offset_index = int((time.shape[1]) *
