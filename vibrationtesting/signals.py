@@ -116,10 +116,9 @@ def window(x, windowname='hanning', normalize=False):
     """
 
     if isinstance(x, (list, tuple, np.ndarray)):
-        '''Create Hanning windowing array of dimension n by N by nr
-        where N is number of data points and n is the number of number of
-        inputs or outputs.
-        and nr is the number of records.'''
+        """Create Hanning windowing array of dimension `n` by `N` by `nr`
+        where `N` is number of data points and `n` is the number of number of
+        inputs or outputs and `nr` is the number of records."""
 
         swap = 0
         if len(x.shape) == 1:
@@ -201,7 +200,7 @@ def window(x, windowname='hanning', normalize=False):
 
 
 def hanning(x, normalize=False):
-    """Returns hanning window
+    r"""Returns hanning window
 
     Create a hanning window of length :math:`x`, or a hanning window sized to
     match :math:`x` that :math:`x\\times w` is the windowed result.
@@ -259,9 +258,9 @@ def hanning(x, normalize=False):
     """
 
     if isinstance(x, (list, tuple, np.ndarray)):
-        '''Create Hanning windowing array of dimension n by N by nr
+        """Create Hanning windowing array of dimension n by N by nr
         where N is number of data points and n is the number of number of
-        inputs or outputs and nr is the number of records.'''
+        inputs or outputs and nr is the number of records."""
 
         swap = 0
         if len(x.shape) == 1:
@@ -832,7 +831,7 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
 
     return freq, Txf1, Txf2, coh, Txfv
 
-    '''# def acorr(self, x, **kwargs):
+    """# def acorr(self, x, **kwargs):
     # """
     # Plot the autocorrelation of `x`.
 
@@ -977,7 +976,7 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
     ##         kwargs.setdefault('linestyle', 'None')
     ##         a, = self.plot(lags, c, **kwargs)
     ##         b = None
-    # return lags, c, a, b'''
+    # return lags, c, a, b"""
 
 
 def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
@@ -1085,10 +1084,10 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
                          ) // (np.amax(freq) - np.amin(freq)) - 1)
     # if inlow<1,inlow=1;end
     # if inhigh>lenF,inhigh=lenF;end
-    '''print('freq shape: {}'.format(freq.shape))
+    """print('freq shape: {}'.format(freq.shape))
     print('H shape: {}'.format(H.shape))
     print('Index of low frequency: {}'.format(inlow))
-    print('Index of high frequency: {}'.format(inhigh))'''
+    print('Index of high frequency: {}'.format(inhigh))"""
     H = H[:, inlow:inhigh]
     # print(H.shape)
     freq = freq[:, inlow:inhigh]
@@ -1131,7 +1130,7 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
         print("Sorry, that option isn't supported yet")
         return
 
-    '''# elif FLAG==2:
+    """# elif FLAG==2:
     # subplot(2,1,1)
     # semilogx(F,mag)
     #   xlabel('Frequency (Hz)')
@@ -1301,11 +1300,11 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
      # gridmin_max=round(phmin_max/90)*90;
      # set(gca,'YTick',gridmin_max(1):90:gridmin_max(2))
      # zoom on
-     '''
+     """
 
 
 def xcorr(t, x, y, zeropad=True):
-    '''Sorry, no docs or tests yet'''
+    """Sorry, no docs or tests yet"""
     tau = t
     # sx = len(x)
     # sy = len(y)
@@ -1326,7 +1325,7 @@ def xcorr(t, x, y, zeropad=True):
 
 def hammer_impulse(time, imp_time=None, imp_duration=None, doublehit=False,
                    dh_delta=None):
-    '''Generate simulated hammer hit (half sin)
+    """Generate simulated hammer hit (half sin)
 
     Parameters
     ----------
@@ -1355,7 +1354,7 @@ def hammer_impulse(time, imp_time=None, imp_duration=None, doublehit=False,
     >>> force = vt.hammer_impulse(time, doublehit=True)
     >>> plt.plot(time.T, force.T)
     [<matplotlib.lines.Line2D object...
-    '''
+    """
     time_max = np.max(time)
     if imp_time is None:
         imp_time = 0.1 * time_max
