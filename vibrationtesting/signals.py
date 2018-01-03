@@ -1,12 +1,13 @@
 """
-Signal processing and creation for processing vibration testing data and
-generating simulated experiments.
+Signal processing, creation and plotting.
+
+Analysis of data and generation of simulated experiments.
 """
 __license__ = "Joseph C. Slater"
 
 __docformat__ = 'reStructuredText'
 
-import warnings
+# import warnings
 
 import numpy as np
 import scipy as sp
@@ -58,10 +59,10 @@ Problem: This hasn't been fully implemented.
 
 
 def window(x, windowname='hanning', normalize=False):
-    """Create leakage window
+    r"""Create leakage window.
 
     Create a  window of length :math:`x`, or a window sized to match
-    :math:`x` that :math:`x\\times w` is the windowed result.
+    :math:`x` that :math:`x\times w` is the windowed result.
 
     Parameters
     ----------
@@ -77,7 +78,7 @@ def window(x, windowname='hanning', normalize=False):
     -------
     w: float array
        | window array of size x
-       | window array. Windowed array is then :math:`x\\times w`
+       | window array. Windowed array is then :math:`x\times w`
 
     Examples
     --------
@@ -113,8 +114,8 @@ def window(x, windowname='hanning', normalize=False):
     >>> ax2.set_title('Effect of window. Note the scaling to conserve ASD amplitude')
     Text(0.5,1,'Effect of window. Note the scaling to conserve ASD amplitude')
     >>> fig.tight_layout()
-    """
 
+    """
     if isinstance(x, (list, tuple, np.ndarray)):
         """Create Hanning windowing array of dimension `n` by `N` by `nr`
         where `N` is number of data points and `n` is the number of number of
@@ -200,10 +201,10 @@ def window(x, windowname='hanning', normalize=False):
 
 
 def hanning(x, normalize=False):
-    r"""Returns hanning window
+    r"""Return hanning window.
 
     Create a hanning window of length :math:`x`, or a hanning window sized to
-    match :math:`x` that :math:`x\\times w` is the windowed result.
+    match :math:`x` that :math:`x\times w` is the windowed result.
 
     Parameters
     ----------
@@ -219,7 +220,7 @@ def hanning(x, normalize=False):
     -------
     w: float array
        | window array of size x
-       | window array. Windowed array is then :math:`x\\times w`
+       | window array. Windowed array is then :math:`x\times w`
 
     Examples
     --------
@@ -255,8 +256,8 @@ def hanning(x, normalize=False):
     >>> ax2.set_title('Effect of window. Note the scaling to conserve ASD amplitude')
     Text(0.5,1,'Effect of window. Note the scaling to conserve ASD amplitude')
     >>> fig.tight_layout()
-    """
 
+    """
     if isinstance(x, (list, tuple, np.ndarray)):
         """Create Hanning windowing array of dimension n by N by nr
         where N is number of data points and n is the number of number of
@@ -314,7 +315,7 @@ def hanning(x, normalize=False):
 
 
 def blackwin(x):
-    """Return the n point Blackman window
+    """Return the n point Blackman window.
 
     Returns x as the Blackman windowing array x_window
     The windowed signal is then x*x_window
@@ -339,7 +340,7 @@ def blackwin(x):
 
 
 def expwin(x, ts=.75):
-    """Return the n point exponential window
+    """Return the n point exponential window.
 
     Returns x as the expwin windowing array x_windowed
     The windowed signal is then x*x_window
@@ -369,7 +370,7 @@ def expwin(x, ts=.75):
 
 
 def hammwin(x):
-    """Return the n point hamming window
+    """Return the n point hamming window.
 
     Returns x as the hamming windowingarray x_windowed
     The windowed signal is then x*x_window
@@ -396,7 +397,7 @@ def hammwin(x):
 
 
 def flatwin(x):
-    """Return the n point flat top window
+    """Return the n point flat top window.
 
     x_windows=flatwin(x)
     Returns x as the flat top windowing array x_windowed
@@ -428,7 +429,7 @@ def flatwin(x):
 
 
 def boxwin(x):
-    """Return the n point box window (uniform)
+    """Return the n point box window (uniform).
 
     Returns x as the boxwin windowing array x_windowed
     The windowed signal is then x*x_window
@@ -454,11 +455,12 @@ def boxwin(x):
 
 
 def hannwin(*args, **kwargs):
+    """Alternative for function `hanning`."""
     return hanning(*args, **kwargs)
 
 
 def asd(x, t, windowname="hanning", ave=bool(True)):
-    """Return autospectrum (power spectrum) density of a signal x
+    """Return autospectrum (power spectrum) density of a signal x.
 
     Parameters
     ----------
@@ -601,6 +603,7 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     >>> plt.ylabel('PSD (V**2/Hz)')
     Text(0,0.5,'PSD (V**2/Hz)')
     >>> fig.tight_layout()
+
     """
     # t_shape = t.shape
     t = t.flatten()
@@ -619,12 +622,13 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
         y = np.expand_dims(y, axis=0)
         y = np.expand_dims(y, axis=2)
     n = x.shape[1]
+    """
     # print(x.shape)
     # print(y.shape)
     # No clue what this does, and I wrote it. Comment your code, you fool!
     # What this "should" do is assure that the data is longer in 0 axis than the others.
     # if len(x.shape)==2:
-    #     # The issue fixed here is that the user put time along the 1 axis (instead of zero)
+    #      The issue fixed here is that the user put time along the 1 axis (instead of zero)
     #     if (x.shape).index(max(x.shape))==0:
     #         #x=x.reshape(max(x.shape),-1,1)
     #         print('I think you put time along the 0 axis instead of the 1 axis. Not even attempting to fix this.')
@@ -638,8 +642,8 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     #         print('I think you put time along the 0 axis instead of the 1 axis. Not attempting to fix this.')
     #     else:
     #         y=y.reshape(may(y.shape),-1,1)
-    # # Should use scipy.signal windows. I need to figure this out. Problem is: They don't scale the ASDs by the windowing "weakening".
-
+    # Should use scipy.signal windows. I need to figure this out. Problem is: They don't scale the ASDs by the windowing "weakening".
+    """
     if windowname == "none":
         win = 1
     else:
@@ -681,9 +685,9 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
 
 
 def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
-    """Returns freq, H1, H2, coh, Hv
+    r"""Return freq, H1, H2, coh, Hv.
 
-    Estimates the :math:`H(j\\omega)` Frequency Response Functions (FRFs)
+    Estimates the :math:`H(j\omega)` Frequency Response Functions (FRFs)
     between :math:`x` and :math:`f`.
 
     Parameters
@@ -766,6 +770,7 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
     .. warning:: hanning window cannot be selected yet. Averaging cannot be
        unslected yet.
     .. todo:: Fix averaging, windowing, multiple input.
+
     """
     if len(f.shape) == 1:
         f = f.reshape(1, -1, 1)
@@ -945,37 +950,37 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
     # `mode` = 2.
     # """
 
-    ##     Nx = len(x)
+    #     Nx = len(x)
     # if Nx != len(y):
-    ##         raise ValueError('x and y must be equal length')
+    #         raise ValueError('x and y must be equal length')
 
-    ##     x = detrend(np.asarray(x))
-    ##     y = detrend(np.asarray(y))
+    #     x = detrend(np.asarray(x))
+    #     y = detrend(np.asarray(y))
 
-    ##     c = np.correlate(x, y, mode=2)
+    #     c = np.correlate(x, y, mode=2)
 
     # if normed:
-    ##         c /= np.sqrt(np.dot(x, x) * np.dot(y, y))
+    #         c /= np.sqrt(np.dot(x, x) * np.dot(y, y))
 
     # if maxlags is None:
-    ##         maxlags = Nx - 1
+    #         maxlags = Nx - 1
 
     # if maxlags >= Nx or maxlags < 1:
     # raise ValueError('maglags must be None or strictly '
     # 'positive < %d' % Nx)
 
-    ##     lags = np.arange(-maxlags, maxlags + 1)
-    ##     c = c[Nx - 1 - maxlags:Nx + maxlags]
+    #     lags = np.arange(-maxlags, maxlags + 1)
+    #     c = c[Nx - 1 - maxlags:Nx + maxlags]
 
     # if usevlines:
-    ##         a = self.vlines(lags, [0], c, **kwargs)
-    ##         b = self.axhline(**kwargs)
+    #         a = self.vlines(lags, [0], c, **kwargs)
+    #         b = self.axhline(**kwargs)
     # else:
 
-    ##         kwargs.setdefault('marker', 'o')
-    ##         kwargs.setdefault('linestyle', 'None')
-    ##         a, = self.plot(lags, c, **kwargs)
-    ##         b = None
+    #         kwargs.setdefault('marker', 'o')
+    #         kwargs.setdefault('linestyle', 'None')
+    #         a, = self.plot(lags, c, **kwargs)
+    #         b = None
     # return lags, c, a, b"""
 
 
@@ -1053,8 +1058,8 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
     Copyright J. Slater, Dec 17, 1994
     Updated April 27, 1995
     Ported to Python, July 1, 2015
-    """
 
+    """
     FLAG = type  # Plot type, should libe renamed throughout.
     freq = freq.reshape(1, -1)
     lenF = freq.shape[1]
@@ -1100,10 +1105,10 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
     #    phmin_max=[min(phase)//45)*45 ceil(max(max(phase))/45)*45];
     phmin = np.amin(phase) // 45 * 45.0
     phmax = (np.amax(phase) // 45 + 1) * 45
-    minreal = np.amin(np.real(H))
+    """minreal = np.amin(np.real(H))
     maxreal = np.amax(np.real(H))
     minimag = np.amin(np.imag(H))
-    maximag = np.amax(np.imag(H))
+    maximag = np.amax(np.imag(H))"""
 
     if FLAG is 1:
         fig, (ax1, ax2) = plt.subplots(2, 1)
@@ -1153,14 +1158,14 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
     # mag=20*log10(abs(Xfer));
     # semilogx(F*2*pi,mag)
     # xlabel('Frequency (Rad/s)')
-      ## ylabel('Mag (dB)')
+      # ylabel('Mag (dB)')
       # grid on
       # axis([Wmin Wmax minmag maxmag])
       # zoom on
       # subplot(2,1,2)
       # semilogx(F*2*pi,phase)
-      ## xlabel('Frequency (Rad/s)')
-      ## ylabel('Phase (deg)')
+      # xlabel('Frequency (Rad/s)')
+      # ylabel('Phase (deg)')
       # grid on
       # axis([Wmin Wmax  phmin_max(1) phmin_max(2)])
       # gridmin_max=round(phmin_max/90)*90;
@@ -1169,14 +1174,14 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
      # elseif FLAG==4
      # subplot(2,1,1)
      # plot(F,real(Xfer))
-     ##  xlabel('Frequency (Hz)')
+     #  xlabel('Frequency (Hz)')
      # ylabel('Real')
      # grid on
      # axis([Fmin Fmax minreal maxreal])
      # zoom on
      # subplot(2,1,2)
      # plot(F,imag(Xfer))
-     ##  xlabel('Frequency (Hz)')
+     #  xlabel('Frequency (Hz)')
      # ylabel('Imaginary')
      # grid on
      # axis([Fmin Fmax minimag maximag])
@@ -1194,16 +1199,16 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
      # subplot(1,1,1)
      # mag=20*log10(abs(Xfer));
      # plot(F,mag)
-     ##  xlabel('Frequency (Hz)')
-     ##  ylabel('Mag (dB)')
+     #  xlabel('Frequency (Hz)')
+     #  ylabel('Mag (dB)')
      # grid on
      # axis([Fmin Fmax minmag maxmag])
      # zoom on
      # elseif FLAG==7
      # subplot(1,1,1)
      # plot(F,phase)
-     ##  xlabel('Frequency (Hz)')
-     ##  ylabel('Phase (deg)')
+     #  xlabel('Frequency (Hz)')
+     #  ylabel('Phase (deg)')
      # grid on
      # phmin_max=[floor(min(phase)/45)*45 ceil(max(phase)/45)*45];
      # axis([Fmin Fmax  phmin_max(1) phmin_max(2)])
@@ -1213,7 +1218,7 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
      # elseif FLAG==8
      # subplot(1,1,1)
      # plot(F,real(Xfer))
-     ##  xlabel('Frequency (Hz)')
+     #  xlabel('Frequency (Hz)')
      # ylabel('Real')
      # grid on
      # axis([Fmin Fmax minreal maxreal])
@@ -1221,7 +1226,7 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
      # elseif FLAG==9
      # subplot(1,1,1)
      # plot(F,imag(Xfer))
-     ##  xlabel('Frequency (Hz)')
+     #  xlabel('Frequency (Hz)')
      # ylabel('Imaginary')
      # grid on
      # axis([Fmin Fmax minimag maximag])
@@ -1230,16 +1235,16 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
      # subplot(1,1,1)
      # mag=20*log10(abs(Xfer));
      # semilogx(F,mag)
-     ##  xlabel('Frequency (Hz)')
-     ##  ylabel('Mag (dB)')
+     #  xlabel('Frequency (Hz)')
+     #  ylabel('Mag (dB)')
      # grid on
      # axis([Fmin Fmax minmag maxmag])
      # zoom on
      # elseif FLAG==11
      # subplot(1,1,1)
      # semilogx(F,phase)
-     ##  xlabel('Frequency (Hz)')
-     ##  ylabel('Phase (deg)')
+     #  xlabel('Frequency (Hz)')
+     #  ylabel('Phase (deg)')
      # grid on
      # phmin_max=[floor(min(phase)/45)*45 ceil(max(phase)/45)*45];
      # axis([Fmin Fmax  phmin_max(1) phmin_max(2)])
@@ -1249,7 +1254,7 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
      # elseif FLAG==12
      # subplot(1,1,1)
      # semilogx(F,real(Xfer))
-     ##  xlabel('Frequency (Hz)')
+     #  xlabel('Frequency (Hz)')
      # ylabel('Real')
      # grid on
      # axis([Fmin Fmax minreal maxreal])
@@ -1257,7 +1262,7 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
      # elseif FLAG==13
      # subplot(1,1,1)
      # semilogx(F,imag(Xfer))
-     ##  xlabel('Frequency (Hz)')
+     #  xlabel('Frequency (Hz)')
      # ylabel('Imaginary')
      # grid on
      # axis([Fmin Fmax minimag maximag])
@@ -1266,16 +1271,16 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
      # subplot(1,1,1)
      # mag=20*log10(abs(Xfer));
      # semilogx(F*2*pi,mag)
-     ##  xlabel('Frequency (Rad/s)')
-     ##  ylabel('Mag (dB)')
+     #  xlabel('Frequency (Rad/s)')
+     #  ylabel('Mag (dB)')
      # grid on
      # axis([Wmin Wmax minmag maxmag])
      # zoom on
      # elseif FLAG==15
      # subplot(1,1,1)
      # semilogx(F*2*pi,phase)
-     ##  xlabel('Frequency (Rad/s)')
-     ##  ylabel('Phase (deg)')
+     #  xlabel('Frequency (Rad/s)')
+     #  ylabel('Phase (deg)')
      # grid on
      # axis([Wmin Wmax  phmin_max(1) phmin_max(2)])
      # gridmin_max=round(phmin_max/90)*90;
@@ -1285,15 +1290,15 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
      # subplot(2,1,1)
      # mag=20*log10(abs(Xfer));
      # plot(F,mag)
-     ##  xlabel('Frequency (Hz)')
-     ##  ylabel('Mag (dB)')
+     #  xlabel('Frequency (Hz)')
+     #  ylabel('Mag (dB)')
      # grid on
      # axis([Fmin Fmax minmag maxmag])
      # zoom on
      # subplot(2,1,2)
      # plot(F,phase)
-     ##  xlabel('Frequency (Hz)')
-     ##  ylabel('Phase (deg)')
+     #  xlabel('Frequency (Hz)')
+     #  ylabel('Phase (deg)')
      # grid on
      # phmin_max=[floor(min(phase)/45)*45 ceil(max(phase)/45)*45];
      # axis([Fmin Fmax phmin_max(1) phmin_max(2)])
@@ -1304,7 +1309,7 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
 
 
 def xcorr(t, x, y, zeropad=True):
-    """Sorry, no docs or tests yet"""
+    """Sorry, no docs or tests yet."""
     tau = t
     # sx = len(x)
     # sy = len(y)
@@ -1325,7 +1330,7 @@ def xcorr(t, x, y, zeropad=True):
 
 def hammer_impulse(time, imp_time=None, imp_duration=None, doublehit=False,
                    dh_delta=None):
-    """Generate simulated hammer hit (half sin)
+    """Generate simulated hammer hit (half sine).
 
     Parameters
     ----------
@@ -1354,6 +1359,7 @@ def hammer_impulse(time, imp_time=None, imp_duration=None, doublehit=False,
     >>> force = vt.hammer_impulse(time, doublehit=True)
     >>> plt.plot(time.T, force.T)
     [<matplotlib.lines.Line2D object...
+
     """
     time_max = np.max(time)
     if imp_time is None:
