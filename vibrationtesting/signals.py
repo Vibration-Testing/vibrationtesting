@@ -1014,6 +1014,11 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
     type : int, optional
         Plot type. See notes.
 
+    Returns
+    -------
+    ax : axis objects
+        allows manipulation of plot parameters (xlabel, title...)
+
     Examples
     --------
     >>> import matplotlib.pyplot as plt
@@ -1024,7 +1029,7 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
     >>> k=1e5;m=1;c=1;
     >>> frf1=1./(m*(w*1j)**2+c*1j*w+k)
     >>> frf2=1./(m*(w*1j)**2+c*1j*w+k*3)
-    >>> vt.frfplot(f,np.hstack((frf1,frf2)), legend = ['FRF 1','FRF 2'])
+    >>> _ = vt.frfplot(f,np.hstack((frf1,frf2)), legend = ['FRF 1','FRF 2'])
     ...                                      # doctest: +SKIP
 
     Notes
@@ -1140,10 +1145,10 @@ def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
 
         if len(legend) > 0:
             plt.legend(legend)
-
+        ax = (ax1, ax2)
     else:
         print("Sorry, that option isn't supported yet")
-        return
+    return ax
 
     """# elif FLAG==2:
     # subplot(2,1,1)
