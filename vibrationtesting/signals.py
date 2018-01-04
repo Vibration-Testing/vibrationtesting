@@ -15,6 +15,7 @@ import scipy.fftpack as fftpack
 import scipy.linalg as la
 import matplotlib.pyplot as plt
 import scipy.integrate as spi
+import scipy.signal as signal
 
 """
 Notes:
@@ -1406,3 +1407,50 @@ def hammer_impulse(time, imp_time=None, imp_duration=None, doublehit=False,
 
     force = force / spi.simps(force.reshape(-1), dx=time[0, 1])
     return force
+
+
+def decimate(t, in_signal, sample_frequency):
+    r"""Decimate a signal to mimic sampling anti-aliased signal.
+
+    Returns the signal down-sampled to `sample_frequency` with an
+    anti-aliasing filter applied at 45% of ` sample_frequency`.
+
+    Parameters
+    ----------
+    t : float array
+        time array, size (N,)
+    signal : float array
+        signal array, size (N,), (m,N), or (m,N,n)
+    sample_frequency : float
+        new sampling frequency
+
+    Returns
+    -------
+    time : float array
+    decimated_signal : float array
+
+    Examples
+    --------
+    >>> time = np.linspace(0,4,4096)
+    >>> u = np.random.randn(1,len(time))
+    >>> ttime, signal_out = decimate(time, u, 100)
+
+    """
+    dt = t[1] - t[0]
+    current_frequency = 1 / dt
+    freq_frac = sample_frequency / current_frequency
+    Wn = .9 * freq_frac
+    b, a = signal.butter(8, Wn, 'low')
+    if len(in_signal.shape) > 1:
+        filtered_signal = signal.lfilter(b, a, in_signal, axis=1)
+    else:
+        filtered_signal = signal.lfilter(b, a, in_signal)
+    step = int(1 / freq_frac)
+    time = t[::step]
+    if len(in_signal.shape) == 1:
+        filtered_signal = filtered_signal[::step]
+    elif len(in_signal.shape) == 2:
+        filtered_signal = filtered_signal[:, ::step]
+    elif len(in_signal.shape) == 3:
+        filtered_signal = filtered_signal[:, ::step, :]
+    return time, filtered_signal
