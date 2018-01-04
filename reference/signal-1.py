@@ -16,7 +16,8 @@ noise_power = A/1e12
 time = np.arange(0,tfinal,1/sample_freq)
 time = np.reshape(time, (1, -1))
 x = A*np.sin(2*np.pi*sig_freq*time)
-x = x + np.random.normal(scale=np.sqrt(noise_power), size=(1, time.shape[1]))
+x = x + np.random.normal(scale=np.sqrt(noise_power),
+                             size=(1, time.shape[1]))
 fig, (ax1, ax2) = plt.subplots(2,1)
 ax1.plot(time[0,:],x[0,:])
 # [<matplotlib.lines.Line2D object at ...>]

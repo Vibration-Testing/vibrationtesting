@@ -43,12 +43,12 @@
             
   <div class="section" id="module-signals">
 <span id="signal-processing-and-generation-signals"></span><h1>Signal Processing and Generation (<a class="reference internal" href="#module-signals" title="signals"><code class="xref py py-mod docutils literal"><span class="pre">signals</span></code></a>)<a class="headerlink" href="#module-signals" title="Permalink to this headline">¶</a></h1>
-<p>Signal processing and creation for processing vibration testing data and
-generating simulated experiments.</p>
+<p>Signal processing, creation and plotting.</p>
+<p>Analysis of data and generation of simulated experiments.</p>
 <dl class="function">
 <dt id="signals.asd">
 <code class="descclassname">signals.</code><code class="descname">asd</code><span class="sig-paren">(</span><em>x</em>, <em>t</em>, <em>windowname='hanning'</em>, <em>ave=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#asd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.asd" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return autospectrum (power spectrum) density of a signal x</p>
+<dd><p>Return autospectrum (power spectrum) density of a signal x.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -94,7 +94,7 @@ number of experiments.</p>
 <dl class="function">
 <dt id="signals.blackwin">
 <code class="descclassname">signals.</code><code class="descname">blackwin</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#blackwin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.blackwin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the n point Blackman window</p>
+<dd><p>Return the n point Blackman window.</p>
 <p>Returns x as the Blackman windowing array x_window
 The windowed signal is then x*x_window</p>
 </dd></dl>
@@ -102,7 +102,7 @@ The windowed signal is then x*x_window</p>
 <dl class="function">
 <dt id="signals.boxwin">
 <code class="descclassname">signals.</code><code class="descname">boxwin</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#boxwin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.boxwin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the n point box window (uniform)</p>
+<dd><p>Return the n point box window (uniform).</p>
 <p>Returns x as the boxwin windowing array x_windowed
 The windowed signal is then x*x_window</p>
 </dd></dl>
@@ -154,9 +154,47 @@ number of experiments.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="signals.decimate">
+<code class="descclassname">signals.</code><code class="descname">decimate</code><span class="sig-paren">(</span><em>t</em>, <em>in_signal</em>, <em>sample_frequency</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#decimate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.decimate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decimate a signal to mimic sampling anti-aliased signal.</p>
+<p>Returns the signal down-sampled to <cite>sample_frequency</cite> with an
+anti-aliasing filter applied at 45% of ` sample_frequency`.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>t</strong> : float array</p>
+<blockquote>
+<div><p>time array, size (N,)</p>
+</div></blockquote>
+<p><strong>signal</strong> : float array</p>
+<blockquote>
+<div><p>signal array, size (N,), (m,N), or (m,N,n)</p>
+</div></blockquote>
+<p><strong>sample_frequency</strong> : float</p>
+<blockquote>
+<div><p>new sampling frequency</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>time</strong> : float array</p>
+<p class="last"><strong>decimated_signal</strong> : float array</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">4096</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ttime</span><span class="p">,</span> <span class="n">signal_out</span> <span class="o">=</span> <span class="n">decimate</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
 <dt id="signals.expwin">
 <code class="descclassname">signals.</code><code class="descname">expwin</code><span class="sig-paren">(</span><em>x</em>, <em>ts=0.75</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#expwin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.expwin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the n point exponential window</p>
+<dd><p>Return the n point exponential window.</p>
 <p>Returns x as the expwin windowing array x_windowed
 The windowed signal is then x*x_window
 The optional second argument set the 5% “settling time” of the window.
@@ -166,7 +204,7 @@ Default is ts=0.75</p>
 <dl class="function">
 <dt id="signals.flatwin">
 <code class="descclassname">signals.</code><code class="descname">flatwin</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#flatwin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.flatwin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the n point flat top window</p>
+<dd><p>Return the n point flat top window.</p>
 <p>x_windows=flatwin(x)
 Returns x as the flat top windowing array x_windowed
 The windowed signal is then x*x_window
@@ -176,7 +214,7 @@ McConnell, K. G., “Vibration Testing: Theory and Practice,” Wiley, 1995.</p>
 <dl class="function">
 <dt id="signals.frfest">
 <code class="descclassname">signals.</code><code class="descname">frfest</code><span class="sig-paren">(</span><em>x</em>, <em>f</em>, <em>dt</em>, <em>windowname='hanning'</em>, <em>ave=True</em>, <em>Hv=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#frfest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.frfest" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns freq, H1, H2, coh, Hv</p>
+<dd><p>Return freq, H1, H2, coh, Hv.</p>
 <p>Estimates the <span class="math">\(H(j\omega)\)</span> Frequency Response Functions (FRFs)
 between <span class="math">\(x\)</span> and <span class="math">\(f\)</span>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -195,7 +233,7 @@ between <span class="math">\(x\)</span> and <span class="math">\(f\)</span>.</p>
 <blockquote>
 <div><p>time step of samples</p>
 </div></blockquote>
-<p><strong>windowname</strong> : string - locked to Hanning</p>
+<p><strong>windowname</strong> : string</p>
 <blockquote>
 <div><p>name of leakage window to use</p>
 </div></blockquote>
@@ -377,7 +415,7 @@ Ported to Python, July 1, 2015</p>
 <dl class="function">
 <dt id="signals.hammer_impulse">
 <code class="descclassname">signals.</code><code class="descname">hammer_impulse</code><span class="sig-paren">(</span><em>time</em>, <em>imp_time=None</em>, <em>imp_duration=None</em>, <em>doublehit=False</em>, <em>dh_delta=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#hammer_impulse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.hammer_impulse" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate simulated hammer hit (half sin)</p>
+<dd><p>Generate simulated hammer hit (half sine).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -425,7 +463,7 @@ Default is 0.02 of record.</p>
 <dl class="function">
 <dt id="signals.hammwin">
 <code class="descclassname">signals.</code><code class="descname">hammwin</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#hammwin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.hammwin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the n point hamming window</p>
+<dd><p>Return the n point hamming window.</p>
 <p>Returns x as the hamming windowingarray x_windowed
 The windowed signal is then x*x_window</p>
 </dd></dl>
@@ -433,7 +471,7 @@ The windowed signal is then x*x_window</p>
 <dl class="function">
 <dt id="signals.hanning">
 <code class="descclassname">signals.</code><code class="descname">hanning</code><span class="sig-paren">(</span><em>x</em>, <em>normalize=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#hanning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.hanning" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns hanning window</p>
+<dd><p>Return hanning window.</p>
 <p>Create a hanning window of length <span class="math">\(x\)</span>, or a hanning window sized to
 match <span class="math">\(x\)</span> that <span class="math">\(x\times w\)</span> is the windowed result.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -469,16 +507,19 @@ match <span class="math">\(x\)</span> that <span class="math">\(x\times w\)</spa
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<p>(<a class="reference external" href="../reference/signal-5.py">Source code</a>, <a class="reference external" href="../reference/signal-5.png">png</a>, <a class="reference external" href="../reference/signal-5.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-5.pdf">pdf</a>)</p>
-<div class="figure">
-<img alt="../_images/signal-5.png" src="../_images/signal-5.png" />
-</div>
+<p>(<a class="reference external" href="../reference/signal-5.py">Source code</a>)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="signals.hannwin">
+<code class="descclassname">signals.</code><code class="descname">hannwin</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#hannwin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.hannwin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alternative for function <cite>hanning</cite>.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="signals.window">
 <code class="descclassname">signals.</code><code class="descname">window</code><span class="sig-paren">(</span><em>x</em>, <em>windowname='hanning'</em>, <em>normalize=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.window" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create leakage window</p>
+<dd><p>Create leakage window.</p>
 <p>Create a  window of length <span class="math">\(x\)</span>, or a window sized to match
 <span class="math">\(x\)</span> that <span class="math">\(x\times w\)</span> is the windowed result.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -514,16 +555,13 @@ match <span class="math">\(x\)</span> that <span class="math">\(x\times w\)</spa
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<p>(<a class="reference external" href="../reference/signal-6.py">Source code</a>, <a class="reference external" href="../reference/signal-6.png">png</a>, <a class="reference external" href="../reference/signal-6.hires.png">hires.png</a>, <a class="reference external" href="../reference/signal-6.pdf">pdf</a>)</p>
-<div class="figure">
-<img alt="../_images/signal-6.png" src="../_images/signal-6.png" />
-</div>
+<p>(<a class="reference external" href="../reference/signal-6.py">Source code</a>)</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="signals.xcorr">
 <code class="descclassname">signals.</code><code class="descname">xcorr</code><span class="sig-paren">(</span><em>t</em>, <em>x</em>, <em>y</em>, <em>zeropad=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/signals.html#xcorr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#signals.xcorr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sorry, no docs or tests yet</p>
+<dd><p>Sorry, no docs or tests yet.</p>
 </dd></dl>
 
 </div>

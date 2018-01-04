@@ -41,14 +41,15 @@
             
   <h1>Source code for signals</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Signal processing and creation for processing vibration testing data and</span>
-<span class="sd">generating simulated experiments.</span>
+<span class="sd">Signal processing, creation and plotting.</span>
+
+<span class="sd">Analysis of data and generation of simulated experiments.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Joseph C. Slater&quot;</span>
 
 <span class="n">__docformat__</span> <span class="o">=</span> <span class="s1">&#39;reStructuredText&#39;</span>
 
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># import warnings</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
@@ -56,6 +57,7 @@
 <span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="k">as</span> <span class="nn">la</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">scipy.integrate</span> <span class="k">as</span> <span class="nn">spi</span>
+<span class="kn">import</span> <span class="nn">scipy.signal</span> <span class="k">as</span> <span class="nn">signal</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Notes:</span>
@@ -100,10 +102,10 @@
 
 
 <div class="viewcode-block" id="window"><a class="viewcode-back" href="../reference/signal.html#signals.window">[docs]</a><span class="k">def</span> <span class="nf">window</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="s1">&#39;hanning&#39;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Create leakage window</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create leakage window.</span>
 
 <span class="sd">    Create a  window of length :math:`x`, or a window sized to match</span>
-<span class="sd">    :math:`x` that :math:`x\\times w` is the windowed result.</span>
+<span class="sd">    :math:`x` that :math:`x\times w` is the windowed result.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -119,7 +121,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    w: float array</span>
 <span class="sd">       | window array of size x</span>
-<span class="sd">       | window array. Windowed array is then :math:`x\\times w`</span>
+<span class="sd">       | window array. Windowed array is then :math:`x\times w`</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -134,7 +136,7 @@
 <span class="sd">    &gt;&gt;&gt; noise_power = 0.001 * sample_freq / 2</span>
 <span class="sd">    &gt;&gt;&gt; time = np.reshape(np.arange(0, tfinal, 1/sample_freq),(1,-1))</span>
 <span class="sd">    &gt;&gt;&gt; xsin = A*np.sin(2*np.pi*freq*time)</span>
-<span class="sd">    &gt;&gt;&gt; xcos = A*np.cos(2*np.pi*freq*time) # assembling individual records. vstack assembles channels</span>
+<span class="sd">    &gt;&gt;&gt; xcos = A*np.cos(2*np.pi*freq*time) # assembling individual records.</span>
 <span class="sd">    &gt;&gt;&gt; x=np.dstack((xsin,xcos)) # assembling individual records. vstack</span>
 <span class="sd">    &gt;&gt;&gt; xw=vt.hanning(x)*x</span>
 <span class="sd">    &gt;&gt;&gt; fig, (ax1, ax2) = plt.subplots(2,1)</span>
@@ -146,22 +148,23 @@
 <span class="sd">    Text(0.5,1,&#39;Original (raw) data.&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; ax1.set_ylabel(&#39;$x(t)$&#39;)</span>
 <span class="sd">    Text(0,0.5,&#39;$x(t)$&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; ax2.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,&#39;--&#39;,time[0,:],-vt.hanning(x)[0,:]*A,&#39;--&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ax2.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,&#39;--&#39;,</span>
+<span class="sd">    ...                            time[0,:],-vt.hanning(x)[0,:]*A,&#39;--&#39;)</span>
 <span class="sd">    [&lt;matplotlib.lines.Line2D object at ...&gt;]</span>
 <span class="sd">    &gt;&gt;&gt; ax2.set_ylabel(&#39;Hanning windowed $x(t)$&#39;)</span>
 <span class="sd">    Text(0,0.5,&#39;Hanning windowed $x(t)$&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; ax2.set_xlabel(&#39;time&#39;)</span>
 <span class="sd">    Text(0.5,0,&#39;time&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; ax2.set_title(&#39;Effect of window. Note the scaling to conserve ASD amplitude&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ax2.set_title(&#39;Effect of window. Note the scaling to conserve</span>
+<span class="sd">    ...                                                ASD amplitude&#39;)</span>
 <span class="sd">    Text(0.5,1,&#39;Effect of window. Note the scaling to conserve ASD amplitude&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; fig.tight_layout()</span>
-<span class="sd">    &quot;&quot;&quot;</span>
 
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
-        <span class="sd">&#39;&#39;&#39;Create Hanning windowing array of dimension n by N by nr</span>
-<span class="sd">        where N is number of data points and n is the number of number of</span>
-<span class="sd">        inputs or outputs.</span>
-<span class="sd">        and nr is the number of records.&#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot;Create Hanning windowing array of dimension `n` by `N` by `nr`</span>
+<span class="sd">        where `N` is number of data points and `n` is the number of number of</span>
+<span class="sd">        inputs or outputs and `nr` is the number of records.&quot;&quot;&quot;</span>
 
         <span class="n">swap</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -243,10 +246,10 @@
 
 
 <div class="viewcode-block" id="hanning"><a class="viewcode-back" href="../reference/signal.html#signals.hanning">[docs]</a><span class="k">def</span> <span class="nf">hanning</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns hanning window</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return hanning window.</span>
 
 <span class="sd">    Create a hanning window of length :math:`x`, or a hanning window sized to</span>
-<span class="sd">    match :math:`x` that :math:`x\\times w` is the windowed result.</span>
+<span class="sd">    match :math:`x` that :math:`x\times w` is the windowed result.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -262,7 +265,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    w: float array</span>
 <span class="sd">       | window array of size x</span>
-<span class="sd">       | window array. Windowed array is then :math:`x\\times w`</span>
+<span class="sd">       | window array. Windowed array is then :math:`x\times w`</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -289,21 +292,23 @@
 <span class="sd">    Text(0.5,1,&#39;Unwindowed data, 2 records.&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; ax1.set_ylabel(&#39;$x(t)$&#39;)</span>
 <span class="sd">    Text(0,0.5,&#39;$x(t)$&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; ax2.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,&#39;--&#39;,time[0,:],-vt.hanning(x)[0,:]*A,&#39;--&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ax2.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,</span>
+<span class="sd">    ...                      &#39;--&#39;,time[0,:],-vt.hanning(x)[0,:]*A,&#39;--&#39;)</span>
 <span class="sd">    [&lt;matplotlib.lines.Line2D object at ...&gt;]</span>
 <span class="sd">    &gt;&gt;&gt; ax2.set_ylabel(&#39;Hanning windowed $x(t)$&#39;)</span>
 <span class="sd">    Text(0,0.5,&#39;Hanning windowed $x(t)$&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; ax2.set_xlabel(&#39;time&#39;)</span>
 <span class="sd">    Text(0.5,0,&#39;time&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; ax2.set_title(&#39;Effect of window. Note the scaling to conserve ASD amplitude&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ax2.set_title(&#39;Effect of window. Note the scaling to conserve</span>
+<span class="sd">    ...                                                ASD amplitude&#39;)</span>
 <span class="sd">    Text(0.5,1,&#39;Effect of window. Note the scaling to conserve ASD amplitude&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; fig.tight_layout()</span>
-<span class="sd">    &quot;&quot;&quot;</span>
 
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
-        <span class="sd">&#39;&#39;&#39;Create Hanning windowing array of dimension n by N by nr</span>
+        <span class="sd">&quot;&quot;&quot;Create Hanning windowing array of dimension n by N by nr</span>
 <span class="sd">        where N is number of data points and n is the number of number of</span>
-<span class="sd">        inputs or outputs and nr is the number of records.&#39;&#39;&#39;</span>
+<span class="sd">        inputs or outputs and nr is the number of records.&quot;&quot;&quot;</span>
 
         <span class="n">swap</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -357,7 +362,7 @@
 
 
 <div class="viewcode-block" id="blackwin"><a class="viewcode-back" href="../reference/signal.html#signals.blackwin">[docs]</a><span class="k">def</span> <span class="nf">blackwin</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return the n point Blackman window</span>
+    <span class="sd">&quot;&quot;&quot;Return the n point Blackman window.</span>
 
 <span class="sd">    Returns x as the Blackman windowing array x_window</span>
 <span class="sd">    The windowed signal is then x*x_window</span>
@@ -382,7 +387,7 @@
 
 
 <div class="viewcode-block" id="expwin"><a class="viewcode-back" href="../reference/signal.html#signals.expwin">[docs]</a><span class="k">def</span> <span class="nf">expwin</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ts</span><span class="o">=.</span><span class="mi">75</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return the n point exponential window</span>
+    <span class="sd">&quot;&quot;&quot;Return the n point exponential window.</span>
 
 <span class="sd">    Returns x as the expwin windowing array x_windowed</span>
 <span class="sd">    The windowed signal is then x*x_window</span>
@@ -412,7 +417,7 @@
 
 
 <div class="viewcode-block" id="hammwin"><a class="viewcode-back" href="../reference/signal.html#signals.hammwin">[docs]</a><span class="k">def</span> <span class="nf">hammwin</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return the n point hamming window</span>
+    <span class="sd">&quot;&quot;&quot;Return the n point hamming window.</span>
 
 <span class="sd">    Returns x as the hamming windowingarray x_windowed</span>
 <span class="sd">    The windowed signal is then x*x_window</span>
@@ -439,7 +444,7 @@
 
 
 <div class="viewcode-block" id="flatwin"><a class="viewcode-back" href="../reference/signal.html#signals.flatwin">[docs]</a><span class="k">def</span> <span class="nf">flatwin</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return the n point flat top window</span>
+    <span class="sd">&quot;&quot;&quot;Return the n point flat top window.</span>
 
 <span class="sd">    x_windows=flatwin(x)</span>
 <span class="sd">    Returns x as the flat top windowing array x_windowed</span>
@@ -471,7 +476,7 @@
 
 
 <div class="viewcode-block" id="boxwin"><a class="viewcode-back" href="../reference/signal.html#signals.boxwin">[docs]</a><span class="k">def</span> <span class="nf">boxwin</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return the n point box window (uniform)</span>
+    <span class="sd">&quot;&quot;&quot;Return the n point box window (uniform).</span>
 
 <span class="sd">    Returns x as the boxwin windowing array x_windowed</span>
 <span class="sd">    The windowed signal is then x*x_window</span>
@@ -496,12 +501,13 @@
     <span class="k">return</span> <span class="n">f</span></div>
 
 
-<span class="k">def</span> <span class="nf">hannwin</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">hanning</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="viewcode-block" id="hannwin"><a class="viewcode-back" href="../reference/signal.html#signals.hannwin">[docs]</a><span class="k">def</span> <span class="nf">hannwin</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Alternative for function `hanning`.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">hanning</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="asd"><a class="viewcode-back" href="../reference/signal.html#signals.asd">[docs]</a><span class="k">def</span> <span class="nf">asd</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="s2">&quot;hanning&quot;</span><span class="p">,</span> <span class="n">ave</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="kc">True</span><span class="p">)):</span>
-    <span class="sd">&quot;&quot;&quot;Return autospectrum (power spectrum) density of a signal x</span>
+    <span class="sd">&quot;&quot;&quot;Return autospectrum (power spectrum) density of a signal x.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -542,7 +548,8 @@
 <span class="sd">    &gt;&gt;&gt; time = np.arange(0,tfinal,1/sample_freq)</span>
 <span class="sd">    &gt;&gt;&gt; time = np.reshape(time, (1, -1))</span>
 <span class="sd">    &gt;&gt;&gt; x = A*np.sin(2*np.pi*sig_freq*time)</span>
-<span class="sd">    &gt;&gt;&gt; x = x + np.random.normal(scale=np.sqrt(noise_power), size=(1, time.shape[1]))</span>
+<span class="sd">    &gt;&gt;&gt; x = x + np.random.normal(scale=np.sqrt(noise_power),</span>
+<span class="sd">    ...                              size=(1, time.shape[1]))</span>
 <span class="sd">    &gt;&gt;&gt; fig, (ax1, ax2) = plt.subplots(2,1)</span>
 <span class="sd">    &gt;&gt;&gt; ax1.plot(time[0,:],x[0,:])</span>
 <span class="sd">    [&lt;matplotlib.lines.Line2D object at ...&gt;]</span>
@@ -644,10 +651,14 @@
 <span class="sd">    &gt;&gt;&gt; plt.ylabel(&#39;PSD (V**2/Hz)&#39;)</span>
 <span class="sd">    Text(0,0.5,&#39;PSD (V**2/Hz)&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; fig.tight_layout()</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># t_shape = t.shape</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-    <span class="n">dt</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">t</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">dt</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;You sent in bad data. Delta t is negative. </span><span class="se">\</span>
@@ -659,26 +670,34 @@
         <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">n</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    # print(x.shape)</span>
+<span class="sd">    # print(y.shape)</span>
+<span class="sd">    # No clue what this does, and I wrote it. Comment your code, you fool!</span>
+<span class="sd">    # What this &quot;should&quot; do is assure that the data is longer in 0 axis than</span>
+<span class="sd">    the others.</span>
+<span class="sd">    # if len(x.shape)==2:</span>
+<span class="sd">    #      The issue fixed here is that the user put time along the 1 axis</span>
+<span class="sd">    (instead of zero)</span>
+<span class="sd">    #     if (x.shape).index(max(x.shape))==0:</span>
+<span class="sd">    #         #x=x.reshape(max(x.shape),-1,1)</span>
+<span class="sd">    #         print(&#39;I think you put time along the 0 axis instead of the 1</span>
+<span class="sd">    axis. Not even attempting to fix this.&#39;)</span>
+<span class="sd">    #     else:</span>
+<span class="sd">    #         # Here we are appending a 3rd dimension to simplify averaging</span>
+<span class="sd">    command later. We could bypass at that point, and should.</span>
+<span class="sd">    #         x=x.reshape(max(x.shape),-1,1)</span>
 
-    <span class="c1"># No clue what this does, and I wrote it. Comment your code, you fool!</span>
-    <span class="c1"># What this &quot;should&quot; do is assure that the data is longer in 0 axis than the others.</span>
-    <span class="c1"># if len(x.shape)==2:</span>
-    <span class="c1">#     # The issue fixed here is that the user put time along the 1 axis (instead of zero)</span>
-    <span class="c1">#     if (x.shape).index(max(x.shape))==0:</span>
-    <span class="c1">#         #x=x.reshape(max(x.shape),-1,1)</span>
-    <span class="c1">#         print(&#39;I think you put time along the 0 axis instead of the 1 axis. Not even attempting to fix this.&#39;)</span>
-    <span class="c1">#     else:</span>
-    <span class="c1">#         # Here we are appending a 3rd dimension to simplify averaging command later. We could bypass at that point, and should.</span>
-    <span class="c1">#         x=x.reshape(max(x.shape),-1,1)</span>
-
-    <span class="c1"># if len(y.shape)==2:</span>
-    <span class="c1">#     if (y.shape).indey(may(y.shape))==0:</span>
-    <span class="c1">#         #y=y.reshape(may(y.shape),-1,1)</span>
-    <span class="c1">#         print(&#39;I think you put time along the 0 axis instead of the 1 axis. Not attempting to fix this.&#39;)</span>
-    <span class="c1">#     else:</span>
-    <span class="c1">#         y=y.reshape(may(y.shape),-1,1)</span>
-    <span class="c1"># # Should use scipy.signal windows. I need to figure this out. Problem is: They don&#39;t scale the ASDs by the windowing &quot;weakening&quot;.</span>
-
+<span class="sd">    # if len(y.shape)==2:</span>
+<span class="sd">    #     if (y.shape).indey(may(y.shape))==0:</span>
+<span class="sd">    #         #y=y.reshape(may(y.shape),-1,1)</span>
+<span class="sd">    #         print(&#39;I think you put time along the 0 axis instead of the 1</span>
+<span class="sd">    axis. Not attempting to fix this.&#39;)</span>
+<span class="sd">    #     else:</span>
+<span class="sd">    #         y=y.reshape(may(y.shape),-1,1)</span>
+<span class="sd">    # Should use scipy.signal windows. I need to figure this out. Problem is:</span>
+<span class="sd">    They don&#39;t scale the ASDs by the windowing &quot;weakening&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">windowname</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
         <span class="n">win</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">else</span><span class="p">:</span>
@@ -720,9 +739,9 @@
 
 
 <div class="viewcode-block" id="frfest"><a class="viewcode-back" href="../reference/signal.html#signals.frfest">[docs]</a><span class="k">def</span> <span class="nf">frfest</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="s2">&quot;hanning&quot;</span><span class="p">,</span> <span class="n">ave</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="n">Hv</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="kc">False</span><span class="p">)):</span>
-    <span class="sd">&quot;&quot;&quot;Returns freq, H1, H2, coh, Hv</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return freq, H1, H2, coh, Hv.</span>
 
-<span class="sd">    Estimates the :math:`H(j\\omega)` Frequency Response Functions (FRFs)</span>
+<span class="sd">    Estimates the :math:`H(j\omega)` Frequency Response Functions (FRFs)</span>
 <span class="sd">    between :math:`x` and :math:`f`.</span>
 
 <span class="sd">    Parameters</span>
@@ -733,7 +752,7 @@
 <span class="sd">        input to system</span>
 <span class="sd">    dt : float</span>
 <span class="sd">        time step of samples</span>
-<span class="sd">    windowname : string - locked to Hanning</span>
+<span class="sd">    windowname : string</span>
 <span class="sd">        name of leakage window to use</span>
 <span class="sd">    ave : bool, optional(True)- currently locked</span>
 <span class="sd">        whether or not to average PSDs and ASDs or calculate raw FRFs</span>
@@ -805,7 +824,13 @@
 <span class="sd">    .. warning:: hanning window cannot be selected yet. Averaging cannot be</span>
 <span class="sd">       unslected yet.</span>
 <span class="sd">    .. todo:: Fix averaging, windowing, multiple input.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -820,11 +845,14 @@
             <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
 
     <span class="c1"># Note: Two different ways to ignore returned values shown</span>
-    <span class="n">Pff</span> <span class="o">=</span> <span class="n">asd</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dt</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">Pff</span> <span class="o">=</span> <span class="n">asd</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="n">windowname</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
     <span class="c1"># print(&#39;works until here?&#39;)</span>
     <span class="c1"># print(x.shape)</span>
     <span class="c1"># print(f.shape)</span>
-    <span class="n">freq</span><span class="p">,</span> <span class="n">Pxf</span> <span class="o">=</span> <span class="n">crsd</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+    <span class="c1"># print(&#39;crsd&#39;)</span>
+    <span class="c1"># print(x.shape)</span>
+    <span class="c1"># print(f.shape)</span>
+    <span class="n">freq</span><span class="p">,</span> <span class="n">Pxf</span> <span class="o">=</span> <span class="n">crsd</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">windowname</span><span class="o">=</span><span class="n">windowname</span><span class="p">)</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">Pxx</span> <span class="o">=</span> <span class="n">asd</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
 
     <span class="c1"># Note Pfx=conj(Pxf) is applied in the H1 FRF estimation</span>
@@ -862,152 +890,152 @@
 
     <span class="k">return</span> <span class="n">freq</span><span class="p">,</span> <span class="n">Txf1</span><span class="p">,</span> <span class="n">Txf2</span><span class="p">,</span> <span class="n">coh</span><span class="p">,</span> <span class="n">Txfv</span>
 
-    <span class="sd">&#39;&#39;&#39;# def acorr(self, x, **kwargs):</span>
-<span class="sd">    # &quot;&quot;&quot;</span>
-<span class="sd">    # Plot the autocorrelation of `x`.</span>
+    <span class="sd">&quot;&quot;&quot;# def acorr(self, x, **kwargs):</span>
+<span class="sd">    # &quot;&quot;&quot;</span></div>
+    <span class="c1"># Plot the autocorrelation of `x`.</span>
 
-<span class="sd">    # Parameters</span>
-<span class="sd">    # ----------</span>
+    <span class="c1"># Parameters</span>
+    <span class="c1"># ----------</span>
 
-<span class="sd">    # x : sequence of scalar</span>
+    <span class="c1"># x : sequence of scalar</span>
 
-<span class="sd">    # hold : boolean, optional, default: True</span>
+    <span class="c1"># hold : boolean, optional, default: True</span>
 
-<span class="sd">    # detrend : callable, optional, default: `mlab.detrend_none`</span>
-<span class="sd">    # x is detrended by the `detrend` callable. Default is no</span>
-<span class="sd">    # normalization.</span>
+    <span class="c1"># detrend : callable, optional, default: `mlab.detrend_none`</span>
+    <span class="c1"># x is detrended by the `detrend` callable. Default is no</span>
+    <span class="c1"># normalization.</span>
 
-<span class="sd">    # normed : boolean, optional, default: True</span>
-<span class="sd">    # if True, normalize the data by the autocorrelation at the 0-th</span>
-<span class="sd">    # lag.</span>
+    <span class="c1"># normed : boolean, optional, default: True</span>
+    <span class="c1"># if True, normalize the data by the autocorrelation at the 0-th</span>
+    <span class="c1"># lag.</span>
 
-<span class="sd">    # usevlines : boolean, optional, default: True</span>
-<span class="sd">    # if True, Axes.vlines is used to plot the vertical lines from the</span>
-<span class="sd">    # origin to the acorr. Otherwise, Axes.plot is used.</span>
+    <span class="c1"># usevlines : boolean, optional, default: True</span>
+    <span class="c1"># if True, Axes.vlines is used to plot the vertical lines from the</span>
+    <span class="c1"># origin to the acorr. Otherwise, Axes.plot is used.</span>
 
-<span class="sd">    # maxlags : integer, optional, default: 10</span>
-<span class="sd">    # number of lags to show. If None, will return all 2 * len(x) - 1</span>
-<span class="sd">    # lags.</span>
+    <span class="c1"># maxlags : integer, optional, default: 10</span>
+    <span class="c1"># number of lags to show. If None, will return all 2 * len(x) - 1</span>
+    <span class="c1"># lags.</span>
 
-<span class="sd">    # Returns</span>
-<span class="sd">    # -------</span>
-<span class="sd">    # (lags, c, line, b) : where:</span>
+    <span class="c1"># Returns</span>
+    <span class="c1"># -------</span>
+    <span class="c1"># (lags, c, line, b) : where:</span>
 
-<span class="sd">    # - `lags` are a length 2`maxlags+1 lag vector.</span>
-<span class="sd">    # - `c` is the 2`maxlags+1 auto correlation vectorI</span>
-<span class="sd">    # - `line` is a `~matplotlib.lines.Line2D` instance returned by</span>
-<span class="sd">    # `plot`.</span>
-<span class="sd">    # - `b` is the x-axis.</span>
+    <span class="c1"># - `lags` are a length 2`maxlags+1 lag vector.</span>
+    <span class="c1"># - `c` is the 2`maxlags+1 auto correlation vectorI</span>
+    <span class="c1"># - `line` is a `~matplotlib.lines.Line2D` instance returned by</span>
+    <span class="c1"># `plot`.</span>
+    <span class="c1"># - `b` is the x-axis.</span>
 
-<span class="sd">    # Other parameters</span>
-<span class="sd">    # -----------------</span>
-<span class="sd">    # linestyle : `~matplotlib.lines.Line2D` prop, optional, default: None</span>
-<span class="sd">    # Only used if usevlines is False.</span>
+    <span class="c1"># Other parameters</span>
+    <span class="c1"># -----------------</span>
+    <span class="c1"># linestyle : `~matplotlib.lines.Line2D` prop, optional, default: None</span>
+    <span class="c1"># Only used if usevlines is False.</span>
 
-<span class="sd">    # marker : string, optional, default: &#39;o&#39;</span>
+    <span class="c1"># marker : string, optional, default: &#39;o&#39;</span>
 
-<span class="sd">    # Notes</span>
-<span class="sd">    # -----</span>
-<span class="sd">    # The cross correlation is performed with :func:`numpy.correlate` with</span>
-<span class="sd">    # `mode` = 2.</span>
+    <span class="c1"># Notes</span>
+    <span class="c1"># -----</span>
+    <span class="c1"># The cross correlation is performed with :func:`numpy.correlate` with</span>
+    <span class="c1"># `mode` = 2.</span>
 
-<span class="sd">    # Examples</span>
-<span class="sd">    # --------</span>
+    <span class="c1"># Examples</span>
+    <span class="c1"># --------</span>
 
-<span class="sd">    # `~matplotlib.pyplot.xcorr` is top graph, and</span>
-<span class="sd">    # `~matplotlib.pyplot.acorr` is bottom graph.</span>
+    <span class="c1"># `~matplotlib.pyplot.xcorr` is top graph, and</span>
+    <span class="c1"># `~matplotlib.pyplot.acorr` is bottom graph.</span>
 
-<span class="sd">    # .. plot:: mpl_examples/pylab_examples/xcorr_demo.py</span>
+    <span class="c1"># .. plot:: mpl_examples/pylab_examples/xcorr_demo.py</span>
 
-<span class="sd">    # &quot;&quot;&quot;</span>
-<span class="sd">    # return self.xcorr(x, x, **kwargs)</span>
+    <span class="c1"># &quot;&quot;&quot;</span>
+    <span class="c1"># return self.xcorr(x, x, **kwargs)</span>
 
-<span class="sd">    # @docstring.dedent_interpd</span>
-<span class="sd">    # def xcorr(self, x, y, normed=True, detrend=mlab.detrend_none,</span>
-<span class="sd">    # usevlines=True, maxlags=10, **kwargs):</span>
-<span class="sd">    # &quot;&quot;&quot;</span>
-<span class="sd">    # Plot the cross correlation between *x* and *y*.</span>
+    <span class="c1"># @docstring.dedent_interpd</span>
+    <span class="c1"># def xcorr(self, x, y, normed=True, detrend=mlab.detrend_none,</span>
+    <span class="c1"># usevlines=True, maxlags=10, **kwargs):</span>
+    <span class="c1"># &quot;&quot;&quot;</span>
+    <span class="c1"># Plot the cross correlation between *x* and *y*.</span>
 
-<span class="sd">    # Parameters</span>
-<span class="sd">    # ----------</span>
+    <span class="c1"># Parameters</span>
+    <span class="c1"># ----------</span>
 
-<span class="sd">    # x : sequence of scalars of length n</span>
+    <span class="c1"># x : sequence of scalars of length n</span>
 
-<span class="sd">    # y : sequence of scalars of length n</span>
+    <span class="c1"># y : sequence of scalars of length n</span>
 
-<span class="sd">    # hold : boolean, optional, default: True</span>
+    <span class="c1"># hold : boolean, optional, default: True</span>
 
-<span class="sd">    # detrend : callable, optional, default: `mlab.detrend_none`</span>
-<span class="sd">    # x is detrended by the `detrend` callable. Default is no</span>
-<span class="sd">    # normalization.</span>
+    <span class="c1"># detrend : callable, optional, default: `mlab.detrend_none`</span>
+    <span class="c1"># x is detrended by the `detrend` callable. Default is no</span>
+    <span class="c1"># normalization.</span>
 
-<span class="sd">    # normed : boolean, optional, default: True</span>
-<span class="sd">    # if True, normalize the data by the autocorrelation at the 0-th</span>
-<span class="sd">    # lag.</span>
+    <span class="c1"># normed : boolean, optional, default: True</span>
+    <span class="c1"># if True, normalize the data by the autocorrelation at the 0-th</span>
+    <span class="c1"># lag.</span>
 
-<span class="sd">    # usevlines : boolean, optional, default: True</span>
-<span class="sd">    # if True, Axes.vlines is used to plot the vertical lines from the</span>
-<span class="sd">    # origin to the acorr. Otherwise, Axes.plot is used.</span>
+    <span class="c1"># usevlines : boolean, optional, default: True</span>
+    <span class="c1"># if True, Axes.vlines is used to plot the vertical lines from the</span>
+    <span class="c1"># origin to the acorr. Otherwise, Axes.plot is used.</span>
 
-<span class="sd">    # maxlags : integer, optional, default: 10</span>
-<span class="sd">    # number of lags to show. If None, will return all 2 * len(x) - 1</span>
-<span class="sd">    # lags.</span>
+    <span class="c1"># maxlags : integer, optional, default: 10</span>
+    <span class="c1"># number of lags to show. If None, will return all 2 * len(x) - 1</span>
+    <span class="c1"># lags.</span>
 
-<span class="sd">    # Returns</span>
-<span class="sd">    # -------</span>
-<span class="sd">    # (lags, c, line, b) : where:</span>
+    <span class="c1"># Returns</span>
+    <span class="c1"># -------</span>
+    <span class="c1"># (lags, c, line, b) : where:</span>
 
-<span class="sd">    # - `lags` are a length 2`maxlags+1 lag vector.</span>
-<span class="sd">    # - `c` is the 2`maxlags+1 auto correlation vectorI</span>
-<span class="sd">    # - `line` is a `~matplotlib.lines.Line2D` instance returned by</span>
-<span class="sd">    # `plot`.</span>
-<span class="sd">    # - `b` is the x-axis (none, if plot is used).</span>
+    <span class="c1"># - `lags` are a length 2`maxlags+1 lag vector.</span>
+    <span class="c1"># - `c` is the 2`maxlags+1 auto correlation vectorI</span>
+    <span class="c1"># - `line` is a `~matplotlib.lines.Line2D` instance returned by</span>
+    <span class="c1"># `plot`.</span>
+    <span class="c1"># - `b` is the x-axis (none, if plot is used).</span>
 
-<span class="sd">    # Other parameters</span>
-<span class="sd">    # -----------------</span>
-<span class="sd">    # linestyle : `~matplotlib.lines.Line2D` prop, optional, default: None</span>
-<span class="sd">    # Only used if usevlines is False.</span>
+    <span class="c1"># Other parameters</span>
+    <span class="c1"># -----------------</span>
+    <span class="c1"># linestyle : `~matplotlib.lines.Line2D` prop, optional, default: None</span>
+    <span class="c1"># Only used if usevlines is False.</span>
 
-<span class="sd">    # marker : string, optional, default: &#39;o&#39;</span>
+    <span class="c1"># marker : string, optional, default: &#39;o&#39;</span>
 
-<span class="sd">    # Notes</span>
-<span class="sd">    # -----</span>
-<span class="sd">    # The cross correlation is performed with :func:`numpy.correlate` with</span>
-<span class="sd">    # `mode` = 2.</span>
-<span class="sd">    # &quot;&quot;&quot;</span>
+    <span class="c1"># Notes</span>
+    <span class="c1"># -----</span>
+    <span class="c1"># The cross correlation is performed with :func:`numpy.correlate` with</span>
+    <span class="c1"># `mode` = 2.</span>
+    <span class="c1"># &quot;&quot;&quot;</span>
 
-<span class="sd">    ##     Nx = len(x)</span>
-<span class="sd">    # if Nx != len(y):</span>
-<span class="sd">    ##         raise ValueError(&#39;x and y must be equal length&#39;)</span>
+    <span class="c1">#     Nx = len(x)</span>
+    <span class="c1"># if Nx != len(y):</span>
+    <span class="c1">#         raise ValueError(&#39;x and y must be equal length&#39;)</span>
 
-<span class="sd">    ##     x = detrend(np.asarray(x))</span>
-<span class="sd">    ##     y = detrend(np.asarray(y))</span>
+    <span class="c1">#     x = detrend(np.asarray(x))</span>
+    <span class="c1">#     y = detrend(np.asarray(y))</span>
 
-<span class="sd">    ##     c = np.correlate(x, y, mode=2)</span>
+    <span class="c1">#     c = np.correlate(x, y, mode=2)</span>
 
-<span class="sd">    # if normed:</span>
-<span class="sd">    ##         c /= np.sqrt(np.dot(x, x) * np.dot(y, y))</span>
+    <span class="c1"># if normed:</span>
+    <span class="c1">#         c /= np.sqrt(np.dot(x, x) * np.dot(y, y))</span>
 
-<span class="sd">    # if maxlags is None:</span>
-<span class="sd">    ##         maxlags = Nx - 1</span>
+    <span class="c1"># if maxlags is None:</span>
+    <span class="c1">#         maxlags = Nx - 1</span>
 
-<span class="sd">    # if maxlags &gt;= Nx or maxlags &lt; 1:</span>
-<span class="sd">    # raise ValueError(&#39;maglags must be None or strictly &#39;</span>
-<span class="sd">    # &#39;positive &lt; %d&#39; % Nx)</span>
+    <span class="c1"># if maxlags &gt;= Nx or maxlags &lt; 1:</span>
+    <span class="c1"># raise ValueError(&#39;maglags must be None or strictly &#39;</span>
+    <span class="c1"># &#39;positive &lt; %d&#39; % Nx)</span>
 
-<span class="sd">    ##     lags = np.arange(-maxlags, maxlags + 1)</span>
-<span class="sd">    ##     c = c[Nx - 1 - maxlags:Nx + maxlags]</span>
+    <span class="c1">#     lags = np.arange(-maxlags, maxlags + 1)</span>
+    <span class="c1">#     c = c[Nx - 1 - maxlags:Nx + maxlags]</span>
 
-<span class="sd">    # if usevlines:</span>
-<span class="sd">    ##         a = self.vlines(lags, [0], c, **kwargs)</span>
-<span class="sd">    ##         b = self.axhline(**kwargs)</span>
-<span class="sd">    # else:</span>
+    <span class="c1"># if usevlines:</span>
+    <span class="c1">#         a = self.vlines(lags, [0], c, **kwargs)</span>
+    <span class="c1">#         b = self.axhline(**kwargs)</span>
+    <span class="c1"># else:</span>
 
-<span class="sd">    ##         kwargs.setdefault(&#39;marker&#39;, &#39;o&#39;)</span>
-<span class="sd">    ##         kwargs.setdefault(&#39;linestyle&#39;, &#39;None&#39;)</span>
-<span class="sd">    ##         a, = self.plot(lags, c, **kwargs)</span>
-<span class="sd">    ##         b = None</span>
-<span class="sd">    # return lags, c, a, b&#39;&#39;&#39;</span></div>
+    <span class="c1">#         kwargs.setdefault(&#39;marker&#39;, &#39;o&#39;)</span>
+    <span class="c1">#         kwargs.setdefault(&#39;linestyle&#39;, &#39;None&#39;)</span>
+    <span class="c1">#         a, = self.plot(lags, c, **kwargs)</span>
+    <span class="c1">#         b = None</span>
+    <span class="c1"># return lags, c, a, b&quot;&quot;&quot;</span>
 
 
 <div class="viewcode-block" id="frfplot"><a class="viewcode-back" href="../reference/signal.html#signals.frfplot">[docs]</a><span class="k">def</span> <span class="nf">frfplot</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">freq_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">freq_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="p">[]):</span>
@@ -1084,8 +1112,8 @@
 <span class="sd">    Copyright J. Slater, Dec 17, 1994</span>
 <span class="sd">    Updated April 27, 1995</span>
 <span class="sd">    Ported to Python, July 1, 2015</span>
-<span class="sd">    &quot;&quot;&quot;</span>
 
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">FLAG</span> <span class="o">=</span> <span class="nb">type</span>  <span class="c1"># Plot type, should libe renamed throughout.</span>
     <span class="n">freq</span> <span class="o">=</span> <span class="n">freq</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">lenF</span> <span class="o">=</span> <span class="n">freq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -1115,10 +1143,10 @@
                          <span class="p">)</span> <span class="o">//</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">freq</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
     <span class="c1"># if inlow&lt;1,inlow=1;end</span>
     <span class="c1"># if inhigh&gt;lenF,inhigh=lenF;end</span>
-    <span class="sd">&#39;&#39;&#39;print(&#39;freq shape: {}&#39;.format(freq.shape))</span>
+    <span class="sd">&quot;&quot;&quot;print(&#39;freq shape: {}&#39;.format(freq.shape))</span>
 <span class="sd">    print(&#39;H shape: {}&#39;.format(H.shape))</span>
 <span class="sd">    print(&#39;Index of low frequency: {}&#39;.format(inlow))</span>
-<span class="sd">    print(&#39;Index of high frequency: {}&#39;.format(inhigh))&#39;&#39;&#39;</span>
+<span class="sd">    print(&#39;Index of high frequency: {}&#39;.format(inhigh))&quot;&quot;&quot;</span>
     <span class="n">H</span> <span class="o">=</span> <span class="n">H</span><span class="p">[:,</span> <span class="n">inlow</span><span class="p">:</span><span class="n">inhigh</span><span class="p">]</span>
     <span class="c1"># print(H.shape)</span>
     <span class="n">freq</span> <span class="o">=</span> <span class="n">freq</span><span class="p">[:,</span> <span class="n">inlow</span><span class="p">:</span><span class="n">inhigh</span><span class="p">]</span>
@@ -1131,10 +1159,10 @@
     <span class="c1">#    phmin_max=[min(phase)//45)*45 ceil(max(max(phase))/45)*45];</span>
     <span class="n">phmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span> <span class="o">//</span> <span class="mi">45</span> <span class="o">*</span> <span class="mf">45.0</span>
     <span class="n">phmax</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span> <span class="o">//</span> <span class="mi">45</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">45</span>
-    <span class="n">minreal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
-    <span class="n">maxreal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
-    <span class="n">minimag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
-    <span class="n">maximag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
+    <span class="sd">&quot;&quot;&quot;minreal = np.amin(np.real(H))</span>
+<span class="sd">    maxreal = np.amax(np.real(H))</span>
+<span class="sd">    minimag = np.amin(np.imag(H))</span>
+<span class="sd">    maximag = np.amax(np.imag(H))&quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">FLAG</span> <span class="ow">is</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -1161,7 +1189,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sorry, that option isn&#39;t supported yet&quot;</span><span class="p">)</span>
         <span class="k">return</span>
 
-    <span class="sd">&#39;&#39;&#39;# elif FLAG==2:</span>
+    <span class="sd">&quot;&quot;&quot;# elif FLAG==2:</span>
 <span class="sd">    # subplot(2,1,1)</span>
 <span class="sd">    # semilogx(F,mag)</span>
 <span class="sd">    #   xlabel(&#39;Frequency (Hz)&#39;)</span>
@@ -1184,14 +1212,14 @@
 <span class="sd">    # mag=20*log10(abs(Xfer));</span>
 <span class="sd">    # semilogx(F*2*pi,mag)</span>
 <span class="sd">    # xlabel(&#39;Frequency (Rad/s)&#39;)</span>
-<span class="sd">      ## ylabel(&#39;Mag (dB)&#39;)</span>
+<span class="sd">      # ylabel(&#39;Mag (dB)&#39;)</span>
 <span class="sd">      # grid on</span>
 <span class="sd">      # axis([Wmin Wmax minmag maxmag])</span>
 <span class="sd">      # zoom on</span>
 <span class="sd">      # subplot(2,1,2)</span>
 <span class="sd">      # semilogx(F*2*pi,phase)</span>
-<span class="sd">      ## xlabel(&#39;Frequency (Rad/s)&#39;)</span>
-<span class="sd">      ## ylabel(&#39;Phase (deg)&#39;)</span>
+<span class="sd">      # xlabel(&#39;Frequency (Rad/s)&#39;)</span>
+<span class="sd">      # ylabel(&#39;Phase (deg)&#39;)</span>
 <span class="sd">      # grid on</span>
 <span class="sd">      # axis([Wmin Wmax  phmin_max(1) phmin_max(2)])</span>
 <span class="sd">      # gridmin_max=round(phmin_max/90)*90;</span>
@@ -1200,14 +1228,14 @@
 <span class="sd">     # elseif FLAG==4</span>
 <span class="sd">     # subplot(2,1,1)</span>
 <span class="sd">     # plot(F,real(Xfer))</span>
-<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     #  xlabel(&#39;Frequency (Hz)&#39;)</span>
 <span class="sd">     # ylabel(&#39;Real&#39;)</span>
 <span class="sd">     # grid on</span>
 <span class="sd">     # axis([Fmin Fmax minreal maxreal])</span>
 <span class="sd">     # zoom on</span>
 <span class="sd">     # subplot(2,1,2)</span>
 <span class="sd">     # plot(F,imag(Xfer))</span>
-<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     #  xlabel(&#39;Frequency (Hz)&#39;)</span>
 <span class="sd">     # ylabel(&#39;Imaginary&#39;)</span>
 <span class="sd">     # grid on</span>
 <span class="sd">     # axis([Fmin Fmax minimag maximag])</span>
@@ -1225,16 +1253,16 @@
 <span class="sd">     # subplot(1,1,1)</span>
 <span class="sd">     # mag=20*log10(abs(Xfer));</span>
 <span class="sd">     # plot(F,mag)</span>
-<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
-<span class="sd">     ##  ylabel(&#39;Mag (dB)&#39;)</span>
+<span class="sd">     #  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     #  ylabel(&#39;Mag (dB)&#39;)</span>
 <span class="sd">     # grid on</span>
 <span class="sd">     # axis([Fmin Fmax minmag maxmag])</span>
 <span class="sd">     # zoom on</span>
 <span class="sd">     # elseif FLAG==7</span>
 <span class="sd">     # subplot(1,1,1)</span>
 <span class="sd">     # plot(F,phase)</span>
-<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
-<span class="sd">     ##  ylabel(&#39;Phase (deg)&#39;)</span>
+<span class="sd">     #  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     #  ylabel(&#39;Phase (deg)&#39;)</span>
 <span class="sd">     # grid on</span>
 <span class="sd">     # phmin_max=[floor(min(phase)/45)*45 ceil(max(phase)/45)*45];</span>
 <span class="sd">     # axis([Fmin Fmax  phmin_max(1) phmin_max(2)])</span>
@@ -1244,7 +1272,7 @@
 <span class="sd">     # elseif FLAG==8</span>
 <span class="sd">     # subplot(1,1,1)</span>
 <span class="sd">     # plot(F,real(Xfer))</span>
-<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     #  xlabel(&#39;Frequency (Hz)&#39;)</span>
 <span class="sd">     # ylabel(&#39;Real&#39;)</span>
 <span class="sd">     # grid on</span>
 <span class="sd">     # axis([Fmin Fmax minreal maxreal])</span>
@@ -1252,7 +1280,7 @@
 <span class="sd">     # elseif FLAG==9</span>
 <span class="sd">     # subplot(1,1,1)</span>
 <span class="sd">     # plot(F,imag(Xfer))</span>
-<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     #  xlabel(&#39;Frequency (Hz)&#39;)</span>
 <span class="sd">     # ylabel(&#39;Imaginary&#39;)</span>
 <span class="sd">     # grid on</span>
 <span class="sd">     # axis([Fmin Fmax minimag maximag])</span>
@@ -1261,16 +1289,16 @@
 <span class="sd">     # subplot(1,1,1)</span>
 <span class="sd">     # mag=20*log10(abs(Xfer));</span>
 <span class="sd">     # semilogx(F,mag)</span>
-<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
-<span class="sd">     ##  ylabel(&#39;Mag (dB)&#39;)</span>
+<span class="sd">     #  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     #  ylabel(&#39;Mag (dB)&#39;)</span>
 <span class="sd">     # grid on</span>
 <span class="sd">     # axis([Fmin Fmax minmag maxmag])</span>
 <span class="sd">     # zoom on</span>
 <span class="sd">     # elseif FLAG==11</span>
 <span class="sd">     # subplot(1,1,1)</span>
 <span class="sd">     # semilogx(F,phase)</span>
-<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
-<span class="sd">     ##  ylabel(&#39;Phase (deg)&#39;)</span>
+<span class="sd">     #  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     #  ylabel(&#39;Phase (deg)&#39;)</span>
 <span class="sd">     # grid on</span>
 <span class="sd">     # phmin_max=[floor(min(phase)/45)*45 ceil(max(phase)/45)*45];</span>
 <span class="sd">     # axis([Fmin Fmax  phmin_max(1) phmin_max(2)])</span>
@@ -1280,7 +1308,7 @@
 <span class="sd">     # elseif FLAG==12</span>
 <span class="sd">     # subplot(1,1,1)</span>
 <span class="sd">     # semilogx(F,real(Xfer))</span>
-<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     #  xlabel(&#39;Frequency (Hz)&#39;)</span>
 <span class="sd">     # ylabel(&#39;Real&#39;)</span>
 <span class="sd">     # grid on</span>
 <span class="sd">     # axis([Fmin Fmax minreal maxreal])</span>
@@ -1288,7 +1316,7 @@
 <span class="sd">     # elseif FLAG==13</span>
 <span class="sd">     # subplot(1,1,1)</span>
 <span class="sd">     # semilogx(F,imag(Xfer))</span>
-<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     #  xlabel(&#39;Frequency (Hz)&#39;)</span>
 <span class="sd">     # ylabel(&#39;Imaginary&#39;)</span>
 <span class="sd">     # grid on</span>
 <span class="sd">     # axis([Fmin Fmax minimag maximag])</span>
@@ -1297,16 +1325,16 @@
 <span class="sd">     # subplot(1,1,1)</span>
 <span class="sd">     # mag=20*log10(abs(Xfer));</span>
 <span class="sd">     # semilogx(F*2*pi,mag)</span>
-<span class="sd">     ##  xlabel(&#39;Frequency (Rad/s)&#39;)</span>
-<span class="sd">     ##  ylabel(&#39;Mag (dB)&#39;)</span>
+<span class="sd">     #  xlabel(&#39;Frequency (Rad/s)&#39;)</span>
+<span class="sd">     #  ylabel(&#39;Mag (dB)&#39;)</span>
 <span class="sd">     # grid on</span>
 <span class="sd">     # axis([Wmin Wmax minmag maxmag])</span>
 <span class="sd">     # zoom on</span>
 <span class="sd">     # elseif FLAG==15</span>
 <span class="sd">     # subplot(1,1,1)</span>
 <span class="sd">     # semilogx(F*2*pi,phase)</span>
-<span class="sd">     ##  xlabel(&#39;Frequency (Rad/s)&#39;)</span>
-<span class="sd">     ##  ylabel(&#39;Phase (deg)&#39;)</span>
+<span class="sd">     #  xlabel(&#39;Frequency (Rad/s)&#39;)</span>
+<span class="sd">     #  ylabel(&#39;Phase (deg)&#39;)</span>
 <span class="sd">     # grid on</span>
 <span class="sd">     # axis([Wmin Wmax  phmin_max(1) phmin_max(2)])</span>
 <span class="sd">     # gridmin_max=round(phmin_max/90)*90;</span>
@@ -1316,26 +1344,26 @@
 <span class="sd">     # subplot(2,1,1)</span>
 <span class="sd">     # mag=20*log10(abs(Xfer));</span>
 <span class="sd">     # plot(F,mag)</span>
-<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
-<span class="sd">     ##  ylabel(&#39;Mag (dB)&#39;)</span>
+<span class="sd">     #  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     #  ylabel(&#39;Mag (dB)&#39;)</span>
 <span class="sd">     # grid on</span>
 <span class="sd">     # axis([Fmin Fmax minmag maxmag])</span>
 <span class="sd">     # zoom on</span>
 <span class="sd">     # subplot(2,1,2)</span>
 <span class="sd">     # plot(F,phase)</span>
-<span class="sd">     ##  xlabel(&#39;Frequency (Hz)&#39;)</span>
-<span class="sd">     ##  ylabel(&#39;Phase (deg)&#39;)</span>
+<span class="sd">     #  xlabel(&#39;Frequency (Hz)&#39;)</span>
+<span class="sd">     #  ylabel(&#39;Phase (deg)&#39;)</span>
 <span class="sd">     # grid on</span>
 <span class="sd">     # phmin_max=[floor(min(phase)/45)*45 ceil(max(phase)/45)*45];</span>
 <span class="sd">     # axis([Fmin Fmax phmin_max(1) phmin_max(2)])</span>
 <span class="sd">     # gridmin_max=round(phmin_max/90)*90;</span>
 <span class="sd">     # set(gca,&#39;YTick&#39;,gridmin_max(1):90:gridmin_max(2))</span>
 <span class="sd">     # zoom on</span>
-<span class="sd">     &#39;&#39;&#39;</span></div>
+<span class="sd">     &quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="xcorr"><a class="viewcode-back" href="../reference/signal.html#signals.xcorr">[docs]</a><span class="k">def</span> <span class="nf">xcorr</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">zeropad</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Sorry, no docs or tests yet&#39;&#39;&#39;</span>
+    <span class="sd">&quot;&quot;&quot;Sorry, no docs or tests yet.&quot;&quot;&quot;</span>
     <span class="n">tau</span> <span class="o">=</span> <span class="n">t</span>
     <span class="c1"># sx = len(x)</span>
     <span class="c1"># sy = len(y)</span>
@@ -1356,7 +1384,7 @@
 
 <div class="viewcode-block" id="hammer_impulse"><a class="viewcode-back" href="../reference/signal.html#signals.hammer_impulse">[docs]</a><span class="k">def</span> <span class="nf">hammer_impulse</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">imp_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">imp_duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">doublehit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                    <span class="n">dh_delta</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Generate simulated hammer hit (half sin)</span>
+    <span class="sd">&quot;&quot;&quot;Generate simulated hammer hit (half sine).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1385,7 +1413,8 @@
 <span class="sd">    &gt;&gt;&gt; force = vt.hammer_impulse(time, doublehit=True)</span>
 <span class="sd">    &gt;&gt;&gt; plt.plot(time.T, force.T)</span>
 <span class="sd">    [&lt;matplotlib.lines.Line2D object...</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">time_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">imp_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">imp_time</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">time_max</span>
@@ -1397,6 +1426,8 @@
         <span class="n">dh_delta</span> <span class="o">=</span> <span class="mf">0.02</span>
 
     <span class="n">dh_delta</span> <span class="o">=</span> <span class="n">dh_delta</span> <span class="o">*</span> <span class="n">time_max</span>
+
+    <span class="n">time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="n">imp_onset_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">imp_time</span> <span class="o">/</span> <span class="n">time_max</span><span class="p">)</span>
     <span class="n">imp_offset_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">time</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span>
@@ -1418,6 +1449,53 @@
 
     <span class="n">force</span> <span class="o">=</span> <span class="n">force</span> <span class="o">/</span> <span class="n">spi</span><span class="o">.</span><span class="n">simps</span><span class="p">(</span><span class="n">force</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">dx</span><span class="o">=</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">force</span></div>
+
+
+<div class="viewcode-block" id="decimate"><a class="viewcode-back" href="../reference/signal.html#signals.decimate">[docs]</a><span class="k">def</span> <span class="nf">decimate</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">in_signal</span><span class="p">,</span> <span class="n">sample_frequency</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decimate a signal to mimic sampling anti-aliased signal.</span>
+
+<span class="sd">    Returns the signal down-sampled to `sample_frequency` with an</span>
+<span class="sd">    anti-aliasing filter applied at 45% of ` sample_frequency`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t : float array</span>
+<span class="sd">        time array, size (N,)</span>
+<span class="sd">    signal : float array</span>
+<span class="sd">        signal array, size (N,), (m,N), or (m,N,n)</span>
+<span class="sd">    sample_frequency : float</span>
+<span class="sd">        new sampling frequency</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    time : float array</span>
+<span class="sd">    decimated_signal : float array</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; time = np.linspace(0,4,4096)</span>
+<span class="sd">    &gt;&gt;&gt; u = np.random.randn(1,len(time))</span>
+<span class="sd">    &gt;&gt;&gt; ttime, signal_out = decimate(time, u, 100)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">current_frequency</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dt</span>
+    <span class="n">freq_frac</span> <span class="o">=</span> <span class="n">sample_frequency</span> <span class="o">/</span> <span class="n">current_frequency</span>
+    <span class="n">Wn</span> <span class="o">=</span> <span class="o">.</span><span class="mi">9</span> <span class="o">*</span> <span class="n">freq_frac</span>
+    <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="n">Wn</span><span class="p">,</span> <span class="s1">&#39;low&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_signal</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">filtered_signal</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">lfilter</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">in_signal</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">filtered_signal</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">lfilter</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">in_signal</span><span class="p">)</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">freq_frac</span><span class="p">)</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">t</span><span class="p">[::</span><span class="n">step</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_signal</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">filtered_signal</span> <span class="o">=</span> <span class="n">filtered_signal</span><span class="p">[::</span><span class="n">step</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_signal</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">filtered_signal</span> <span class="o">=</span> <span class="n">filtered_signal</span><span class="p">[:,</span> <span class="p">::</span><span class="n">step</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_signal</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">filtered_signal</span> <span class="o">=</span> <span class="n">filtered_signal</span><span class="p">[:,</span> <span class="p">::</span><span class="n">step</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">time</span><span class="p">,</span> <span class="n">filtered_signal</span></div>
 </pre></div>
 
           </div>
