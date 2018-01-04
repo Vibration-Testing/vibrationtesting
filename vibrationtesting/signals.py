@@ -93,7 +93,7 @@ def window(x, windowname='hanning', normalize=False):
     >>> noise_power = 0.001 * sample_freq / 2
     >>> time = np.reshape(np.arange(0, tfinal, 1/sample_freq),(1,-1))
     >>> xsin = A*np.sin(2*np.pi*freq*time)
-    >>> xcos = A*np.cos(2*np.pi*freq*time) # assembling individual records. vstack assembles channels
+    >>> xcos = A*np.cos(2*np.pi*freq*time) # assembling individual records.
     >>> x=np.dstack((xsin,xcos)) # assembling individual records. vstack
     >>> xw=vt.hanning(x)*x
     >>> fig, (ax1, ax2) = plt.subplots(2,1)
@@ -105,13 +105,15 @@ def window(x, windowname='hanning', normalize=False):
     Text(0.5,1,'Original (raw) data.')
     >>> ax1.set_ylabel('$x(t)$')
     Text(0,0.5,'$x(t)$')
-    >>> ax2.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,'--',time[0,:],-vt.hanning(x)[0,:]*A,'--')
+    >>> ax2.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,'--',
+    ...                            time[0,:],-vt.hanning(x)[0,:]*A,'--')
     [<matplotlib.lines.Line2D object at ...>]
     >>> ax2.set_ylabel('Hanning windowed $x(t)$')
     Text(0,0.5,'Hanning windowed $x(t)$')
     >>> ax2.set_xlabel('time')
     Text(0.5,0,'time')
-    >>> ax2.set_title('Effect of window. Note the scaling to conserve ASD amplitude')
+    >>> ax2.set_title('Effect of window. Note the scaling to conserve
+    ...                                                ASD amplitude')
     Text(0.5,1,'Effect of window. Note the scaling to conserve ASD amplitude')
     >>> fig.tight_layout()
 
@@ -247,13 +249,15 @@ def hanning(x, normalize=False):
     Text(0.5,1,'Unwindowed data, 2 records.')
     >>> ax1.set_ylabel('$x(t)$')
     Text(0,0.5,'$x(t)$')
-    >>> ax2.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,'--',time[0,:],-vt.hanning(x)[0,:]*A,'--')
+    >>> ax2.plot(time[0,:],xw[0,:],time[0,:],vt.hanning(x)[0,:]*A,
+    ...                      '--',time[0,:],-vt.hanning(x)[0,:]*A,'--')
     [<matplotlib.lines.Line2D object at ...>]
     >>> ax2.set_ylabel('Hanning windowed $x(t)$')
     Text(0,0.5,'Hanning windowed $x(t)$')
     >>> ax2.set_xlabel('time')
     Text(0.5,0,'time')
-    >>> ax2.set_title('Effect of window. Note the scaling to conserve ASD amplitude')
+    >>> ax2.set_title('Effect of window. Note the scaling to conserve
+    ...                                                ASD amplitude')
     Text(0.5,1,'Effect of window. Note the scaling to conserve ASD amplitude')
     >>> fig.tight_layout()
 
@@ -501,7 +505,8 @@ def asd(x, t, windowname="hanning", ave=bool(True)):
     >>> time = np.arange(0,tfinal,1/sample_freq)
     >>> time = np.reshape(time, (1, -1))
     >>> x = A*np.sin(2*np.pi*sig_freq*time)
-    >>> x = x + np.random.normal(scale=np.sqrt(noise_power), size=(1, time.shape[1]))
+    >>> x = x + np.random.normal(scale=np.sqrt(noise_power),
+    ...                              size=(1, time.shape[1]))
     >>> fig, (ax1, ax2) = plt.subplots(2,1)
     >>> ax1.plot(time[0,:],x[0,:])
     [<matplotlib.lines.Line2D object at ...>]
@@ -626,23 +631,29 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     # print(x.shape)
     # print(y.shape)
     # No clue what this does, and I wrote it. Comment your code, you fool!
-    # What this "should" do is assure that the data is longer in 0 axis than the others.
+    # What this "should" do is assure that the data is longer in 0 axis than
+    the others.
     # if len(x.shape)==2:
-    #      The issue fixed here is that the user put time along the 1 axis (instead of zero)
+    #      The issue fixed here is that the user put time along the 1 axis
+    (instead of zero)
     #     if (x.shape).index(max(x.shape))==0:
     #         #x=x.reshape(max(x.shape),-1,1)
-    #         print('I think you put time along the 0 axis instead of the 1 axis. Not even attempting to fix this.')
+    #         print('I think you put time along the 0 axis instead of the 1
+    axis. Not even attempting to fix this.')
     #     else:
-    #         # Here we are appending a 3rd dimension to simplify averaging command later. We could bypass at that point, and should.
+    #         # Here we are appending a 3rd dimension to simplify averaging
+    command later. We could bypass at that point, and should.
     #         x=x.reshape(max(x.shape),-1,1)
 
     # if len(y.shape)==2:
     #     if (y.shape).indey(may(y.shape))==0:
     #         #y=y.reshape(may(y.shape),-1,1)
-    #         print('I think you put time along the 0 axis instead of the 1 axis. Not attempting to fix this.')
+    #         print('I think you put time along the 0 axis instead of the 1
+    axis. Not attempting to fix this.')
     #     else:
     #         y=y.reshape(may(y.shape),-1,1)
-    # Should use scipy.signal windows. I need to figure this out. Problem is: They don't scale the ASDs by the windowing "weakening".
+    # Should use scipy.signal windows. I need to figure this out. Problem is:
+    They don't scale the ASDs by the windowing "weakening".
     """
     if windowname == "none":
         win = 1
