@@ -28,7 +28,6 @@ ax2.set_ylabel('Hanning windowed $x(t)$')
 # Text(0,0.5,'Hanning windowed $x(t)$')
 ax2.set_xlabel('time')
 # Text(0.5,0,'time')
-ax2.set_title('Effect of window. Note the scaling to conserve
-                                               ASD amplitude')
+ax2.set_title('Effect of window. Note the scaling to conserve ASD amplitude')
 # Text(0.5,1,'Effect of window. Note the scaling to conserve ASD amplitude')
 fig.tight_layout()
