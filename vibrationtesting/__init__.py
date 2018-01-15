@@ -9,7 +9,8 @@ __version__ = '0.21'
 __author__ = u'Joseph C. Slater'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2002-2017 Joseph C. Slater'
-
+__all__ = ['identification', 'signals', 'system',
+           '__version__']
 import sys
 import matplotlib as mpl
 import numpy as np
