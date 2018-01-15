@@ -564,8 +564,7 @@ def guyan(M, K, master=None, fraction=None):
         List of retained degrees of freedom (0 indexing)
     fraction : float, optional
         Fraction of degrees of freedom (0< `fraction` <1.0) to retain in model.
-        If both master and
-        fraction or neglected, fraction is set to 0.25.
+        If both master and fraction are neglected, fraction is set to 0.25.
 
     Returns
     -------
@@ -586,7 +585,7 @@ def guyan(M, K, master=None, fraction=None):
     ...               [-4, 8, -4],
     ...               [0, -4, 4]])
     >>> Mred, Kred, T, master, truncated_dofs = vt.guyan(M, K, fraction = 0.5)
-    untested
+
 
     Notes
     -----
@@ -597,14 +596,22 @@ def guyan(M, K, master=None, fraction=None):
     If mode shapes are obtained for the reduced system, full system mode shapes
     are `phi = T @ phi_r`.
 
+    Code is not as efficient as possible. Using block submatrices would be
+    more efficient.
+
     """
     if master is None:
         if fraction is None:
             fraction = 0.25
 
         ratios = np.diag(M) / np.diag(K)
-        ranked = [i[0] for i in sorted(enumerate(ratios), key=lambda x:x[1])]
+        ranked = [i[0] for i in sorted(enumerate(ratios), key=lambda x: x[1])]
         thresh = int(fraction * ratios.size)
+        if (thresh >= ratios.size) or thresh == 0:
+            print("Can't keep", thresh, 'DOFs.')
+            print("Fraction of", fraction, "is too low or too high.")
+            return 0, 0, 0, 0, 0
+
         master = ranked[-thresh:]
 
     master = np.array(master)
@@ -635,7 +642,6 @@ def guyan(M, K, master=None, fraction=None):
     T[truncated_dofs, :nm] = la.solve(-Ktt, Ktm)
     Mred = T.T @ M @ T
     Kred = T.T @ K @ T
-    print('untested')
     return Mred, Kred, T, master, truncated_dofs
 
 
@@ -883,3 +889,75 @@ def rsolve(B, C, **kwargs):
 
     """
     return la.solve(B.T, C.T, **kwargs).T
+
+
+def real_modes(Psi):
+    r"""Real modes from complex modes."""
+    Psi_real = np.real(Psi)
+    Psi_im = np.imag(Psi)
+    return Psi_real+rsolve(Psi_real.T@Psi_real,Psi_im)@Psi_real.T@Psi_im
+
+
+def ss_modal(A, B = None, C = None, D = None):
+    r"""State space modes, frequencies, damping ratios, and modal matrices.
+
+    Parameters
+    ----------
+    A, B, C, D : float arrays
+        State space system matrices
+
+    Returns
+    -------
+    Am, Bm, Cm, Dm : float arrays
+        Modal state space system matrices
+
+    Examples
+    --------
+    >>> import vibrationtesting as vt
+    >>> M = np.array([[4, 0, 0],
+    ...               [0, 4, 0],
+    ...               [0, 0, 4]])
+    >>> Cso = np.array([[.1,0,0],
+    ...                 [0,0,0],
+    ...                 [0,0,0]])
+    >>> K = np.array([[8, -4, 0],
+    ...               [-4, 8, -4],
+    ...               [0, -4, 4]])
+    >>> Bt = np.array([[1],[0],[0]])
+    >>> Ca = np.array([[1,0,0]])
+    >>> Cd = Cv = np.zeros_like(Ca)
+    >>> A, B, C, D = vt.so2ss(M, Cso, K, Bt, Cd, Cv, Ca)
+    >>> Am, Bm, Cm, Dm = vt.ss_modal(A, B, C, D)
+    >>> print(Am)
+    [[-0.0044+1.8019j  0.0000+0.j      0.0000+0.j      0.0000+0.j     -0.0000-0.j
+      -0.0000-0.j    ]
+     [ 0.0000-0.j     -0.0044-1.8019j  0.0000-0.j      0.0000-0.j     -0.0000+0.j
+      -0.0000+0.j    ]
+     [-0.0000+0.j      0.0000+0.j     -0.0068+1.247j  -0.0000-0.j      0.0000-0.j
+       0.0000-0.j    ]
+     [ 0.0000-0.j     -0.0000-0.j     -0.0000+0.j     -0.0068-1.247j
+       0.0000+0.j      0.0000+0.j    ]
+     [ 0.0000-0.j      0.0000+0.j     -0.0000-0.j      0.0000-0.j
+      -0.0013+0.445j  -0.0000-0.j    ]
+     [ 0.0000-0.j      0.0000+0.j      0.0000+0.j     -0.0000+0.j     -0.0000+0.j
+      -0.0013-0.445j ]]
+    >>> print(Cm)
+    [[ 0.0241-0.9307j  0.0241+0.9307j  0.0039-0.717j   0.0039+0.717j
+       0.0594-0.0001j  0.0594+0.0001j]]
+    """
+
+    if B is None:
+        B = np.zeros_like(A)
+
+    if C is None:
+        C = np.zeros_like(A)
+
+    if D is None:
+        D = np.zeros_like(A)
+
+    _, vectors = la.eig(A)
+    A_modal = la.solve(vectors,A)@vectors
+    B_modal = la.solve(vectors,B)
+    C_modal = C@vectors
+    # D_modal = D wasted CPUs
+    return A_modal, B_modal, C_modal, D
