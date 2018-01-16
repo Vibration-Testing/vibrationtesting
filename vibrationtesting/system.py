@@ -891,11 +891,44 @@ def rsolve(B, C, **kwargs):
     return la.solve(B.T, C.T, **kwargs).T
 
 
-def real_modes(Psi):
-    r"""Real modes from complex modes."""
+def real_modes(Psi, autorotate = True):
+    r"""Real modes from complex modes.
+
+    Assuming a transformation
+
+    .. math:: Psi_{real} = Psi_{complex} T
+
+    exists, where :math:`T` is a complex transformation matrix, find
+    :math:`Psi_{real}` using linear algebra.
+
+    Parameters
+    ----------
+    Psi : complex float array
+        Complex mode shapes (displacement)
+    autorotate : Boolean, optional
+        Attempt to rotate to near-real first
+
+    Returns
+    -------
+    Psi : float array
+        Real modes
+
+    Notes
+    -----
+    .. note:: Rotation of modes should be performed to get them as close to real
+      as possible first.
+    .. warnings:: Current autorotate bases the rotation on de-rotating the first
+      element of each vector. User can use their own pre-process by doing to
+      and setting `autorotate` to False
+
+    """
+    if autorotate is True:
+        Psi = Psi@np.diag(np.exp(np.angle(Psi[0, :]) * -1j))
     Psi_real = np.real(Psi)
     Psi_im = np.imag(Psi)
-    return Psi_real+rsolve(Psi_real.T@Psi_real,Psi_im)@Psi_real.T@Psi_im
+
+    Psi = Psi_real + Psi_im @ la.lstsq(Psi_real, Psi_im)[0]
+    return Psi
 
 
 def ss_modal(A, B = None, C = None, D = None):
@@ -927,7 +960,7 @@ def ss_modal(A, B = None, C = None, D = None):
     >>> Ca = np.array([[1,0,0]])
     >>> Cd = Cv = np.zeros_like(Ca)
     >>> A, B, C, D = vt.so2ss(M, Cso, K, Bt, Cd, Cv, Ca)
-    >>> Am, Bm, Cm, Dm = vt.ss_modal(A, B, C, D)
+    >>> Am, Bm, Cm, Dm, eigenvalues, modes = vt.ss_modal(A, B, C, D)
     >>> print(Am)
     [[-0.0044+1.8019j  0.0000+0.j      0.0000+0.j      0.0000+0.j     -0.0000-0.j
       -0.0000-0.j    ]
@@ -955,9 +988,9 @@ def ss_modal(A, B = None, C = None, D = None):
     if D is None:
         D = np.zeros_like(A)
 
-    _, vectors = la.eig(A)
+    eigenvalues, vectors = la.eig(A)
     A_modal = la.solve(vectors,A)@vectors
     B_modal = la.solve(vectors,B)
     C_modal = C@vectors
     # D_modal = D wasted CPUs
-    return A_modal, B_modal, C_modal, D
+    return A_modal, B_modal, C_modal, D, eigenvalues, vectors
