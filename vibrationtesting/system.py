@@ -707,7 +707,8 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
 
     Notes
     -----
-    .. seealso:: incomplete multi-mode update
+    .. seealso:: incomplete multi-mode update. Would require each at a
+      different frequency. 
 
     """
     measured = measured.reshape(-1)  # retained dofs
@@ -913,13 +914,32 @@ def real_modes(Psi, autorotate = True):
     Psi : float array
         Real modes
 
+    Examples
+    --------
+    >>> import vibrationtesting as vt
+    >>> M = np.array([[4, 0, 0],
+    ...               [0, 4, 0],
+    ...               [0, 0, 4]])
+    >>> Cso = np.array([[.1,0,0],
+    ...                 [0,0,0],
+    ...                 [0,0,0]])
+    >>> K = np.array([[8, -4, 0],
+    ...               [-4, 8, -4],
+    ...               [0, -4, 4]])
+    >>> Bt = np.array([[1],[0],[0]])
+    >>> Ca = np.array([[1,0,0]])
+    >>> Cd = Cv = np.zeros_like(Ca)
+    >>> A, B, C, D = vt.so2ss(M, Cso, K, Bt, Cd, Cv, Ca)
+    >>> Am, Bm, Cm, Dm, eigenvalues, modes = vt.ss_modal(A, B, C, D)
+    >>> Psi = vt.real_modes(modes[:,0::2])
+
     Notes
     -----
     .. note:: Rotation of modes should be performed to get them as close to real
       as possible first.
     .. warnings:: Current autorotate bases the rotation on de-rotating the first
       element of each vector. User can use their own pre-process by doing to
-      and setting `autorotate` to False
+      and setting `autorotate` to False.
 
     """
     if autorotate is True:
@@ -977,8 +997,8 @@ def ss_modal(A, B = None, C = None, D = None):
     >>> print(Cm)
     [[ 0.0241-0.9307j  0.0241+0.9307j  0.0039-0.717j   0.0039+0.717j
        0.0594-0.0001j  0.0594+0.0001j]]
-    """
 
+    """
     if B is None:
         B = np.zeros_like(A)
 
@@ -989,6 +1009,11 @@ def ss_modal(A, B = None, C = None, D = None):
         D = np.zeros_like(A)
 
     eigenvalues, vectors = la.eig(A)
+
+    idxp = abs(eigenvalues).argsort()
+    eigenvalues = eigenvalues[idxp]
+    vectors = vectors[:, idxp]
+
     A_modal = la.solve(vectors,A)@vectors
     B_modal = la.solve(vectors,B)
     C_modal = C@vectors
