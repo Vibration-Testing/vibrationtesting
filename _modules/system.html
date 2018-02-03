@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>system &#8212; Vibration Testing 0.21 documentation</title>
+    <title>system &#8212; Vibration Testing 0.22 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.21',
+        VERSION:     '0.22',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -606,8 +606,7 @@
 <span class="sd">        List of retained degrees of freedom (0 indexing)</span>
 <span class="sd">    fraction : float, optional</span>
 <span class="sd">        Fraction of degrees of freedom (0&lt; `fraction` &lt;1.0) to retain in model.</span>
-<span class="sd">        If both master and</span>
-<span class="sd">        fraction or neglected, fraction is set to 0.25.</span>
+<span class="sd">        If both master and fraction are neglected, fraction is set to 0.25.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -628,7 +627,7 @@
 <span class="sd">    ...               [-4, 8, -4],</span>
 <span class="sd">    ...               [0, -4, 4]])</span>
 <span class="sd">    &gt;&gt;&gt; Mred, Kred, T, master, truncated_dofs = vt.guyan(M, K, fraction = 0.5)</span>
-<span class="sd">    untested</span>
+
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -639,14 +638,22 @@
 <span class="sd">    If mode shapes are obtained for the reduced system, full system mode shapes</span>
 <span class="sd">    are `phi = T @ phi_r`.</span>
 
+<span class="sd">    Code is not as efficient as possible. Using block submatrices would be</span>
+<span class="sd">    more efficient.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">master</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">fraction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">fraction</span> <span class="o">=</span> <span class="mf">0.25</span>
 
         <span class="n">ratios</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">M</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">K</span><span class="p">)</span>
-        <span class="n">ranked</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">ratios</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+        <span class="n">ranked</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">ratios</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
         <span class="n">thresh</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fraction</span> <span class="o">*</span> <span class="n">ratios</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">thresh</span> <span class="o">&gt;=</span> <span class="n">ratios</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="ow">or</span> <span class="n">thresh</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Can&#39;t keep&quot;</span><span class="p">,</span> <span class="n">thresh</span><span class="p">,</span> <span class="s1">&#39;DOFs.&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fraction of&quot;</span><span class="p">,</span> <span class="n">fraction</span><span class="p">,</span> <span class="s2">&quot;is too low or too high.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+
         <span class="n">master</span> <span class="o">=</span> <span class="n">ranked</span><span class="p">[</span><span class="o">-</span><span class="n">thresh</span><span class="p">:]</span>
 
     <span class="n">master</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">master</span><span class="p">)</span>
@@ -677,7 +684,6 @@
     <span class="n">T</span><span class="p">[</span><span class="n">truncated_dofs</span><span class="p">,</span> <span class="p">:</span><span class="n">nm</span><span class="p">]</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="o">-</span><span class="n">Ktt</span><span class="p">,</span> <span class="n">Ktm</span><span class="p">)</span>
 <div class="viewcode-block" id="mode_expansion_from_model"><a class="viewcode-back" href="../reference/system.html#system.mode_expansion_from_model">[docs]</a>    <span class="n">Mred</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">M</span> <span class="o">@</span> <span class="n">T</span>
     <span class="n">Kred</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">K</span> <span class="o">@</span> <span class="n">T</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;untested&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Mred</span><span class="p">,</span> <span class="n">Kred</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">master</span><span class="p">,</span> <span class="n">truncated_dofs</span></div>
 
 
@@ -743,7 +749,8 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    .. seealso:: incomplete multi-mode update</span>
+<span class="sd">    .. seealso:: incomplete multi-mode update. Would require each at a</span>
+<span class="sd">      different frequency.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">measured</span> <span class="o">=</span> <span class="n">measured</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># retained dofs</span>
@@ -925,6 +932,135 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">T</span></div>
+
+
+<div class="viewcode-block" id="real_modes"><a class="viewcode-back" href="../reference/system.html#system.real_modes">[docs]</a><span class="k">def</span> <span class="nf">real_modes</span><span class="p">(</span><span class="n">Psi</span><span class="p">,</span> <span class="n">autorotate</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Real modes from complex modes.</span>
+
+<span class="sd">    Assuming a transformation</span>
+
+<span class="sd">    .. math:: Psi_{real} = Psi_{complex} T</span>
+
+<span class="sd">    exists, where :math:`T` is a complex transformation matrix, find</span>
+<span class="sd">    :math:`Psi_{real}` using linear algebra.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Psi : complex float array</span>
+<span class="sd">        Complex mode shapes (displacement)</span>
+<span class="sd">    autorotate : Boolean, optional</span>
+<span class="sd">        Attempt to rotate to near-real first</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Psi : float array</span>
+<span class="sd">        Real modes</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
+<span class="sd">    &gt;&gt;&gt; M = np.array([[4, 0, 0],</span>
+<span class="sd">    ...               [0, 4, 0],</span>
+<span class="sd">    ...               [0, 0, 4]])</span>
+<span class="sd">    &gt;&gt;&gt; Cso = np.array([[.1,0,0],</span>
+<span class="sd">    ...                 [0,0,0],</span>
+<span class="sd">    ...                 [0,0,0]])</span>
+<span class="sd">    &gt;&gt;&gt; K = np.array([[8, -4, 0],</span>
+<span class="sd">    ...               [-4, 8, -4],</span>
+<span class="sd">    ...               [0, -4, 4]])</span>
+<span class="sd">    &gt;&gt;&gt; Bt = np.array([[1],[0],[0]])</span>
+<span class="sd">    &gt;&gt;&gt; Ca = np.array([[1,0,0]])</span>
+<span class="sd">    &gt;&gt;&gt; Cd = Cv = np.zeros_like(Ca)</span>
+<span class="sd">    &gt;&gt;&gt; A, B, C, D = vt.so2ss(M, Cso, K, Bt, Cd, Cv, Ca)</span>
+<span class="sd">    &gt;&gt;&gt; Am, Bm, Cm, Dm, eigenvalues, modes = vt.ss_modal(A, B, C, D)</span>
+<span class="sd">    &gt;&gt;&gt; Psi = vt.real_modes(modes[:,0::2])</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    .. note:: Rotation of modes should be performed to get them as close to real</span>
+<span class="sd">      as possible first.</span>
+<span class="sd">    .. warnings:: Current autorotate bases the rotation on de-rotating the first</span>
+<span class="sd">      element of each vector. User can use their own pre-process by doing to</span>
+<span class="sd">      and setting `autorotate` to False.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">autorotate</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+<div class="viewcode-block" id="ss_modal"><a class="viewcode-back" href="../reference/system.html#system.ss_modal">[docs]</a>        <span class="n">Psi</span> <span class="o">=</span> <span class="n">Psi</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">Psi</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:])</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="p">))</span>
+    <span class="n">Psi_real</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">Psi</span><span class="p">)</span>
+    <span class="n">Psi_im</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">Psi</span><span class="p">)</span>
+
+    <span class="n">Psi</span> <span class="o">=</span> <span class="n">Psi_real</span> <span class="o">+</span> <span class="n">Psi_im</span> <span class="o">@</span> <span class="n">la</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">Psi_real</span><span class="p">,</span> <span class="n">Psi_im</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">Psi</span></div>
+
+
+<span class="k">def</span> <span class="nf">ss_modal</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;State space modes, frequencies, damping ratios, and modal matrices.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A, B, C, D : float arrays</span>
+<span class="sd">        State space system matrices</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Am, Bm, Cm, Dm : float arrays</span>
+<span class="sd">        Modal state space system matrices</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import vibrationtesting as vt</span>
+<span class="sd">    &gt;&gt;&gt; M = np.array([[4, 0, 0],</span>
+<span class="sd">    ...               [0, 4, 0],</span>
+<span class="sd">    ...               [0, 0, 4]])</span>
+<span class="sd">    &gt;&gt;&gt; Cso = np.array([[.1,0,0],</span>
+<span class="sd">    ...                 [0,0,0],</span>
+<span class="sd">    ...                 [0,0,0]])</span>
+<span class="sd">    &gt;&gt;&gt; K = np.array([[8, -4, 0],</span>
+<span class="sd">    ...               [-4, 8, -4],</span>
+<span class="sd">    ...               [0, -4, 4]])</span>
+<span class="sd">    &gt;&gt;&gt; Bt = np.array([[1],[0],[0]])</span>
+<span class="sd">    &gt;&gt;&gt; Ca = np.array([[1,0,0]])</span>
+<span class="sd">    &gt;&gt;&gt; Cd = Cv = np.zeros_like(Ca)</span>
+<span class="sd">    &gt;&gt;&gt; A, B, C, D = vt.so2ss(M, Cso, K, Bt, Cd, Cv, Ca)</span>
+<span class="sd">    &gt;&gt;&gt; Am, Bm, Cm, Dm, eigenvalues, modes = vt.ss_modal(A, B, C, D)</span>
+<span class="sd">    &gt;&gt;&gt; print(Am+(0.00001+0.00001j))</span>
+<span class="sd">    [[-0.0013+0.4451j  0.0000+0.j      0.0000+0.j      0.0000+0.j      0.0000+0.j</span>
+<span class="sd">       0.0000+0.j    ]</span>
+<span class="sd">     [ 0.0000+0.j     -0.0013-0.445j   0.0000+0.j      0.0000+0.j      0.0000+0.j</span>
+<span class="sd">       0.0000+0.j    ]</span>
+<span class="sd">     [ 0.0000+0.j      0.0000+0.j     -0.0068+1.247j   0.0000+0.j      0.0000+0.j</span>
+<span class="sd">       0.0000+0.j    ]</span>
+<span class="sd">     [ 0.0000+0.j      0.0000+0.j      0.0000+0.j     -0.0068-1.247j</span>
+<span class="sd">       0.0000+0.j      0.0000+0.j    ]</span>
+<span class="sd">     [ 0.0000+0.j      0.0000+0.j      0.0000+0.j      0.0000+0.j</span>
+<span class="sd">      -0.0044+1.8019j  0.0000+0.j    ]</span>
+<span class="sd">     [ 0.0000+0.j      0.0000+0.j      0.0000+0.j      0.0000+0.j      0.0000+0.j</span>
+<span class="sd">      -0.0044-1.8019j]]</span>
+<span class="sd">    &gt;&gt;&gt; print(Cm)</span>
+<span class="sd">    [[ 0.0594-0.0001j  0.0594+0.0001j  0.0039-0.717j   0.0039+0.717j</span>
+<span class="sd">       0.0241-0.9307j  0.0241+0.9307j]]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">B</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">C</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">D</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="n">eigenvalues</span><span class="p">,</span> <span class="n">vectors</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="n">idxp</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">eigenvalues</span><span class="p">)</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+    <span class="n">eigenvalues</span> <span class="o">=</span> <span class="n">eigenvalues</span><span class="p">[</span><span class="n">idxp</span><span class="p">]</span>
+    <span class="n">vectors</span> <span class="o">=</span> <span class="n">vectors</span><span class="p">[:,</span> <span class="n">idxp</span><span class="p">]</span>
+
+    <span class="n">A_modal</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">vectors</span><span class="p">,</span><span class="n">A</span><span class="p">)</span><span class="nd">@vectors</span>
+    <span class="n">B_modal</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">vectors</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
+    <span class="n">C_modal</span> <span class="o">=</span> <span class="n">C</span><span class="nd">@vectors</span>
+    <span class="c1"># D_modal = D wasted CPUs</span>
+    <span class="k">return</span> <span class="n">A_modal</span><span class="p">,</span> <span class="n">B_modal</span><span class="p">,</span> <span class="n">C_modal</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">eigenvalues</span><span class="p">,</span> <span class="n">vectors</span></div>
 </pre></div>
 
           </div>
@@ -969,7 +1105,7 @@
       &copy;2017, Joseph C. Slater.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
     </div>

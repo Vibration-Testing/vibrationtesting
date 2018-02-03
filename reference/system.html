@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>System Manipulation, Reduction, and Correction (system) &#8212; Vibration Testing 0.21 documentation</title>
+    <title>System Manipulation, Reduction, and Correction (system) &#8212; Vibration Testing 0.22 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.21',
+        VERSION:     '0.22',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -212,8 +212,7 @@ continuous counterpart.</p>
 <p><strong>fraction</strong> : float, optional</p>
 <blockquote>
 <div><p>Fraction of degrees of freedom (0&lt; <cite>fraction</cite> &lt;1.0) to retain in model.
-If both master and
-fraction or neglected, fraction is set to 0.25.</p>
+If both master and fraction are neglected, fraction is set to 0.25.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -238,6 +237,8 @@ fraction or neglected, fraction is set to 0.25.</p>
 <p>Reduced damping matrix can be obtained using <cite>Cr = T.T &#64; C &#64; T</cite>.</p>
 <p>If mode shapes are obtained for the reduced system, full system mode shapes
 are <cite>phi = T &#64; phi_r</cite>.</p>
+<p>Code is not as efficient as possible. Using block submatrices would be
+more efficient.</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
@@ -247,7 +248,6 @@ are <cite>phi = T &#64; phi_r</cite>.</p>
 <span class="gp">... </span>              <span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">],</span>
 <span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Mred</span><span class="p">,</span> <span class="n">Kred</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">master</span><span class="p">,</span> <span class="n">truncated_dofs</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">guyan</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">fraction</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span>
-<span class="go">untested</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -314,7 +314,8 @@ direct algebraic solution, aka</p>
 <p class="rubric">Notes</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last">incomplete multi-mode update</p>
+<p class="last">incomplete multi-mode update. Would require each at a
+different frequency.</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
@@ -390,6 +391,64 @@ Orthogonalization of Measured Modes,” <em>AIAA Journal</em>, 16(4), 1978, pp.
 Model using Test Data,” <em>AIAA Journal</em>, 21(8), 1983, pp. 1168-1173.</td></tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="function">
+<dt id="system.real_modes">
+<code class="descclassname">system.</code><code class="descname">real_modes</code><span class="sig-paren">(</span><em>Psi</em>, <em>autorotate=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#real_modes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.real_modes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Real modes from complex modes.</p>
+<p>Assuming a transformation</p>
+<div class="math">
+\[Psi_{real} = Psi_{complex} T\]</div>
+<p>exists, where <span class="math">\(T\)</span> is a complex transformation matrix, find
+<span class="math">\(Psi_{real}\)</span> using linear algebra.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>Psi</strong> : complex float array</p>
+<blockquote>
+<div><p>Complex mode shapes (displacement)</p>
+</div></blockquote>
+<p><strong>autorotate</strong> : Boolean, optional</p>
+<blockquote>
+<div><p>Attempt to rotate to near-real first</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>Psi</strong> : float array</p>
+<blockquote class="last">
+<div><p>Real modes</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Rotation of modes should be performed to get them as close to real
+as possible first.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Cso</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Ca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Cd</span> <span class="o">=</span> <span class="n">Cv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">Ca</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">so2ss</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">Cso</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">Bt</span><span class="p">,</span> <span class="n">Cd</span><span class="p">,</span> <span class="n">Cv</span><span class="p">,</span> <span class="n">Ca</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Am</span><span class="p">,</span> <span class="n">Bm</span><span class="p">,</span> <span class="n">Cm</span><span class="p">,</span> <span class="n">Dm</span><span class="p">,</span> <span class="n">eigenvalues</span><span class="p">,</span> <span class="n">modes</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">ss_modal</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Psi</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">real_modes</span><span class="p">(</span><span class="n">modes</span><span class="p">[:,</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="function">
@@ -747,6 +806,64 @@ non-zero eigenvalue.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="system.ss_modal">
+<code class="descclassname">system.</code><code class="descname">ss_modal</code><span class="sig-paren">(</span><em>A</em>, <em>B=None</em>, <em>C=None</em>, <em>D=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#ss_modal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.ss_modal" title="Permalink to this definition">¶</a></dt>
+<dd><p>State space modes, frequencies, damping ratios, and modal matrices.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>A, B, C, D</strong> : float arrays</p>
+<blockquote>
+<div><p>State space system matrices</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>Am, Bm, Cm, Dm</strong> : float arrays</p>
+<blockquote class="last">
+<div><p>Modal state space system matrices</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Cso</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Bt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Ca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Cd</span> <span class="o">=</span> <span class="n">Cv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">Ca</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">so2ss</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">Cso</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">Bt</span><span class="p">,</span> <span class="n">Cd</span><span class="p">,</span> <span class="n">Cv</span><span class="p">,</span> <span class="n">Ca</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Am</span><span class="p">,</span> <span class="n">Bm</span><span class="p">,</span> <span class="n">Cm</span><span class="p">,</span> <span class="n">Dm</span><span class="p">,</span> <span class="n">eigenvalues</span><span class="p">,</span> <span class="n">modes</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">ss_modal</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Am</span><span class="o">+</span><span class="p">(</span><span class="mf">0.00001</span><span class="o">+</span><span class="mf">0.00001</span><span class="n">j</span><span class="p">))</span>
+<span class="go">[[-0.0013+0.4451j  0.0000+0.j      0.0000+0.j      0.0000+0.j      0.0000+0.j</span>
+<span class="go">   0.0000+0.j    ]</span>
+<span class="go"> [ 0.0000+0.j     -0.0013-0.445j   0.0000+0.j      0.0000+0.j      0.0000+0.j</span>
+<span class="go">   0.0000+0.j    ]</span>
+<span class="go"> [ 0.0000+0.j      0.0000+0.j     -0.0068+1.247j   0.0000+0.j      0.0000+0.j</span>
+<span class="go">   0.0000+0.j    ]</span>
+<span class="go"> [ 0.0000+0.j      0.0000+0.j      0.0000+0.j     -0.0068-1.247j</span>
+<span class="go">   0.0000+0.j      0.0000+0.j    ]</span>
+<span class="go"> [ 0.0000+0.j      0.0000+0.j      0.0000+0.j      0.0000+0.j</span>
+<span class="go">  -0.0044+1.8019j  0.0000+0.j    ]</span>
+<span class="go"> [ 0.0000+0.j      0.0000+0.j      0.0000+0.j      0.0000+0.j      0.0000+0.j</span>
+<span class="go">  -0.0044-1.8019j]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Cm</span><span class="p">)</span>
+<span class="go">[[ 0.0594-0.0001j  0.0594+0.0001j  0.0039-0.717j   0.0039+0.717j</span>
+<span class="go">   0.0241-0.9307j  0.0241+0.9307j]]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
 <dt id="system.ssfrf">
 <code class="descclassname">system.</code><code class="descname">ssfrf</code><span class="sig-paren">(</span><em>A</em>, <em>B</em>, <em>C</em>, <em>D</em>, <em>omega_low</em>, <em>omega_high</em>, <em>in_index</em>, <em>out_index</em>, <em>num_freqs=1000</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/system.html#ssfrf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.ssfrf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return FRF of state space system.</p>
@@ -861,7 +978,7 @@ and output over frequency range of interest.</p>
       &copy;2017, Joseph C. Slater.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |

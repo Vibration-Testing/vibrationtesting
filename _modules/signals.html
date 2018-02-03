@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>signals &#8212; Vibration Testing 0.21 documentation</title>
+    <title>signals &#8212; Vibration Testing 0.22 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.21',
+        VERSION:     '0.22',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -1056,6 +1056,11 @@
 <span class="sd">    type : int, optional</span>
 <span class="sd">        Plot type. See notes.</span>
 
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ax : axis objects</span>
+<span class="sd">        allows manipulation of plot parameters (xlabel, title...)</span>
+
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
@@ -1066,7 +1071,7 @@
 <span class="sd">    &gt;&gt;&gt; k=1e5;m=1;c=1;</span>
 <span class="sd">    &gt;&gt;&gt; frf1=1./(m*(w*1j)**2+c*1j*w+k)</span>
 <span class="sd">    &gt;&gt;&gt; frf2=1./(m*(w*1j)**2+c*1j*w+k*3)</span>
-<span class="sd">    &gt;&gt;&gt; vt.frfplot(f,np.hstack((frf1,frf2)), legend = [&#39;FRF 1&#39;,&#39;FRF 2&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; _ = vt.frfplot(f,np.hstack((frf1,frf2)), legend = [&#39;FRF 1&#39;,&#39;FRF 2&#39;])</span>
 <span class="sd">    ...                                      # doctest: +SKIP</span>
 
 <span class="sd">    Notes</span>
@@ -1182,10 +1187,10 @@
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">legend</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">legend</span><span class="p">)</span>
-
+        <span class="n">ax</span> <span class="o">=</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sorry, that option isn&#39;t supported yet&quot;</span><span class="p">)</span>
-        <span class="k">return</span>
+    <span class="k">return</span> <span class="n">ax</span>
 
     <span class="sd">&quot;&quot;&quot;# elif FLAG==2:</span>
 <span class="sd">    # subplot(2,1,1)</span>
@@ -1538,7 +1543,7 @@
       &copy;2017, Joseph C. Slater.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
     </div>
