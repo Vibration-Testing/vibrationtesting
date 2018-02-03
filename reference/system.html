@@ -430,6 +430,12 @@ Model using Test Data,” <em>AIAA Journal</em>, 21(8), 1983, pp. 1168-1173.</td
 <p class="last">Rotation of modes should be performed to get them as close to real
 as possible first.</p>
 </div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Current autorotate bases the rotation on de-rotating the first
+element of each vector. User can use their own pre-process by doing to
+and setting <cite>autorotate</cite> to False.</p>
+</div>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vibrationtesting</span> <span class="k">as</span> <span class="nn">vt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
