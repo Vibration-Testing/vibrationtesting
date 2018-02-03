@@ -937,7 +937,7 @@ def real_modes(Psi, autorotate = True):
     -----
     .. note:: Rotation of modes should be performed to get them as close to real
       as possible first.
-    .. warnings:: Current autorotate bases the rotation on de-rotating the first
+    .. warning:: Current autorotate bases the rotation on de-rotating the first
       element of each vector. User can use their own pre-process by doing to
       and setting `autorotate` to False.
 
