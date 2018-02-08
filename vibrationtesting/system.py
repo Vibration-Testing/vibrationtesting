@@ -946,8 +946,8 @@ def real_modes(Psi, autorotate = True):
         Psi = Psi@np.diag(np.exp(np.angle(Psi[0, :]) * -1j))
     Psi_real = np.real(Psi)
     Psi_im = np.imag(Psi)
-
-    Psi = Psi_real + Psi_im @ la.lstsq(Psi_real, Psi_im)[0]
+    
+    Psi = Psi_real - Psi_im @ la.lstsq(Psi_real, Psi_im)[0]
     return Psi
 
 
