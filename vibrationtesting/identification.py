@@ -411,3 +411,17 @@ def cmif(freq, H, freq_min=None, freq_max=None, plot=True):
         ax.set_xlabel('Frequency')
         ax.set_xlim(xmax=freq_max, xmin=freq_min)
     return cmifs
+
+
+def mac(Psi_1, Psi_2):
+    '''Modal Assurance Criterion
+    '''
+    mac = 1
+    return mac
+
+
+def comac(Psi_1, Psi_2, dof):
+    '''Co-modal assurance criterion
+    '''
+    comac = 1
+    return comac
