@@ -335,7 +335,7 @@ def mdof_cf(f, TF, Fmin=None, Fmax=None):
 
 
 def cmif(freq, H, freq_min=None, freq_max=None, plot=True):
-    '''Complex mode indicator function
+    """Complex mode indicator function.
 
     Plots the complex mode indicator function
 
@@ -379,8 +379,8 @@ def cmif(freq, H, freq_min=None, freq_max=None, plot=True):
       Mode Indicator Function (CMIF) With Applications,” Proceedings of ISMA
       International Conference on Noise and Vibration Engineering, Katholieke
       Universiteit Leuven, Belgium, 2006.
-    '''
 
+    """
     if freq_max is None:
         freq_max = np.max(freq)
         # print(str(freq_max))
@@ -414,14 +414,38 @@ def cmif(freq, H, freq_min=None, freq_max=None, plot=True):
 
 
 def mac(Psi_1, Psi_2):
-    '''Modal Assurance Criterion
-    '''
-    mac = 1
+    """Modal Assurance Criterion.
+
+    Parameters
+    ----------
+    Psi_1, Psi_2 : float arrays
+        Mode shape matrices to be compared.
+
+    Returns
+    -------
+    mac : float array
+
+    Examples
+    --------
+
+    """
+    mac = np.zeros((nummodes, nummodes))
+    if Psi_1.shape == Psi_2.shape:
+        nummodes = Psi_1.shape[1]
+
+        for i in np.arange(nummodes):
+            for j in np.arange(nummodes):
+                mac[i, j] = ((np.conj(Psi_1[:, i]) @ Psi_2[:, j])**2 /
+                             (np.conj(Psi_1[:, i]) @ Psi_1[:, i] *
+                              np.conj(Psi_2[:, j]) @ Psi_2[:, j]))
+    else:
+        print('Mode shape arrays must have the same size.')
     return mac
 
 
 def comac(Psi_1, Psi_2, dof):
-    '''Co-modal assurance criterion
-    '''
+    """Co-modal assurance criterion
+
+    """
     comac = 1
     return comac
