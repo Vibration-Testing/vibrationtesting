@@ -465,10 +465,10 @@ def mass_normalize(Psi, M):
 
     """
     if len(Psi.shape) is 1:
-        Psi = Psi.reshape((-1,1))
+        Psi = Psi.reshape((-1, 1))
 
     for i in np.arange(Psi.shape[1]):
-        alpha_sqr = Psi[:, i].T@M@Psi[:,i]
-        Psi[:,i]= Psi[:,i]/np.sqrt(alpha_sqr)
+        alpha_sqr = Psi[:, i].T @ M @ Psi[:, i]
+        Psi[:, i] = Psi[:, i] / np.sqrt(alpha_sqr)
 
     return Psi
