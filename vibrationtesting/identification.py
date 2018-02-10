@@ -429,18 +429,17 @@ def mac(Psi_1, Psi_2):
     --------
 
     """
-    mac = np.zeros((nummodes, nummodes))
+    nummodes = Psi_1.shape[1]
+    MAC = np.zeros((nummodes, nummodes))
     if Psi_1.shape == Psi_2.shape:
-        nummodes = Psi_1.shape[1]
-
         for i in np.arange(nummodes):
             for j in np.arange(nummodes):
-                mac[i, j] = ((np.conj(Psi_1[:, i]) @ Psi_2[:, j])**2 /
+                MAC[i, j] = ((np.conj(Psi_1[:, i]) @ Psi_2[:, j])**2 /
                              (np.conj(Psi_1[:, i]) @ Psi_1[:, i] *
                               np.conj(Psi_2[:, j]) @ Psi_2[:, j]))
     else:
         print('Mode shape arrays must have the same size.')
-    return mac
+    return MAC
 
 
 def comac(Psi_1, Psi_2, dof):
