@@ -434,7 +434,7 @@ def mac(Psi_1, Psi_2):
     if Psi_1.shape == Psi_2.shape:
         for i in np.arange(nummodes):
             for j in np.arange(nummodes):
-                MAC[i, j] = ((np.conj(Psi_1[:, i]) @ Psi_2[:, j])**2 /
+                MAC[i, j] = (abs(np.conj(Psi_1[:, i]) @ Psi_2[:, j])**2 /
                              (np.conj(Psi_1[:, i]) @ Psi_1[:, i] *
                               np.conj(Psi_2[:, j]) @ Psi_2[:, j]))
     else:
