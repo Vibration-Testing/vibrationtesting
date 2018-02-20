@@ -937,7 +937,7 @@ def real_modes(Psi, autorotate = True):
     -----
     .. note:: Rotation of modes should be performed to get them as close to real
       as possible first.
-    .. warnings:: Current autorotate bases the rotation on de-rotating the first
+    .. warning:: Current autorotate bases the rotation on de-rotating the first
       element of each vector. User can use their own pre-process by doing to
       and setting `autorotate` to False.
 
@@ -946,8 +946,8 @@ def real_modes(Psi, autorotate = True):
         Psi = Psi@np.diag(np.exp(np.angle(Psi[0, :]) * -1j))
     Psi_real = np.real(Psi)
     Psi_im = np.imag(Psi)
-
-    Psi = Psi_real + Psi_im @ la.lstsq(Psi_real, Psi_im)[0]
+    
+    Psi = Psi_real - Psi_im @ la.lstsq(Psi_real, Psi_im)[0]
     return Psi
 
 

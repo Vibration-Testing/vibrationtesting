@@ -10,16 +10,15 @@ A package for signal processing, modal analysis, and model reduction and model u
 .. image:: https://travis-ci.org/Vibration-Testing/vibrationtesting.svg?branch=master
     :target: https://travis-ci.org/Vibration-Testing/vibrationtesting
 
+.. image:: https://zenodo.org/badge/50037940.svg
+    :target: https://zenodo.org/badge/latestdoi/50037940
 
 Joseph C. Slater
 ----------------
 
-This is the software repository for  Vibration Testing, not the `online manual <http://Vibration-Testing.github.io/vibrationtesting/>`_.
-
 Welcome to `Vibration Testing <http://Vibration-Testing.github.io/vibrationtesting/>`_.
 
-For more information, please see the `documentation for the Python version <http://Vibration-Testing.github.io/vibrationtesting/>`_ but please excuse that it is all still under development. Such documentation has never existed for the other ports of the module so this is taking some time. We don't need feedback at this time (shortcomings abound), but I will take assistance in improving documentation and code. *Please* clone the repository and support use by submitting pull requests fixing typos and clarifying documentation.
-
+For more information, please see the `documentation for the Python version <http://Vibration-Testing.github.io/vibrationtesting/>`_
 
 Installation
 ------------
