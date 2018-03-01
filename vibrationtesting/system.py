@@ -390,8 +390,8 @@ def sos_modal(M, K, C=False, damp_diag=0.03, shift=1):
     >>> print(omega)
     [...0.445   1.247   1.8019]
     >>> print(Psi.T@K@Psi)
-    [[ 0.1981  0.     -0.    ]
-     [ 0.      1.555  -0.    ]
+    [[...0.1981  0.     -0.    ]
+     [...0.      1.555  -0.    ]
      [-0.     -0.      3.247 ]]
 
     Check that it works for rigid body modes.
@@ -415,9 +415,9 @@ def sos_modal(M, K, C=False, damp_diag=0.03, shift=1):
     Damping matrix cannot be completely diagonalized.
     Off diagonal error of 22%.
     >>> print(omega)
-    [0.     1.1649 1.7461]
+    [...0.     1.1649 1.7461]
     >>> print(zeta)
-    [0.     0.1134 0.113 ]
+    [...0.     0.1134 0.113 ]
     >>> print(Psi.T@C@Psi)
     [[ 0.0413 -0.0483  0.0388]
      [-0.0483  0.2641 -0.0871]
