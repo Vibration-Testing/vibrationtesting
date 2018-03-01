@@ -388,7 +388,7 @@ def sos_modal(M, K, C=False, damp_diag=0.03, shift=1):
     ...               [0, -4, 4]])
     >>> omega, zeta, Psi = vt.sos_modal(M, K, K/10)
     >>> print(omega)
-    [0.445   1.247   1.8019]
+    [...0.445   1.247   1.8019]
     >>> print(Psi.T@K@Psi)
     [[ 0.1981  0.     -0.    ]
      [ 0.      1.555  -0.    ]
