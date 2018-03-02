@@ -102,3 +102,48 @@ def test_ss_modal():
     nt.assert_array_almost_equal(Cm, np.array(
     [[ 0.0594-0.0001j, 0.0594+0.0001j, 0.0039-0.717j, 0.0039+0.717j,
        0.0241-0.9307j,  0.0241+0.9307j]]), decimal = 3)
+
+
+def test_sos_modal_non_rigid():
+    omega, zeta, Psi = vt.sos_modal(M, K, K/10)
+    nt.assert_array_almost_equal(omega, np.array(
+    [0.445,   1.247,   1.8019]), decimal = 3)
+
+def test_sos_modal_non_rigid_diag():
+    omega, zeta, Psi = vt.sos_modal(M, K, K/10)
+    nt.assert_array_almost_equal(Psi.T@K@Psi,
+    np.array([[0.1981,  0.,     -0.    ],
+     [0.,      1.555,  -0.    ],
+     [-0.,     -0.,      3.247 ]]), decimal = 3)
+
+def test_sos_modal_rigid():
+    omega, zeta, Psi = vt.sos_modal(M, K)
+    K2 = K-np.eye(K.shape[0])@M*(Psi.T@K@Psi)[0,0]
+    omega, zeta, Psi = vt.sos_modal(M, K2)
+    nt.assert_array_almost_equal(omega, np.array(
+    [0.,     1.1649, 1.7461]), decimal = 3)
+
+def test_sos_modal_rigid_diag():
+    omega, zeta, Psi = vt.sos_modal(M, K)
+    K2 = K-np.eye(K.shape[0])@M*(Psi.T@K@Psi)[0,0]
+    omega, zeta, Psi = vt.sos_modal(M, K2)
+    nt.assert_array_almost_equal(Psi,
+    np.array([[-0.164,   0.3685, -0.2955],
+     [-0.2955,  0.164,   0.3685],
+     [-0.3685, -0.2955, -0.164 ]]), decimal = 3)
+
+
+def test_sos_modal_non_proportional():
+    omega, zeta, Psi = vt.sos_modal(M, K)
+    K2 = K-np.eye(K.shape[0])@M*(Psi.T@K@Psi)[0,0]
+    C = K/10
+    C[0,0] = 2 * C[0,0]
+    omega, zeta, Psi = vt.sos_modal(M, K2, C)
+    nt.assert_array_almost_equal(omega,
+    np.array([0.,     1.1649, 1.7461]), decimal=3)
+    nt.assert_array_almost_equal(zeta,
+    np.array([0.,     0.1134, 0.113]), decimal=3)
+    nt.assert_array_almost_equal(Psi.T@C@Psi,
+        np.array([[ 0.0413, -0.0483,  0.0388],
+        [-0.0483,  0.2641, -0.0871],
+        [ 0.0388, -0.0871,  0.3946]]), decimal=3)
