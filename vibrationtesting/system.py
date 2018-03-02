@@ -9,13 +9,10 @@ __docformat__ = 'reStructuredText'
 
 
 import math
-# import warnings
 
 import numpy as np
-# import control as ctrl
 import scipy.signal as sig
 import scipy.linalg as la
-# np.set_printoptions(precision=4, suppress=True)
 
 
 def d2c(Ad, Bd, C, D, dt):
@@ -399,7 +396,7 @@ def sos_modal(M, K, C=False, damp_diag=0.03, shift=1):
     >>> K2 = K-np.eye(K.shape[0])@M*(Psi.T@K@Psi)[0,0]
     >>> omega, zeta, Psi = vt.sos_modal(M, K2)
     >>> print(omega)
-    [0.     1.1649 1.7461]
+    [...0.     1.1649 1.7461]
     >>> print(Psi)
     [[-0.164   0.3685 -0.2955]
      [-0.2955  0.164   0.3685]
