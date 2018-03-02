@@ -69,8 +69,8 @@ def d2c(Ad, Bd, C, D, dt):
     # B = la.solve((Ad - np.eye(A.shape[0])), A) @ Bd
     sa = Ad.shape[0]
     sb = Bd.shape[1]
-    AAd = np.vstack((np.hstack((Ad,                  Bd)),
-                     np.hstack((np.zeros((sb, sa)),  np.eye(sb)))))
+    AAd = np.vstack((np.hstack((Ad, Bd)),
+                     np.hstack((np.zeros((sb, sa)), np.eye(sb)))))
     AA = la.logm(AAd) / dt
     A = AA[0:sa, 0:sa]
     B = AA[0:sa, sa:]
