@@ -9,13 +9,10 @@ __docformat__ = 'reStructuredText'
 
 
 import math
-# import warnings
 
 import numpy as np
-# import control as ctrl
 import scipy.signal as sig
 import scipy.linalg as la
-# np.set_printoptions(precision=4, suppress=True)
 
 
 def d2c(Ad, Bd, C, D, dt):
@@ -69,8 +66,8 @@ def d2c(Ad, Bd, C, D, dt):
     # B = la.solve((Ad - np.eye(A.shape[0])), A) @ Bd
     sa = Ad.shape[0]
     sb = Bd.shape[1]
-    AAd = np.vstack((np.hstack((Ad,                  Bd)),
-                     np.hstack((np.zeros((sb, sa)),  np.eye(sb)))))
+    AAd = np.vstack((np.hstack((Ad, Bd)),
+                     np.hstack((np.zeros((sb, sa)), np.eye(sb)))))
     AA = la.logm(AAd) / dt
     A = AA[0:sa, 0:sa]
     B = AA[0:sa, sa:]
@@ -115,16 +112,6 @@ def c2d(A, B, C, D, dt):
     >>> C = np.array([[-1.4, 1.2, -0.0058, 0.0014]])
     >>> D = np.array([[-0.2]])
     >>> Ad, Bd, *_ = vt.c2d(A, B, C, D, 0.01)
-    >>> print(Ad)
-    [[ 0.9999  0.0001  0.01    0.    ]
-     [ 0.      0.9999  0.      0.01  ]
-     [-0.014   0.012   0.9999  0.0001]
-     [ 0.008  -0.014   0.0001  0.9999]]
-    >>> print(Bd)
-    [[ 0.  ]
-     [ 0.  ]
-     [ 0.  ]
-     [ 0.01]]
 
     Notes
     -----
@@ -387,41 +374,6 @@ def sos_modal(M, K, C=False, damp_diag=0.03, shift=1):
     ...               [-4, 8, -4],
     ...               [0, -4, 4]])
     >>> omega, zeta, Psi = vt.sos_modal(M, K, K/10)
-    >>> print(omega)
-    [ 0.445   1.247   1.8019]
-    >>> print(Psi.T@K@Psi)
-    [[ 0.1981  0.     -0.    ]
-     [ 0.      1.555  -0.    ]
-     [-0.     -0.      3.247 ]]
-
-    Check that it works for rigid body modes.
-
-    >>> K2 = K-np.eye(K.shape[0])@M*(Psi.T@K@Psi)[0,0]
-    >>> omega, zeta, Psi = vt.sos_modal(M, K2)
-    >>> print(omega)
-    [ 0.      1.1649  1.7461]
-    >>> print(Psi)
-    [[-0.164   0.3685 -0.2955]
-     [-0.2955  0.164   0.3685]
-     [-0.3685 -0.2955 -0.164 ]]
-    >>> print(np.diag(Psi.T@K2@Psi))
-    [ 0.      1.3569  3.0489]
-
-    How about non-proportional damping
-
-    >>> C = K/10
-    >>> C[0,0] = 2 * C[0,0]
-    >>> omega, zeta, Psi = vt.sos_modal(M, K2, C)
-    Damping matrix cannot be completely diagonalized.
-    Off diagonal error of 22%.
-    >>> print(omega)
-    [ 0.      1.1649  1.7461]
-    >>> print(zeta)
-    [ 0.      0.1134  0.113 ]
-    >>> print(Psi.T@C@Psi)
-    [[ 0.0413 -0.0483  0.0388]
-     [-0.0483  0.2641 -0.0871]
-     [ 0.0388 -0.0871  0.3946]]
 
     """
     K = K + M * shift
@@ -946,7 +898,7 @@ def real_modes(Psi, autorotate = True):
         Psi = Psi@np.diag(np.exp(np.angle(Psi[0, :]) * -1j))
     Psi_real = np.real(Psi)
     Psi_im = np.imag(Psi)
-    
+
     Psi = Psi_real - Psi_im @ la.lstsq(Psi_real, Psi_im)[0]
     return Psi
 
@@ -981,22 +933,24 @@ def ss_modal(A, B = None, C = None, D = None):
     >>> Cd = Cv = np.zeros_like(Ca)
     >>> A, B, C, D = vt.so2ss(M, Cso, K, Bt, Cd, Cv, Ca)
     >>> Am, Bm, Cm, Dm, eigenvalues, modes = vt.ss_modal(A, B, C, D)
-    >>> print(Am+(0.00001+0.00001j))
-    [[-0.0013+0.4451j  0.0000+0.j      0.0000+0.j      0.0000+0.j      0.0000+0.j
-       0.0000+0.j    ]
-     [ 0.0000+0.j     -0.0013-0.445j   0.0000+0.j      0.0000+0.j      0.0000+0.j
-       0.0000+0.j    ]
-     [ 0.0000+0.j      0.0000+0.j     -0.0068+1.247j   0.0000+0.j      0.0000+0.j
-       0.0000+0.j    ]
-     [ 0.0000+0.j      0.0000+0.j      0.0000+0.j     -0.0068-1.247j
-       0.0000+0.j      0.0000+0.j    ]
-     [ 0.0000+0.j      0.0000+0.j      0.0000+0.j      0.0000+0.j
-      -0.0044+1.8019j  0.0000+0.j    ]
-     [ 0.0000+0.j      0.0000+0.j      0.0000+0.j      0.0000+0.j      0.0000+0.j
-      -0.0044-1.8019j]]
-    >>> print(Cm)
-    [[ 0.0594-0.0001j  0.0594+0.0001j  0.0039-0.717j   0.0039+0.717j
-       0.0241-0.9307j  0.0241+0.9307j]]
+    >>> np.allclose(Am,np.array(
+    ... [[-0.0013+0.445j,  0.0000+0.j,      0.0000+0.j,      0.0000+0.j,      0.0000+0.j,
+    ...      0.0000+0.j    ],
+    ... [ 0.0000+0.j,     -0.0013-0.445j,   0.0000+0.j,      0.0000+0.j,      0.0000+0.j,
+    ...   0.0000+0.j    ],
+    ... [ 0.0000+0.j,      0.0000+0.j,     -0.0068+1.247j,   0.0000+0.j,      0.0000+0.j,
+    ...   0.0000+0.j    ],
+    ... [ 0.0000+0.j,      0.0000+0.j,      0.0000+0.j,     -0.0068-1.247j,
+    ...   0.0000+0.j,      0.0000+0.j    ],
+    ... [ 0.0000+0.j,      0.0000+0.j,      0.0000+0.j,      0.0000+0.j,
+    ...  -0.0044+1.8019j,  0.0000+0.j    ],
+    ... [ 0.0000+0.j,      0.0000+0.j,      0.0000+0.j,      0.0000+0.j,      0.0000+0.j,
+    ...  -0.0044-1.8019j]]), atol=0.001)
+    True
+    >>> Cm  # doctest: +SKIP
+     [[ 0.0594-0.0001j 0.0594+0.0001j 0.0039-0.717j 0.0039+0.717j
+        0.0241-0.9307j  0.0241+0.9307j]]
+
 
     """
     if B is None:

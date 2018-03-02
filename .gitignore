@@ -79,3 +79,4 @@ target/
 vibrationtesting/.DS_Store
 .DS_Store
 *.lock
+.pytest_cache/v/cache/lastfailed
