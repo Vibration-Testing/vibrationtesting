@@ -5,7 +5,7 @@
 from __future__ import division, print_function, absolute_import
 
 __title__ = 'vibrationtesting'
-__version__ = '0.22'
+__version__ = '0.23'
 __author__ = u'Joseph C. Slater'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2002-2017 Joseph C. Slater'
