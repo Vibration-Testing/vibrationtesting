@@ -153,8 +153,6 @@ def window(x, windowname='hanning', normalize=False):
                 f = np.swapaxes(f, 0, 1)
 
         elif len(x.shape) == 2:
-            # f,_=np.meshgrid(f[0,:],np.arange(x.shape[0]))
-            # print('b')
 
             if x.shape[0] > x.shape[1]:
                 x = np.swapaxes(x, 0, 1)
@@ -172,10 +170,7 @@ def window(x, windowname='hanning', normalize=False):
                 f = np.swapaxes(f, 0, 1)
 
     else:
-        # print(x)
-        # Create hanning window of length x
         N = x
-        # print(N)
         if windowname is 'hanning':
             f = np.sin(np.pi * np.arange(N) / (N - 1))**2 * np.sqrt(8 / 3)
         elif windowname is 'hamming':
@@ -195,7 +190,7 @@ def window(x, windowname='hanning', normalize=False):
             f = np.ones((1, N))
         else:
             f = np.ones((1, N))
-            print("I don't recognize that window name. Sorry")
+            print("I don't recognize window name ", windowname, ". Sorry.")
 
         if normalize is True:
             f = f / la.norm(f) * np.sqrt(N)
@@ -462,7 +457,7 @@ def hannwin(*args, **kwargs):
     return hanning(*args, **kwargs)
 
 
-def asd(x, t, windowname="hanning", ave=bool(True)):
+def asd(x, t, windowname="none", ave=bool(True)):
     """Return autospectrum (power spectrum) density of a signal x.
 
     Parameters
@@ -537,7 +532,7 @@ def asd(x, t, windowname="hanning", ave=bool(True)):
     return f, Pxx
 
 
-def crsd(x, y, t, windowname="hanning", ave=bool(True)):
+def crsd(x, y, t, windowname="none", ave=bool(True)):
     """
     Calculate the cross spectrum (power spectrum) density between two signals.
 
@@ -549,7 +544,7 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
     t : array
         Time array (1 x N)
     windowname : string
-        Name of windowing function to use
+        Name of windowing function to use. See `window`.
     ave : bool, optional
         Average result or not?
 
@@ -626,42 +621,14 @@ def crsd(x, y, t, windowname="hanning", ave=bool(True)):
         y = np.expand_dims(y, axis=0)
         y = np.expand_dims(y, axis=2)
     n = x.shape[1]
-    """
-    # print(x.shape)
-    # print(y.shape)
-    # No clue what this does, and I wrote it. Comment your code, you fool!
-    # What this "should" do is assure that the data is longer in 0 axis than
-    the others.
-    # if len(x.shape)==2:
-    #      The issue fixed here is that the user put time along the 1 axis
-    (instead of zero)
-    #     if (x.shape).index(max(x.shape))==0:
-    #         #x=x.reshape(max(x.shape),-1,1)
-    #         print('I think you put time along the 0 axis instead of the 1
-    axis. Not even attempting to fix this.')
-    #     else:
-    #         # Here we are appending a 3rd dimension to simplify averaging
-    command later. We could bypass at that point, and should.
-    #         x=x.reshape(max(x.shape),-1,1)
 
-    # if len(y.shape)==2:
-    #     if (y.shape).indey(may(y.shape))==0:
-    #         #y=y.reshape(may(y.shape),-1,1)
-    #         print('I think you put time along the 0 axis instead of the 1
-    axis. Not attempting to fix this.')
-    #     else:
-    #         y=y.reshape(may(y.shape),-1,1)
-    # Should use scipy.signal windows. I need to figure this out. Problem is:
-    They don't scale the ASDs by the windowing "weakening".
-    """
-    if windowname == "none":
+    if windowname is False or windowname.lower() is "none":
         win = 1
     else:
         # print('This doesn\'t work yet')
+        windowname = windowname.lower()
         win = 1
         if windowname == "hanning":
-            # print('shape of x')
-            # print(x.shape)
             win = window(x, windowname='hanning')
         elif windowname == "blackwin":
             win = window(x, windowname='blackwin')
@@ -709,7 +676,7 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
     dt : float
         time step of samples
     windowname : string
-        name of leakage window to use
+        One of: hanning, hamming, blackman, flatwin, boxwin
     ave : bool, optional(True)- currently locked
         whether or not to average PSDs and ASDs or calculate raw FRFs
     Hv : bool, optional(False)
@@ -728,7 +695,7 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
     Hv : float array
         Frequency Response Function :math:`H_v` estimate, (nxN) or (nxNxm)
 
-    Currently ``windowname`` and ``ave`` are locked to default values.
+    Currently  ``ave`` is locked to default values.
 
     Examples
     --------
@@ -802,12 +769,6 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
 
     # Note: Two different ways to ignore returned values shown
     Pff = asd(f, dt, windowname=windowname)[1]
-    # print('works until here?')
-    # print(x.shape)
-    # print(f.shape)
-    # print('crsd')
-    # print(x.shape)
-    # print(f.shape)
     freq, Pxf = crsd(x, f, dt, windowname=windowname)
     _, Pxx = asd(x, dt)
 
@@ -837,161 +798,9 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
 
             vecs = vecs[:, index]
 
-            Txfv[0, i] = -(vecs[0, 0] / vecs[1, 0]) / alpha  # *np.sqrt(alpha)
-            # a = 1
-            # b = -Pxx[0, i] - Pff[0, i]
-            # c = Pxx[0, i] * Pff[0, i] - abs(Pxf[0, i])**2
-
-    #        lambda1 = (-b - np.sqrt(b**2 - 4 * a * c)) / 2 / a
+            Txfv[0, i] = -(vecs[0, 0] / vecs[1, 0]) / alpha
 
     return freq, Txf1, Txf2, coh, Txfv
-
-    """# def acorr(self, x, **kwargs):
-    # """
-    # Plot the autocorrelation of `x`.
-
-    # Parameters
-    # ----------
-
-    # x : sequence of scalar
-
-    # hold : boolean, optional, default: True
-
-    # detrend : callable, optional, default: `mlab.detrend_none`
-    # x is detrended by the `detrend` callable. Default is no
-    # normalization.
-
-    # normed : boolean, optional, default: True
-    # if True, normalize the data by the autocorrelation at the 0-th
-    # lag.
-
-    # usevlines : boolean, optional, default: True
-    # if True, Axes.vlines is used to plot the vertical lines from the
-    # origin to the acorr. Otherwise, Axes.plot is used.
-
-    # maxlags : integer, optional, default: 10
-    # number of lags to show. If None, will return all 2 * len(x) - 1
-    # lags.
-
-    # Returns
-    # -------
-    # (lags, c, line, b) : where:
-
-    # - `lags` are a length 2`maxlags+1 lag vector.
-    # - `c` is the 2`maxlags+1 auto correlation vectorI
-    # - `line` is a `~matplotlib.lines.Line2D` instance returned by
-    # `plot`.
-    # - `b` is the x-axis.
-
-    # Other parameters
-    # -----------------
-    # linestyle : `~matplotlib.lines.Line2D` prop, optional, default: None
-    # Only used if usevlines is False.
-
-    # marker : string, optional, default: 'o'
-
-    # Notes
-    # -----
-    # The cross correlation is performed with :func:`numpy.correlate` with
-    # `mode` = 2.
-
-    # Examples
-    # --------
-
-    # `~matplotlib.pyplot.xcorr` is top graph, and
-    # `~matplotlib.pyplot.acorr` is bottom graph.
-
-    # .. plot:: mpl_examples/pylab_examples/xcorr_demo.py
-
-    # """
-    # return self.xcorr(x, x, **kwargs)
-
-    # @docstring.dedent_interpd
-    # def xcorr(self, x, y, normed=True, detrend=mlab.detrend_none,
-    # usevlines=True, maxlags=10, **kwargs):
-    # """
-    # Plot the cross correlation between *x* and *y*.
-
-    # Parameters
-    # ----------
-
-    # x : sequence of scalars of length n
-
-    # y : sequence of scalars of length n
-
-    # hold : boolean, optional, default: True
-
-    # detrend : callable, optional, default: `mlab.detrend_none`
-    # x is detrended by the `detrend` callable. Default is no
-    # normalization.
-
-    # normed : boolean, optional, default: True
-    # if True, normalize the data by the autocorrelation at the 0-th
-    # lag.
-
-    # usevlines : boolean, optional, default: True
-    # if True, Axes.vlines is used to plot the vertical lines from the
-    # origin to the acorr. Otherwise, Axes.plot is used.
-
-    # maxlags : integer, optional, default: 10
-    # number of lags to show. If None, will return all 2 * len(x) - 1
-    # lags.
-
-    # Returns
-    # -------
-    # (lags, c, line, b) : where:
-
-    # - `lags` are a length 2`maxlags+1 lag vector.
-    # - `c` is the 2`maxlags+1 auto correlation vectorI
-    # - `line` is a `~matplotlib.lines.Line2D` instance returned by
-    # `plot`.
-    # - `b` is the x-axis (none, if plot is used).
-
-    # Other parameters
-    # -----------------
-    # linestyle : `~matplotlib.lines.Line2D` prop, optional, default: None
-    # Only used if usevlines is False.
-
-    # marker : string, optional, default: 'o'
-
-    # Notes
-    # -----
-    # The cross correlation is performed with :func:`numpy.correlate` with
-    # `mode` = 2.
-    # """
-
-    #     Nx = len(x)
-    # if Nx != len(y):
-    #         raise ValueError('x and y must be equal length')
-
-    #     x = detrend(np.asarray(x))
-    #     y = detrend(np.asarray(y))
-
-    #     c = np.correlate(x, y, mode=2)
-
-    # if normed:
-    #         c /= np.sqrt(np.dot(x, x) * np.dot(y, y))
-
-    # if maxlags is None:
-    #         maxlags = Nx - 1
-
-    # if maxlags >= Nx or maxlags < 1:
-    # raise ValueError('maglags must be None or strictly '
-    # 'positive < %d' % Nx)
-
-    #     lags = np.arange(-maxlags, maxlags + 1)
-    #     c = c[Nx - 1 - maxlags:Nx + maxlags]
-
-    # if usevlines:
-    #         a = self.vlines(lags, [0], c, **kwargs)
-    #         b = self.axhline(**kwargs)
-    # else:
-
-    #         kwargs.setdefault('marker', 'o')
-    #         kwargs.setdefault('linestyle', 'None')
-    #         a, = self.plot(lags, c, **kwargs)
-    #         b = None
-    # return lags, c, a, b"""
 
 
 def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
