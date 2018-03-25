@@ -1,5 +1,13 @@
 """
+Vibration Testing module
+------------------------
 
+This module is a companion to the manuscript Vibration Testing with Health
+Monitoring by Joseph C. Slater. It includes functions for:
+
+- Signal processing
+- System manipulation and solution
+- System identification
 
 """
 from __future__ import division, print_function, absolute_import
@@ -11,13 +19,14 @@ __license__ = 'MIT'
 __copyright__ = 'Copyright 2002-2017 Joseph C. Slater'
 __all__ = ['identification', 'signals', 'system',
            '__version__']
+
 import sys
 import matplotlib as mpl
 import numpy as np
 
 if 'pytest' in sys.argv[0]:
     # print('Setting backend to agg to run tests')
-    _ = mpl.use('agg');
+    _ = mpl.use('agg')
     np.set_printoptions(precision=4, suppress=True)
 
 from .signals import *
