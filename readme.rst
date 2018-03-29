@@ -13,6 +13,12 @@ A package for signal processing, modal analysis, and model reduction and model u
 .. image:: https://zenodo.org/badge/50037940.svg
     :target: https://zenodo.org/badge/latestdoi/50037940
 
+.. image:: https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg
+   :target: https://saythanks.io/to/josephcslater
+
+.. image:: https://img.shields.io/badge/patreon-donate-yellow.svg
+   :target: https://www.patreon.com/josephcslater
+
 Joseph C. Slater
 ----------------
 
