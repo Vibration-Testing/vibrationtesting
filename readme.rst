@@ -35,11 +35,11 @@ Installation is made easy with ``pip`` (or ``pip3``), with releases as we have t
 to create a full first release. Much of it works already, but I certainly need
 issue reports (on `github <http://github.com/Vibration-Testing/vibrationtesting>`_) when something is not working as it should.
 
-To install::
+To install type::
 
   pip install --user vibrationtesting
 
-where ``--user`` isn't necessary if you are using a locally installed version of Python such as `Anaconda <https://www.continuum.io/downloads>`_.
+at your command prompt **(not the python prompt)** where ``--user`` isn't necessary if you are using a locally installed version of Python such as `Anaconda <https://www.continuum.io/downloads>`_.
 
 To run, I recommend you open a `Jupyter <https://jupyter.org>`_ notebook by using ``jupyter notebook`` and then type::
 
