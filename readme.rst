@@ -18,6 +18,10 @@ A package for signal processing, modal analysis, and model reduction and model u
 
 .. image:: https://img.shields.io/badge/patreon-donate-yellow.svg
    :target: https://www.patreon.com/josephcslater
+   
+.. image:: http://pepy.tech/badge/vibrationtesting
+   :target: http://pepy.tech/project/vibrationtesting
+   :alt: PyPi Download stats
 
 Joseph C. Slater
 ----------------
