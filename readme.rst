@@ -28,7 +28,7 @@ Joseph C. Slater
 
 Welcome to `Vibration Testing <http://Vibration-Testing.github.io/vibrationtesting/>`_.
 
-For more information, please see the `documentation for the Python version <http://Vibration-Testing.github.io/vibrationtesting/>`_
+For more information, please see the `documentation for the Python version <http://Vibration-Testing.github.io/vibrationtesting/>`_.
 
 Installation
 ------------
@@ -59,6 +59,8 @@ The usage documentation is far behind the current code, while the reference is w
 If you wish to install the current version of the software, read the instructions in `Contributing.rst  <https://github.com/Vibration-Testing/vibrationtesting/blob/master/CONTRIBUTING.rst>`_
 
 That should be it. Please note issues on the `issues tab  <https://github.com/Vibration-Testing/vibrationtesting/issues>`_ on GitHub.
+
+Like this module, `buy me a coffee! <https://www.buymeacoffee.com/s6BCSuEiU>`_
 
 Quick notes:
 -------------
