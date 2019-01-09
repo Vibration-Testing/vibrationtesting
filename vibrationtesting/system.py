@@ -619,7 +619,7 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
     shape, :math:`\Psi_{i_u}` by
     direct algebraic solution, aka
 
-    :math:`\Psi_{i_u} = - (K_{uu}- M_{ss} \omega_i^2) ^{-1}
+    :math:`\Psi_{i_u} = - (K_{uu}- M_{uu} \omega_i^2) ^{-1}
     (K_{um}-M_{um}\omega_i^2)\Psi_{i_m}`
 
     Parameters
@@ -650,12 +650,26 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
     >>> measured = np.array([[0, 2]])
     >>> omega, zeta, Psi = vt.sos_modal(M, K)
     >>> Psi_measured = np.array([[-0.15], [-0.37]])
-    >>> Psi_full = vt.mode_expansion_from_model(Psi_measured, omega[0], M, K,
-    ... measured)
+    >>> Psi_full = vt.mode_expansion_from_model(Psi_measured, omega[0], M, K, measured)
     >>> print(np.hstack((Psi[:,0].reshape(-1,1), Psi_full)))
-    [[-0.164  -0.15  ]
-     [-0.2955  0.2886]
-     [-0.3685 -0.37  ]]
+    [[-0.163992639 -0.15       ]
+     [-0.295504524  0.288578229]
+     [-0.368488115 -0.37       ]]
+    >>> import vibrationtesting as vt
+    >>> M = np.array([[4, 0, 0],
+    ...               [0, 4, 0],
+    ...               [0, 0, 4]])
+    >>> K = np.array([[8, -4, 0],
+    ...               [-4, 8, -4],
+    ...               [0, -4, 4]])
+    >>> measured = np.array([[0, 2]])
+    >>> omega, zeta, Psi = vt.sos_modal(M, K)
+    >>> Psi_measured = np.array([[-0.15, -0.24], [-0.37, -0.40]])
+    >>> Psi_full = vt.mode_expansion_from_model(Psi_measured, np.array([omega[0], omega[2]]), M, K, measured)
+    >>> print(np.hstack((Psi[:,0].reshape(-1,1), Psi_full)))
+    [[-0.163992639 -0.15        -0.24       ]
+     [-0.295504524  0.288578229 -0.513240151]
+     [-0.368488115 -0.37        -0.4        ]]
 
     Notes
     -----
@@ -697,6 +711,7 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
         Psi_i = Psi[:, i].reshape(-1, 1)
         Psi_unmeasured = la.solve((Kuu - Muu * omega_n**2),
                                   (Kum - Mum * omega_n**2)@Psi_i)
+        Psi_unmeasured = Psi_unmeasured.reshape(-1, )
         Psi_full[unmeasured_dofs, i] = Psi_unmeasured
         # Psi_full = Psi_full.reshape(-1, 1)
     return Psi_full
