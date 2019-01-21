@@ -11,11 +11,11 @@ __docformat__ = 'reStructuredText'
 import math
 
 import numpy as np
-import scipy.signal as sig
-import scipy.linalg as la
+#import scipy.signal as sig
+#import scipy.linalg as la
 import scipy.sparse.linalg as spla
 from scipy.sparse import lil_matrix
-from scipy.sparse import csr_matrix
+#from scipy.sparse import csr_matrix
 import scipy.sparse as sps
 
 def sos_modal_forsparse(M, K, C=False, damp_diag=0.03):
@@ -75,7 +75,7 @@ def sos_modal_forsparse(M, K, C=False, damp_diag=0.03):
 
     minvals = np.sort((Kdiag/Mdiag),axis=0)
 
-    minvallocs = (Kdiag/Mdiag).argsort(axis=0)
+    #minvallocs = (Kdiag/Mdiag).argsort(axis=0)
 
     shift = minvals[min(7,len(minvals))]
 
