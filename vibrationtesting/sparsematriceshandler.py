@@ -226,25 +226,25 @@ def guyan_forsparse(M, K, master=None, fraction=None):
 
     K= lil_matrix(K)
 
-    zerovals= np.asarray(((np.absolute(K).sum(axis=0))==False)).reshape(1,-1)
+    #zerovals= np.asarray(((np.absolute(K).sum(axis=0))==False)).reshape(1,-1)
 
-    numzeros=np.sum([zerovals], dtype=np.int)
+    #numzeros=np.sum([zerovals], dtype=np.int)
 
-    i = np.arange(0, ncoord).reshape(1,-1)
+    #i = np.arange(0, ncoord).reshape(1,-1)
 
-    zerolocs = np.sort(i*zerovals, axis =0)
+    #zerolocs = np.sort(i*zerovals, axis =0)
 
-    zerolocs=zerolocs[(ncoord+1-numzeros):ncoord]
+    #zerolocs=zerolocs[(ncoord+1-numzeros):ncoord]
 
-    master2=np.union1d(zerolocs,master)
+    #master2=np.union1d(zerolocs,master)
 
-    master = master2.reshape(1,-1)
+    #master = master2.reshape(1,-1)
 
-    slave2 = np.setdiff1d(slave,zerolocs)
+    #slave2 = np.setdiff1d(slave,zerolocs)
 
-    slave = slave2.reshape(1,-1)
+    slave = slave.reshape(1,-1)
 
-    lmaster = master.shape[1]
+    #lmaster = master.shape[1]
 
     master = master-np.ones((1,master.shape[0]),int)
 
