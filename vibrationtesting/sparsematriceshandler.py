@@ -85,7 +85,7 @@ def sos_modal_forsparse(M, K, C=False, damp_diag=0.03):
 
     M = ((M.tocsr() + (M.T).tocsr()).tolil()) * 0.5
 
-    [lam, Psi] = spla.eigsh(A = K, k = np.min((K.shape[1], np.max((np.floor(math.sqrt(K.shape[1])), 100))))-1, M = M)
+    [lam, Psi] = la.eigh(K.toarray(), M.toarray())
 
     lam = lam.reshape(-1,1)
 
