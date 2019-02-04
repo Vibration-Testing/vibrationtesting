@@ -1,7 +1,7 @@
 """
-System manipulation, reduction, and corrections functions.
+System expansion, reduction, and corrections functions for Sparse systems.
 
-@author: Joseph C. Slater
+@author: Joseph C. Slater and Sainag Immidisetty
 """
 __license__ = "Joseph C. Slater"
 
@@ -9,7 +9,6 @@ __docformat__ = 'reStructuredText'
 
 
 import math
-
 import numpy as np
 #import scipy.signal as sig
 import scipy.linalg as la
@@ -54,28 +53,15 @@ def sos_modal_forsparse(M, K, C=False, damp_diag=0.03):
 
     Examples
     --------
-    >>> import numpy as np
-    >>> import vibrationtesting as vt
-    >>> M = np.array([[4, 0, 0],
-    ...               [0, 4, 0],
-    ...               [0, 0, 4]])
-    >>> K = np.array([[8, -4, 0],
-    ...               [-4, 8, -4],
-    ...               [0, -4, 4]])
-    >>> omega, zeta, Psi = vt.sos_modal(M, K, K/10)
+
 
     """
-    #K = K + M * shift
-
-
 
     Kdiag = K.diagonal().reshape(-1,1)
 
     Mdiag = M.diagonal().reshape(-1,1)
 
     minvals = np.sort((Kdiag/Mdiag),axis=0)
-
-    #minvallocs = (Kdiag/Mdiag).argsort(axis=0)
 
     shift = minvals[min(7,len(minvals))]
 
@@ -167,15 +153,6 @@ def guyan_forsparse(M, K, master=None, fraction=None):
 
     Examples
     --------
-    >>> import vibrationtesting as vt
-    >>> M = np.array([[4, 0, 0],
-    ...               [0, 4, 0],
-    ...               [0, 0, 4]])
-    >>> K = np.array([[8, -4, 0],
-    ...               [-4, 8, -4],
-    ...               [0, -4, 4]])
-    >>> Mred, Kred, T, master, truncated_dofs = vt.guyan(M, K, fraction = 0.5)
-
 
     Notes
     -----
@@ -226,25 +203,7 @@ def guyan_forsparse(M, K, master=None, fraction=None):
 
     K= lil_matrix(K)
 
-    #zerovals= np.asarray(((np.absolute(K).sum(axis=0))==False)).reshape(1,-1)
-
-    #numzeros=np.sum([zerovals], dtype=np.int)
-
-    #i = np.arange(0, ncoord).reshape(1,-1)
-
-    #zerolocs = np.sort(i*zerovals, axis =0)
-
-    #zerolocs=zerolocs[(ncoord+1-numzeros):ncoord]
-
-    #master2=np.union1d(zerolocs,master)
-
-    #master = master2.reshape(1,-1)
-
-    #slave2 = np.setdiff1d(slave,zerolocs)
-
     slave = slave.reshape(1,-1)
-
-    #lmaster = master.shape[1]
 
     master = master-np.ones((1,master.shape[0]),int)
 
@@ -324,36 +283,6 @@ def mode_expansion_from_model_forsparse(Psi, omega, M, K, measured):
 
     Examples
     --------
-    >>> import vibrationtesting as vt
-    >>> M = np.array([[4, 0, 0],
-    ...               [0, 4, 0],
-    ...               [0, 0, 4]])
-    >>> K = np.array([[8, -4, 0],
-    ...               [-4, 8, -4],
-    ...               [0, -4, 4]])
-    >>> measured = np.array([[0, 2]])
-    >>> omega, zeta, Psi = vt.sos_modal(M, K)
-    >>> Psi_measured = np.array([[-0.15], [-0.37]])
-    >>> Psi_full = vt.mode_expansion_from_model(Psi_measured, omega[0], M, K, measured)
-    >>> print(np.hstack((Psi[:,0].reshape(-1,1), Psi_full)))
-    [[-0.163992639 -0.15       ]
-     [-0.295504524  0.288578229]
-     [-0.368488115 -0.37       ]]
-    >>> import vibrationtesting as vt
-    >>> M = np.array([[4, 0, 0],
-    ...               [0, 4, 0],
-    ...               [0, 0, 4]])
-    >>> K = np.array([[8, -4, 0],
-    ...               [-4, 8, -4],
-    ...               [0, -4, 4]])
-    >>> measured = np.array([[0, 2]])
-    >>> omega, zeta, Psi = vt.sos_modal(M, K)
-    >>> Psi_measured = np.array([[-0.15, -0.24], [-0.37, -0.40]])
-    >>> Psi_full = vt.mode_expansion_from_model(Psi_measured, np.array([omega[0], omega[2]]), M, K, measured)
-    >>> print(np.hstack((Psi[:,0].reshape(-1,1), Psi_full)))
-    [[-0.163992639 -0.15        -0.24       ]
-     [-0.295504524  0.288578229 -0.513240151]
-     [-0.368488115 -0.37        -0.4        ]]
 
     Notes
     -----
@@ -399,5 +328,5 @@ def mode_expansion_from_model_forsparse(Psi, omega, M, K, measured):
                                   (Kum - Mum * omega_n**2)@Psi_i)
         Psi_unmeasured = Psi_unmeasured.reshape(-1, )
         Psi_full[unmeasured_dofs, i] = Psi_unmeasured
-        # Psi_full = Psi_full.reshape(-1, 1)
+
     return Psi_full
