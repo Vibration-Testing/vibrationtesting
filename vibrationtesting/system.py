@@ -844,7 +844,7 @@ def rsolve(B, C, **kwargs):
     return la.solve(B.T, C.T, **kwargs).T
 
 
-def real_modes(Psi, autorotate = True):
+def real_modes(Psi, autorotate=True):
     r"""Real modes from complex modes.
 
     Assuming a transformation
@@ -887,8 +887,8 @@ def real_modes(Psi, autorotate = True):
 
     Notes
     -----
-    .. note:: Rotation of modes should be performed to get them as close to real
-      as possible first.
+    .. note:: Rotation of modes should be performed to get them as close to
+      real as possible first.
     .. warning:: Current autorotate bases the rotation on de-rotating the first
       element of each vector. User can use their own pre-process by doing to
       and setting `autorotate` to False.
@@ -903,7 +903,7 @@ def real_modes(Psi, autorotate = True):
     return Psi
 
 
-def ss_modal(A, B = None, C = None, D = None):
+def ss_modal(A, B=None, C=None, D=None):
     r"""State space modes, frequencies, damping ratios, and modal matrices.
 
     Parameters
@@ -934,20 +934,20 @@ def ss_modal(A, B = None, C = None, D = None):
     >>> A, B, C, D = vt.so2ss(M, Cso, K, Bt, Cd, Cv, Ca)
     >>> Am, Bm, Cm, Dm, eigenvalues, modes = vt.ss_modal(A, B, C, D)
     >>> np.allclose(Am,np.array(
-    ... [[-0.0013+0.445j,  0.0000+0.j,      0.0000+0.j,      0.0000+0.j,      0.0000+0.j,
-    ...      0.0000+0.j    ],
-    ... [ 0.0000+0.j,     -0.0013-0.445j,   0.0000+0.j,      0.0000+0.j,      0.0000+0.j,
-    ...   0.0000+0.j    ],
-    ... [ 0.0000+0.j,      0.0000+0.j,     -0.0068+1.247j,   0.0000+0.j,      0.0000+0.j,
-    ...   0.0000+0.j    ],
+    ... [[-0.0013+0.445j,  0.0000+0.j,      0.0000+0.j,      0.0000+0.j,
+    ...    0.0000+0.j,     0.0000+0.j    ],
+    ... [ 0.0000+0.j,     -0.0013-0.445j,   0.0000+0.j,      0.0000+0.j,
+    ...   0.0000+0.j,      0.0000+0.j    ],
+    ... [ 0.0000+0.j,      0.0000+0.j,     -0.0068+1.247j,   0.0000+0.j,
+    ...   0.0000+0.j,      0.0000+0.j    ],
     ... [ 0.0000+0.j,      0.0000+0.j,      0.0000+0.j,     -0.0068-1.247j,
     ...   0.0000+0.j,      0.0000+0.j    ],
     ... [ 0.0000+0.j,      0.0000+0.j,      0.0000+0.j,      0.0000+0.j,
     ...  -0.0044+1.8019j,  0.0000+0.j    ],
-    ... [ 0.0000+0.j,      0.0000+0.j,      0.0000+0.j,      0.0000+0.j,      0.0000+0.j,
-    ...  -0.0044-1.8019j]]), atol=0.001)
+    ... [ 0.0000+0.j,      0.0000+0.j,      0.0000+0.j,      0.0000+0.j,
+    ...   0.0000+0.j,      -0.0044-1.8019j]]), atol=0.001)
     True
-    >>> Cm  # doctest: +SKIP
+    >>> Cm
      [[ 0.0594-0.0001j 0.0594+0.0001j 0.0039-0.717j 0.0039+0.717j
         0.0241-0.9307j  0.0241+0.9307j]]
 
@@ -968,8 +968,8 @@ def ss_modal(A, B = None, C = None, D = None):
     eigenvalues = eigenvalues[idxp]
     vectors = vectors[:, idxp]
 
-    A_modal = la.solve(vectors,A)@vectors
-    B_modal = la.solve(vectors,B)
+    A_modal = la.solve(vectors, A)@vectors
+    B_modal = la.solve(vectors, B)
     C_modal = C@vectors
     # D_modal = D wasted CPUs
     return A_modal, B_modal, C_modal, D, eigenvalues, vectors
