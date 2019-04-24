@@ -18,7 +18,7 @@ def test_sos_modal_forsparse():
 		59, 60, 62, 63, 64, 65, 66, 68, 69, 70, 71, 72, 74, 75, 76, 77,
 		78, 80, 81, 82, 83, 84, 86, 87, 88, 89, 90]])
 	## Mred and Kred are from guyan_forsparse
-	[Mred, Kred, T, master, slave] = vt.guyan_forsparse(M, K, master=master, fraction=None)
+	[Mred, Kred, T, master] = vt.guyan_forsparse(M, K, master=master, fraction=None)
 	[omega_sp,zeta_sp,Psi_sp] = vt.sos_modal_forsparse(Mred,Kred)
 	Kbm = Kr.todense()
 	Mbm = Mr.todense()
@@ -41,7 +41,7 @@ def test_guyan_forsparse():
 		59, 60, 62, 63, 64, 65, 66, 68, 69, 70, 71, 72, 74, 75, 76, 77,
 		78, 80, 81, 82, 83, 84, 86, 87, 88, 89, 90]])
 	## Mred and Kred are from guyan_forsparse
-	[Mred, Kred, T, master, slave] = vt.guyan_forsparse(M, K, master=master, fraction=None)
+	[Mred, Kred, T, master] = vt.guyan_forsparse(M, K, master=master, fraction=None)
 	Kred = Kred.todense()
 	Mred = Mred.todense()
 	Kr = Kr.todense()

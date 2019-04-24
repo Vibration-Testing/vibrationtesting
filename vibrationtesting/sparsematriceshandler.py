@@ -8,7 +8,7 @@ __license__ = "Joseph C. Slater"
 __docformat__ = 'reStructuredText'
 
 
-import math
+#import math
 import numpy as np
 #import scipy.signal as sig
 import scipy.linalg as la
@@ -246,4 +246,4 @@ def guyan_forsparse(M, K, master=None, fraction=None):
 
 	Kred = T.T * K * T
 
-	return Mred, Kred, T, master, slave
+	return Mred, Kred, T, master
