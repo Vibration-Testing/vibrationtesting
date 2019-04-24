@@ -246,4 +246,4 @@ def guyan_forsparse(M, K, master=None, fraction=None):
 
 	Kred = T.T * K * T
 
-	return Mred, Kred, T, master
+	return Mred, Kred, master
