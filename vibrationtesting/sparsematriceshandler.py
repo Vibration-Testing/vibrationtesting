@@ -247,3 +247,152 @@ def guyan_forsparse(M, K, master=None, fraction=None):
 	Kred = T.T * K * T
 
 	return Mred, Kred, master
+
+
+def mode_expansion_from_model_forsparse(Psi, omega, M, K, master):
+    r"""Deflection extrapolation to full FEM model coordinates, matrix method.
+
+    Provided an equation  of the form:
+
+    :math:`\begin{pmatrix}-\begin{bmatrix}M_{mm}&M_{mu}\\ M_{um}&M_{uu}
+    \end{bmatrix} \omega_i^2
+    +\begin{bmatrix}K_{mm}&K_{mu}\\ K_{um}&K_{uu}\end{bmatrix}\end{pmatrix}`
+    :math:`\begin{bmatrix}\Psi_{i_m}\\ \Psi_{i_u}\end{bmatrix}= 0`
+
+    Where:
+
+    - :math:`M` and :math:`K` are the mass and stiffness matrices, likely from
+      a finite element model
+    - :math:`\Psi_i` and :math:`\omega_i` represent a mode/frequency pair
+    - subscripts :math:`m` and :math:`u` represent measure and unmeasured
+      of the mode
+
+    Determines the unknown portion of the mode (or operational deflection)
+    shape, :math:`\Psi_{i_u}` by
+    direct algebraic solution, aka
+
+    :math:`\Psi_{i_u} = - (K_{uu}- M_{ss} \omega_i^2) ^{-1}
+    (K_{um}-M_{um}\omega_i^2)\Psi_{i_m}`
+
+    Parameters
+    ----------
+    Psi : float array
+        mode shape or shapes, 2-D array columns of which are mode shapes
+    omega : float or 1-D float array
+        natural (or driving) frequencies
+    M, K : float arrays
+        Mass and Stiffness matrices
+    measured : float or integer array or list
+        List of measured degrees of freedom (0 indexed)
+
+    Returns
+    -------
+    Psi_full : float array
+        Complete mode shape
+
+    Examples
+    --------
+    >>> import vibrationtesting as vt
+    >>> M = np.array([[4, 0, 0],
+    ...               [0, 4, 0],
+    ...               [0, 0, 4]])
+    >>> K = np.array([[8, -4, 0],
+    ...               [-4, 8, -4],
+    ...               [0, -4, 4]])
+    >>> measured = np.array([[0, 2]])
+    >>> omega, zeta, Psi = vt.sos_modal(M, K)
+    >>> Psi_measured = np.array([[-0.15], [-0.37]])
+    >>> Psi_full = vt.mode_expansion_from_model(Psi_measured, omega[0], M, K,
+    ... measured)
+    >>> print(np.hstack((Psi[:,0].reshape(-1,1), Psi_full)))
+    [[-0.164  -0.15  ]
+     [-0.2955  0.2886]
+     [-0.3685 -0.37  ]]
+
+    Notes
+    -----
+    .. seealso:: incomplete multi-mode update. Would require each at a
+      different frequency.
+
+    """
+
+    # Code from before my slicing code
+    """
+    Muu = np.array(M[unmeasured_dofs].T[unmeasured_dofs].T).
+                   reshape(num_unmeasured, num_unmeasured)
+
+    Kuu = np.array(K[unmeasured_dofs].T[unmeasured_dofs].T)
+                   .reshape(num_unmeasured, num_unmeasured)
+    Mum = np.array(M[unmeasured_dofs].T[measured].T).reshape(num_unmeasured,
+                                                         num_measured)
+    Kum = np.array(K[unmeasured_dofs].T[measured].T).reshape(num_unmeasured,
+                                                         num_measured)
+    """
+
+#   Muu = slice(M, unmeasured_dofs, unmeasured_dofs)
+#	Kuu = slice(K, unmeasured_dofs, unmeasured_dofs)
+#   Mum = slice(M, unmeasured_dofs, measured)
+#   Kum = slice(K, unmeasured_dofs, measured)
+
+    master = np.array(master)
+
+    ncoord = M.shape[0]
+
+    i = np.arange(0, ncoord)
+
+    i = i.reshape(1,-1)
+
+    i = i + np.ones((1,i.shape[1]),int)
+
+    lmaster = master.shape[1]
+
+    i[0,master-1] = np.transpose(np.zeros((lmaster,1)))
+
+    i = np.sort((i), axis =1)
+
+    slave = i[0,lmaster + 0:ncoord]
+
+    K= lil_matrix(K)
+
+    M= lil_matrix(M)
+
+    slave = slave.reshape(1,-1)
+
+    master = master-np.ones((1,master.shape[0]),int)
+
+    master = master.ravel()
+
+    slave = slave - np.ones((1,slave.shape[0]),int)
+
+    slave = slave.ravel()
+
+    Kum = K[slave,:].toarray()
+
+    Kum=Kum[:, master]
+
+    Kuu = K[slave,:].toarray()
+
+    Kuu=Kuu[:, slave]
+
+    Mum = M[slave,:].toarray()
+
+    Mum=Mum[:, master]
+
+    Muu = M[slave,:].toarray()
+
+    Muu=Muu[:, slave]
+
+    if isinstance(omega, float):
+        omega = np.array(omega).reshape(1)
+
+    Psi_full = np.zeros((len(master)+len(slave), Psi.shape[1]))
+    Psi_full[master] = Psi
+
+    for i, omega_n in enumerate(omega):
+        Psi_i = Psi[:, i].reshape(-1, 1)
+        Psi_unmeasured = la.solve((Kuu - Muu * omega_n**2),
+                                  (Kum - Mum * omega_n**2)@Psi_i)
+        Psi_unmeasured = Psi_unmeasured.reshape(-1, )
+        Psi_full[slave, i] = Psi_unmeasured
+        # Psi_full = Psi_full.reshape(-1, 1)
+    return Psi_full

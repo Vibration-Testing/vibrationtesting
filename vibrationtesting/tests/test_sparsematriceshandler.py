@@ -49,3 +49,37 @@ def test_guyan_forsparse():
 	## The below compares the two outputs guyanWFEM vs guyanVibrationtesting
 	nt.assert_array_almost_equal(Mred,Mr)
 	nt.assert_array_almost_equal(Kred,Kr)
+
+def test_mode_expansion_from_model_forsparse():
+	mat_contents=sio.loadmat('vibrationtesting/data/Modeshapedata/1stNaturalFreq15.mat')
+	U1 = mat_contents['U1']
+	mat_contents=sio.loadmat('vibrationtesting/data/Modeshapedata/2ndNaturalFreq15.mat')
+	U2 = mat_contents['U2']
+	mat_contents=sio.loadmat('vibrationtesting/data/Modeshapedata/3rdNaturalFreq15.mat')
+	U3 = mat_contents['U3']
+	mat_contents=sio.loadmat('vibrationtesting/data/Modeshapedata/4rthNaturalFreq15.mat')
+	U4 = mat_contents['U4']
+	mat_contents=sio.loadmat('vibrationtesting/data/Modeshapedata/5thNaturalFreq15.mat')
+	U5 = mat_contents['U5']
+	mat_contents=sio.loadmat('vibrationtesting/data/Modeshapedata/6thNaturalFreq15.mat')
+	U6 = mat_contents['U6']
+	Psi_1 = np.array(U1)
+	Psi_2 = np.array(U2)
+	Psi_3 = np.array(U3)
+	Psi_4 = np.array(U4)
+	Psi_5 = np.array(U5)
+	Psi_6 = np.array(U6)
+	Psi_1=np.column_stack((Psi_1,Psi_2,Psi_3,Psi_4,Psi_5,Psi_6))
+	Psi_abs = np.abs(Psi_1)*np.real(np.sign(Psi_1))
+	Psi_1 = Psi_abs
+	mat_contents=sio.loadmat('vibrationtesting/data/WingBeamforMAC.mat') # WFEM generated .mat file
+	K = (mat_contents['Kr'])
+	M = (mat_contents['Mr'])
+	Kbm = K.todense()
+	Mbm = M.todense()
+	omega, zeta, PsiBM = vt.sos_modal(Mbm, Kbm)
+	measured = np.array([[1,6,11,16,21,26,31,36,41,46,51,56,61,66,71]])
+	omega=np.array([omega[0], omega[1], omega[3], omega[4], omega[5], omega[6]])
+	Psi_fullBM_1=vt.mode_expansion_from_model(Psi_1, omega, Mbm, Kbm, measured)
+	Psi_fullBM_2=vt.mode_expansion_from_model_forsparse(Psi_1, omega, M, K, measured)
+	nt.assert_array_almost_equal(Psi_fullBM_1,Psi_fullBM_2)
