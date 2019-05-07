@@ -78,6 +78,7 @@ def test_mode_expansion_from_model_forsparse():
 	Kbm = K.todense()
 	Mbm = M.todense()
 	omega, zeta, PsiBM = vt.sos_modal(Mbm, Kbm)
+	PsiBM = PsiBM
 	measured = np.array([[1,6,11,16,21,26,31,36,41,46,51,56,61,66,71]])
 	omega=np.array([omega[0], omega[1], omega[3], omega[4], omega[5], omega[6]])
 	Psi_fullBM_1=vt.mode_expansion_from_model(Psi_1, omega, Mbm, Kbm, measured)

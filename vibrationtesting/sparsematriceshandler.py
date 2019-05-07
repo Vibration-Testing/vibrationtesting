@@ -316,23 +316,6 @@ def mode_expansion_from_model_forsparse(Psi, omega, M, K, measured):
 
     """
 
-    # Code from before my slicing code
-    """
-    Muu = np.array(M[unmeasured_dofs].T[unmeasured_dofs].T).
-                   reshape(num_unmeasured, num_unmeasured)
-
-    Kuu = np.array(K[unmeasured_dofs].T[unmeasured_dofs].T)
-                   .reshape(num_unmeasured, num_unmeasured)
-    Mum = np.array(M[unmeasured_dofs].T[measured].T).reshape(num_unmeasured,
-                                                         num_measured)
-    Kum = np.array(K[unmeasured_dofs].T[measured].T).reshape(num_unmeasured,
-                                                         num_measured)
-    """
-
-#   Muu = slice(M, unmeasured_dofs, unmeasured_dofs)
-#	Kuu = slice(K, unmeasured_dofs, unmeasured_dofs)
-#   Mum = slice(M, unmeasured_dofs, measured)
-#   Kum = slice(K, unmeasured_dofs, measured)
 
     measured = measured.reshape(-1)  # retained dofs
     num_measured = len(measured)
