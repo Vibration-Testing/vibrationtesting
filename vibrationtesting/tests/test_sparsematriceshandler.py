@@ -82,4 +82,5 @@ def test_mode_expansion_from_model_forsparse():
 	omega=np.array([omega[0], omega[1], omega[3], omega[4], omega[5], omega[6]])
 	Psi_fullBM_1=vt.mode_expansion_from_model(Psi_1, omega, Mbm, Kbm, measured)
 	Psi_fullBM_2=vt.mode_expansion_from_model_forsparse(Psi_1, omega, M, K, measured)
+	## The below compares sparsematriceshandler.py vs system.py results
 	nt.assert_array_almost_equal(Psi_fullBM_1,Psi_fullBM_2)

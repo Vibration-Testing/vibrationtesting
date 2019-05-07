@@ -249,7 +249,7 @@ def guyan_forsparse(M, K, master=None, fraction=None):
 	return Mred, Kred, master
 
 
-def mode_expansion_from_model_forsparse(Psi, omega, M, K, master):
+def mode_expansion_from_model_forsparse(Psi, omega, M, K, measured):
     r"""Deflection extrapolation to full FEM model coordinates, matrix method.
 
     Provided an equation  of the form:
@@ -334,65 +334,43 @@ def mode_expansion_from_model_forsparse(Psi, omega, M, K, master):
 #   Mum = slice(M, unmeasured_dofs, measured)
 #   Kum = slice(K, unmeasured_dofs, measured)
 
-    master = np.array(master)
-
-    ncoord = M.shape[0]
-
-    i = np.arange(0, ncoord)
-
-    i = i.reshape(1,-1)
-
-    i = i + np.ones((1,i.shape[1]),int)
-
-    lmaster = master.shape[1]
-
-    i[0,master-1] = np.transpose(np.zeros((lmaster,1)))
-
-    i = np.sort((i), axis =1)
-
-    slave = i[0,lmaster + 0:ncoord]
-
-    K= lil_matrix(K)
+    measured = measured.reshape(-1)  # retained dofs
+    num_measured = len(measured)
+    ndof = int(M.shape[0])  # length(M);
+    unmeasured_dofs = list(set(np.arange(ndof)) - set(measured))
+    num_unmeasured = len(unmeasured_dofs)
 
     M= lil_matrix(M)
 
-    slave = slave.reshape(1,-1)
+    K= lil_matrix(K)
 
-    master = master-np.ones((1,master.shape[0]),int)
+    Muu = M[unmeasured_dofs,:].toarray()
 
-    master = master.ravel()
+    Muu = Muu[:, unmeasured_dofs]
 
-    slave = slave - np.ones((1,slave.shape[0]),int)
+    Kuu = K[unmeasured_dofs,:].toarray()
 
-    slave = slave.ravel()
+    Kuu = Kuu[:, unmeasured_dofs]
 
-    Kum = K[slave,:].toarray()
+    Mum = M[unmeasured_dofs,:].toarray()
 
-    Kum=Kum[:, master]
+    Mum = Mum[:, measured]
 
-    Kuu = K[slave,:].toarray()
+    Kum = K[unmeasured_dofs,:].toarray()
 
-    Kuu=Kuu[:, slave]
-
-    Mum = M[slave,:].toarray()
-
-    Mum=Mum[:, master]
-
-    Muu = M[slave,:].toarray()
-
-    Muu=Muu[:, slave]
+    Kum = Kum[:, measured]
 
     if isinstance(omega, float):
         omega = np.array(omega).reshape(1)
 
-    Psi_full = np.zeros((len(master)+len(slave), Psi.shape[1]))
-    Psi_full[master] = Psi
+    Psi_full = np.zeros((num_measured + num_unmeasured, Psi.shape[1]))
+    Psi_full[measured] = Psi
 
     for i, omega_n in enumerate(omega):
         Psi_i = Psi[:, i].reshape(-1, 1)
         Psi_unmeasured = la.solve((Kuu - Muu * omega_n**2),
                                   (Kum - Mum * omega_n**2)@Psi_i)
         Psi_unmeasured = Psi_unmeasured.reshape(-1, )
-        Psi_full[slave, i] = Psi_unmeasured
+        Psi_full[unmeasured_dofs, i] = Psi_unmeasured
         # Psi_full = Psi_full.reshape(-1, 1)
     return Psi_full
