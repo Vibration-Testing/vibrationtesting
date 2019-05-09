@@ -398,12 +398,12 @@ def slice_forSparse(Matrix, a, b):
 	Mab = Mab[:, b]
 
 
-	if(len(a)==len(b)):
-		try:
-			if(a==b.all()):
-				return Maa
+	if(np.array_equiv(a,b)):
+		#try:
+			#if(a==b.all()):
+		return Maa
 
-		except:
-			return Mab
+		#except: AttributeError
+			#return Mab
 	else:
 		return Mab
