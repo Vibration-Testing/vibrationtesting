@@ -222,22 +222,6 @@ def guyan_forsparse(M, K, master=None, fraction=None):
 
 	slave = slave.ravel()
 
-	#kmm = K[master,:].toarray()
-
-	#kmm=kmm[:, master]
-
-	#ksm = K[slave,:].toarray()
-
-	#ksm=ksm[:, master]
-
-	#kss = K[slave,:].toarray()
-
-	#kss=kss[:, slave]
-
-    #kss = slice_forSparse(K, slave, slave)
-
-    #ksm = slice_forSparse(K, slave, master)
-
 	kss = slice_forSparse(K, slave, slave)
 
 	ksm = slice_forSparse(K, slave, master)
@@ -335,22 +319,6 @@ def mode_expansion_from_model_forsparse(Psi, omega, M, K, measured):
 
     K= lil_matrix(K)
 
-	#Muu = M[unmeasured_dofs,:].toarray()
-
-    #Muu = Muu[:, unmeasured_dofs]
-
-    #Kuu = K[unmeasured_dofs,:].toarray()
-
-    #Kuu = Kuu[:, unmeasured_dofs]
-
-    #Mum = M[unmeasured_dofs,:].toarray()
-
-    #Mum = Mum[:, measured]
-
-    #Kum = K[unmeasured_dofs,:].toarray()
-
-    #Kum = Kum[:, measured]
-
     Muu = slice_forSparse(M, unmeasured_dofs, unmeasured_dofs)
 
     Kuu = slice_forSparse(K, unmeasured_dofs, unmeasured_dofs)
@@ -399,11 +367,7 @@ def slice_forSparse(Matrix, a, b):
 
 
 	if(np.array_equiv(a,b)):
-		#try:
-			#if(a==b.all()):
 		return Maa
 
-		#except: AttributeError
-			#return Mab
 	else:
 		return Mab
