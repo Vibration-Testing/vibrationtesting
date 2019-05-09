@@ -405,6 +405,5 @@ def slice_forSparse(Matrix, a, b):
 
 		except:
 			return Mab
-			raise
 	else:
 		return Mab
