@@ -222,17 +222,25 @@ def guyan_forsparse(M, K, master=None, fraction=None):
 
 	slave = slave.ravel()
 
-	kmm = K[master,:].toarray()
+	#kmm = K[master,:].toarray()
 
-	kmm=kmm[:, master]
+	#kmm=kmm[:, master]
 
-	ksm = K[slave,:].toarray()
+	#ksm = K[slave,:].toarray()
 
-	ksm=ksm[:, master]
+	#ksm=ksm[:, master]
 
-	kss = K[slave,:].toarray()
+	#kss = K[slave,:].toarray()
 
-	kss=kss[:, slave]
+	#kss=kss[:, slave]
+
+    #kss = slice_forSparse(K, slave, slave)
+
+    #ksm = slice_forSparse(K, slave, master)
+
+	kss = slice_forSparse(K, slave, slave)
+
+	ksm = slice_forSparse(K, slave, master)
 
 	T= np.zeros((len(master)+len(slave), len(master)))
 
@@ -327,21 +335,29 @@ def mode_expansion_from_model_forsparse(Psi, omega, M, K, measured):
 
     K= lil_matrix(K)
 
-    Muu = M[unmeasured_dofs,:].toarray()
+	#Muu = M[unmeasured_dofs,:].toarray()
 
-    Muu = Muu[:, unmeasured_dofs]
+    #Muu = Muu[:, unmeasured_dofs]
 
-    Kuu = K[unmeasured_dofs,:].toarray()
+    #Kuu = K[unmeasured_dofs,:].toarray()
 
-    Kuu = Kuu[:, unmeasured_dofs]
+    #Kuu = Kuu[:, unmeasured_dofs]
 
-    Mum = M[unmeasured_dofs,:].toarray()
+    #Mum = M[unmeasured_dofs,:].toarray()
 
-    Mum = Mum[:, measured]
+    #Mum = Mum[:, measured]
 
-    Kum = K[unmeasured_dofs,:].toarray()
+    #Kum = K[unmeasured_dofs,:].toarray()
 
-    Kum = Kum[:, measured]
+    #Kum = Kum[:, measured]
+
+    Muu = slice_forSparse(M, unmeasured_dofs, unmeasured_dofs)
+
+    Kuu = slice_forSparse(K, unmeasured_dofs, unmeasured_dofs)
+
+    Mum = slice_forSparse(M, unmeasured_dofs, measured)
+
+    Kum = slice_forSparse(K, unmeasured_dofs, measured)
 
     if isinstance(omega, float):
         omega = np.array(omega).reshape(1)
@@ -357,3 +373,38 @@ def mode_expansion_from_model_forsparse(Psi, omega, M, K, measured):
         Psi_full[unmeasured_dofs, i] = Psi_unmeasured
         # Psi_full = Psi_full.reshape(-1, 1)
     return Psi_full
+
+def slice_forSparse(Matrix, a, b):
+	"""
+
+	Parameters
+	----------
+	Matrix : float array
+		Arbitrary array
+	a, b : int lists or arrays
+		list of rows and columns to be selected from `Matrix`
+
+	Returns
+	-------
+	Matrix : float array
+
+	"""
+	Maa = Matrix[a,:].toarray()
+
+	Maa = Maa[:, a]
+
+	Mab = Matrix[a,:].toarray()
+
+	Mab = Mab[:, b]
+
+
+	if(len(a)==len(b)):
+		try:
+			if(a==b.all()):
+				return Maa
+
+		except:
+			return Mab
+			raise
+	else:
+		return Mab
