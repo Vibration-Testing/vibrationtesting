@@ -222,17 +222,9 @@ def guyan_forsparse(M, K, master=None, fraction=None):
 
 	slave = slave.ravel()
 
-	kmm = K[master,:].toarray()
+	kss = slice_forSparse(K, slave, slave)
 
-	kmm=kmm[:, master]
-
-	ksm = K[slave,:].toarray()
-
-	ksm=ksm[:, master]
-
-	kss = K[slave,:].toarray()
-
-	kss=kss[:, slave]
+	ksm = slice_forSparse(K, slave, master)
 
 	T= np.zeros((len(master)+len(slave), len(master)))
 
@@ -247,3 +239,135 @@ def guyan_forsparse(M, K, master=None, fraction=None):
 	Kred = T.T * K * T
 
 	return Mred, Kred, master
+
+
+def mode_expansion_from_model_forsparse(Psi, omega, M, K, measured):
+    r"""Deflection extrapolation to full FEM model coordinates, matrix method.
+
+    Provided an equation  of the form:
+
+    :math:`\begin{pmatrix}-\begin{bmatrix}M_{mm}&M_{mu}\\ M_{um}&M_{uu}
+    \end{bmatrix} \omega_i^2
+    +\begin{bmatrix}K_{mm}&K_{mu}\\ K_{um}&K_{uu}\end{bmatrix}\end{pmatrix}`
+    :math:`\begin{bmatrix}\Psi_{i_m}\\ \Psi_{i_u}\end{bmatrix}= 0`
+
+    Where:
+
+    - :math:`M` and :math:`K` are the mass and stiffness matrices, likely from
+      a finite element model
+    - :math:`\Psi_i` and :math:`\omega_i` represent a mode/frequency pair
+    - subscripts :math:`m` and :math:`u` represent measure and unmeasured
+      of the mode
+
+    Determines the unknown portion of the mode (or operational deflection)
+    shape, :math:`\Psi_{i_u}` by
+    direct algebraic solution, aka
+
+    :math:`\Psi_{i_u} = - (K_{uu}- M_{ss} \omega_i^2) ^{-1}
+    (K_{um}-M_{um}\omega_i^2)\Psi_{i_m}`
+
+    Parameters
+    ----------
+    Psi : float array
+        mode shape or shapes, 2-D array columns of which are mode shapes
+    omega : float or 1-D float array
+        natural (or driving) frequencies
+    M, K : float arrays
+        Mass and Stiffness matrices
+    measured : float or integer array or list
+        List of measured degrees of freedom (0 indexed)
+
+    Returns
+    -------
+    Psi_full : float array
+        Complete mode shape
+
+    Examples
+    --------
+    >>> import vibrationtesting as vt
+    >>> M = np.array([[4, 0, 0],
+    ...               [0, 4, 0],
+    ...               [0, 0, 4]])
+    >>> K = np.array([[8, -4, 0],
+    ...               [-4, 8, -4],
+    ...               [0, -4, 4]])
+    >>> measured = np.array([[0, 2]])
+    >>> omega, zeta, Psi = vt.sos_modal(M, K)
+    >>> Psi_measured = np.array([[-0.15], [-0.37]])
+    >>> Psi_full = vt.mode_expansion_from_model(Psi_measured, omega[0], M, K,
+    ... measured)
+    >>> print(np.hstack((Psi[:,0].reshape(-1,1), Psi_full)))
+    [[-0.164  -0.15  ]
+     [-0.2955  0.2886]
+     [-0.3685 -0.37  ]]
+
+    Notes
+    -----
+    .. seealso:: incomplete multi-mode update. Would require each at a
+      different frequency.
+
+    """
+
+
+    measured = measured.reshape(-1)  # retained dofs
+    num_measured = len(measured)
+    ndof = int(M.shape[0])  # length(M);
+    unmeasured_dofs = list(set(np.arange(ndof)) - set(measured))
+    num_unmeasured = len(unmeasured_dofs)
+
+    M= lil_matrix(M)
+
+    K= lil_matrix(K)
+
+    Muu = slice_forSparse(M, unmeasured_dofs, unmeasured_dofs)
+
+    Kuu = slice_forSparse(K, unmeasured_dofs, unmeasured_dofs)
+
+    Mum = slice_forSparse(M, unmeasured_dofs, measured)
+
+    Kum = slice_forSparse(K, unmeasured_dofs, measured)
+
+    if isinstance(omega, float):
+        omega = np.array(omega).reshape(1)
+
+    Psi_full = np.zeros((num_measured + num_unmeasured, Psi.shape[1]))
+    Psi_full[measured] = Psi
+
+    for i, omega_n in enumerate(omega):
+        Psi_i = Psi[:, i].reshape(-1, 1)
+        Psi_unmeasured = la.solve((Kuu - Muu * omega_n**2),
+                                  (Kum - Mum * omega_n**2)@Psi_i)
+        Psi_unmeasured = Psi_unmeasured.reshape(-1, )
+        Psi_full[unmeasured_dofs, i] = Psi_unmeasured
+        # Psi_full = Psi_full.reshape(-1, 1)
+    return Psi_full
+
+def slice_forSparse(Matrix, a, b):
+	"""
+
+	Parameters
+	----------
+	Matrix : float array
+		Arbitrary array
+	a, b : int lists or arrays
+		list of rows and columns to be selected from `Matrix`
+
+	Returns
+	-------
+	Matrix : float array
+
+	"""
+	Maa = Matrix[a,:].toarray()
+
+	Maa = Maa[:, a]
+
+	Mab = Matrix[a,:].toarray()
+
+	Mab = Mab[:, b]
+
+
+	if(np.array_equiv(a,b)):
+		return Maa
+
+	else:
+		return Mab

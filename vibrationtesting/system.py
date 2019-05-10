@@ -697,6 +697,7 @@ def mode_expansion_from_model(Psi, omega, M, K, measured):
         Psi_i = Psi[:, i].reshape(-1, 1)
         Psi_unmeasured = la.solve((Kuu - Muu * omega_n**2),
                                   (Kum - Mum * omega_n**2)@Psi_i)
+        Psi_unmeasured = Psi_unmeasured.reshape(-1, )
         Psi_full[unmeasured_dofs, i] = Psi_unmeasured
         # Psi_full = Psi_full.reshape(-1, 1)
     return Psi_full
