@@ -67,14 +67,15 @@ To contribute code we recommend you follow these steps:
 
      $ pytest
 
-
     1. To run the tests from ``pycharm`` you can do: Run -> Edit Configurations -> Add -> python tests -> pytest Then just set the path to the project directory.
 
     2. To run the tests from ``spyder`` see `spyder-unittest <https://github.com/spyder-ide/spyder-unittest`_.
 
-#. Commit and check `travis-ci <https://travis-ci.org/Vibration-Testing/vibrationtesting>`_ tests regularly. Having a great number of changes before a commit can make tracing errors very hard. Make sure you are looking at your branch when assessing whether it's working.
+#. Please `update from the main repository <https://www.sitepoint.com/quick-tip-sync-your-fork-with-the-original-without-the-cli/>`_ before submitting a pull request. To do this, as your terminal within your clone ofthe repository::
 
-#. You may need to `update from the main repository <https://www.sitepoint.com/quick-tip-sync-your-fork-with-the-original-without-the-cli/>`_ before submitting a pull request. This allows you to see the complete results before we look at them.  If it doesn't work, the pull will (should) be denied. This can be a bit daunting for some, so it's recommended but not necessary.
+    $ git pull origin
+
+#. Commit and check `travis-ci <https://travis-ci.org/Vibration-Testing/vibrationtesting>`_ tests regularly. Having a great number of changes before a commit can make tracing errors very hard. Make sure you are looking at your branch when assessing whether it's working.
 
 #. If the tests are passing, make a git pull (in your GitHub app) to assure that your code is up to date with the master branch and that your code has no conflicts with the current base. Doing this regularly ensures that your accumulated edits won't be massively in conflict with the existing code base. After that, push your branch to github and then open a pull request.
 
