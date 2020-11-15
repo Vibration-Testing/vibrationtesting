@@ -804,7 +804,7 @@ def frfest(x, f, dt, windowname="hanning", ave=bool(True), Hv=bool(False)):
 
 
 def frfplot(freq, H, freq_min=0, freq_max=None, type=1, legend=[]):
-    """Frequency Response function pretty plotting.
+    """Frequency Response Function pretty plotting.
 
     Plots frequency response functions in a variety of formats
 
